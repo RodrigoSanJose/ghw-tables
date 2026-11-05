@@ -19,6 +19,8 @@
 #about ul + p {
 	margin: 0 0 1.25em 0;
 }
+#about .ghw-cite-text { margin: 0 0 1em 0; }
+#about pre { margin-bottom: 1.5em; }
 
 /* ---------- Choice of q and m ---------- */
 .ghw-controls {

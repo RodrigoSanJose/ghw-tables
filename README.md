@@ -4,7 +4,8 @@ Bounds and exact values for the generalized Hamming weights of projective Reedâ€
 with a justification for every value, in the spirit of [codetables.de](https://www.codetables.de).
 
 > **Status: work in progress.** The tables will be available at
-> https://rodrigosanjose.github.io/ghw-tables/, and every release will be archived on Zenodo with a DOI.
+> https://rodrigosanjose.github.io/ghw-tables/, and every release will be archived on Zenodo with a DOI
+> (see [Citation](#citation)).
 
 ## The codes
 
@@ -166,6 +167,48 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 | [`data/references.csv`](data/references.csv) | the references |
 | [`tests/`](tests) | the tests |
 | [`docs/`](docs) | the website; `docs/data/` is generated, never edit it by hand |
+| [`CITATION.cff`](CITATION.cff) | how to cite the tables (used by GitHub and Zenodo) |
+| [`LICENSE`](LICENSE), [`LICENSE-CC-BY-4.0.txt`](LICENSE-CC-BY-4.0.txt) | the licenses (see below) |
+
+## Citation
+
+If you use these tables, please consider citing them and the paper [PRM] where the bounds are proved.
+
+> [!NOTE]
+> The tables will be archived on Zenodo with the first release. The DOI below, `10.5281/zenodo.XXXXXXX`,
+> is a placeholder until then.
+
+### Citation for the tables
+```
+@Misc{ghwTables,
+    AUTHOR = {San-Jos\'{e}, Rodrigo},
+    TITLE = {Tables of generalized {H}amming weights of projective {R}eed--{M}uller codes},
+    year = "2026",
+    publisher = "Zenodo",
+    doi = "10.5281/zenodo.XXXXXXX",
+    howpublished = "Available online: \url{https://rodrigosanjose.github.io/ghw-tables/}"
+}
+```
+
+### Citation for the paper
+```
+@Misc{sanjoseCommonZeros,
+    AUTHOR = {San-Jos\'{e}, Rodrigo},
+    TITLE = {Common zeros of homogeneous polynomials and the weight hierarchy of projective {R}eed--{M}uller codes},
+    year = "2026",
+    note = "Preprint"
+}
+```
+
+## License
+
+* The code (the folders `src/` and `tests/`, and the files `docs/ghw.js`, `docs/ghw.css` and `docs/index.html`)
+  is released under the [MIT license](LICENSE).
+* The tables (`docs/data/`), the data (`data/`) and the documentation (this README and the texts of the website)
+  are released under the [Creative Commons Attribution 4.0 International license](LICENSE-CC-BY-4.0.txt) (CC BY 4.0).
+
+The website uses the style of https://rodrigosanjose.github.io, which is based on
+[Strata](https://html5up.net/strata) by HTML5 UP.
 
 ## References
 

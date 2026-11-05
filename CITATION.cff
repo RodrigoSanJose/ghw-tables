@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+title: Tables of generalized Hamming weights of projective Reed-Muller codes
+message: >-
+  If you use these tables, please cite them as below, together with the paper
+  where the bounds are proved (see the README).
+type: dataset
+authors:
+  - given-names: Rodrigo
+    family-names: San-José
+    affiliation: Virginia Tech
+    orcid: 'https://orcid.org/0000-0002-0944-7584'
+abstract: >-
+  Bounds and exact values for the generalized Hamming weights of projective
+  Reed-Muller codes, with a justification for every value.
+keywords:
+  - generalized Hamming weights
+  - weight hierarchy
+  - projective Reed-Muller codes
+  - coding theory
+repository-code: 'https://github.com/RodrigoSanJose/ghw-tables'
+url: 'https://rodrigosanjose.github.io/ghw-tables/'
+# The tables, data and documentation are licensed under CC BY 4.0, and the code under the MIT license (see the README).
+license: CC-BY-4.0
+# After the first release on Zenodo, add the DOI that covers all versions:
+# identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.XXXXXXX
+#     description: Zenodo archive (all versions)
