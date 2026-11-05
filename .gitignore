@@ -1,0 +1,6 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Personal notes that must never be committed
+private/
