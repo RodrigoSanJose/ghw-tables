@@ -40,8 +40,6 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 | 8 | 1, 2, 3 | 585 |
 | 9 | 1, 2, 3 | 820 |
 
-The range is set in [`src/parameters.py`](src/parameters.py) and will be extended.
-
 ## Where the bounds come from
 
 Theorem numbers refer to the current version of [PRM]. Those of [SJ24] refer to arXiv:2312.05072v2.
