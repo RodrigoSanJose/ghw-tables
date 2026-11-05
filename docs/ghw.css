@@ -1,0 +1,236 @@
+/*
+	Styles of the tables page.  Everything else comes from /assets/css/main.css (the main page).
+	The boxes and colours follow the tier lists of the main page (books.html):
+	subtle grey boxes, and the Strata palette #49bf9d, #459a96, #586e75, #404a52.
+*/
+
+/* ---------- Header: the name links to the main page ---------- */
+#header .name-link,
+#header .name-link:hover {
+	color: inherit;
+	border-bottom: none;
+}
+
+/* ---------- Paragraphs ----------
+	The main page gives every paragraph a negative top margin, to reduce the space below the titles.
+	The paragraphs of this page that come after other elements need their own margins. */
+#ghw-summary,
+#ghw-loading,
+#about ul + p {
+	margin: 0 0 1.25em 0;
+}
+
+/* ---------- Choice of q and m ---------- */
+.ghw-controls {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em 2.5em;
+	margin: 1em 0 1em 0;
+}
+.ghw-control {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4em;
+}
+.ghw-control-label {
+	font-weight: bold;
+	margin-right: 0.35em;
+}
+#ghw-q-choices, #ghw-m-choices {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4em;
+}
+.ghw-choice {
+	display: inline-block;
+	min-width: 2.2em;
+	padding: 0 10px;
+	line-height: 1.9;
+	text-align: center;
+	border-radius: 4px;
+	background: rgba(0, 0, 0, 0.04);
+	border: solid 1px rgba(0, 0, 0, 0.1);
+	color: inherit;
+}
+#main .ghw-choice { border-bottom: solid 1px rgba(0, 0, 0, 0.1); }
+#main .ghw-choice:hover { border-color: #49bf9d; color: inherit; }
+#main .ghw-choice.ghw-current {
+	background: #49bf9d;
+	border-color: #49bf9d;
+	color: #ffffff;
+}
+
+/* ---------- One block per code PRM_q(d,m), like a tier row ---------- */
+.ghw-code {
+	display: flex;
+	margin-bottom: 15px;
+	background-color: rgba(0, 0, 0, 0.02);
+	border: solid 1px rgba(0, 0, 0, 0.1);
+	border-radius: 4px;
+	overflow: hidden;
+}
+.ghw-code-label {
+	width: 7.5em;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5em 0.25em;
+	color: #ffffff;
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+	text-align: center;
+	line-height: 1.3;
+}
+.ghw-code-label .ghw-degree { font-weight: bold; font-size: 1.35em; }
+.ghw-code-label .ghw-dimension { font-size: 0.8em; }
+.ghw-complete .ghw-code-label { background-color: #49bf9d; }   /* every weight is known */
+.ghw-partial .ghw-code-label { background-color: #586e75; }    /* some weights are only bounded */
+
+.ghw-code-content {
+	padding: 10px 15px 15px 15px;
+	flex-grow: 1;
+	min-width: 0;          /* lets the grid scroll horizontally on small screens */
+}
+.ghw-code-title {
+	margin-bottom: 0.5em;
+	font-size: 0.9em;
+}
+#main .ghw-toggle {
+	margin-left: 0.75em;
+	font-size: 0.9em;
+	cursor: pointer;
+}
+.ghw-grid-wrapper { overflow-x: auto; }
+
+/* The grid: row a and column b hold d_{a+b}. */
+.ghw-grid {
+	display: grid;
+	grid-template-columns: 2.6em repeat(10, minmax(2.8em, max-content));
+	gap: 4px;
+	font-size: 0.85em;
+	line-height: 1.6;
+}
+.ghw-head {
+	text-align: center;
+	color: #999999;
+	font-size: 0.85em;
+}
+#main a.ghw-cell {
+	display: block;
+	padding: 0 5px;
+	text-align: center;
+	white-space: nowrap;
+	border-radius: 3px;
+	background: rgba(0, 0, 0, 0.04);
+	border: solid 1px rgba(0, 0, 0, 0.1);
+	color: inherit;
+	text-decoration: none;
+}
+#main a.ghw-cell:hover { border-color: #49bf9d; }
+#main a.ghw-cell.ghw-open {
+	background: rgba(73, 191, 157, 0.16);
+	border-color: #459a96;
+	font-weight: bold;
+}
+#main a.ghw-cell.ghw-selected {
+	outline: 2px solid #49bf9d;
+	outline-offset: 1px;
+}
+.ghw-open-sample {
+	padding: 0 5px;
+	border-radius: 3px;
+	background: rgba(73, 191, 157, 0.16);
+	border: solid 1px #459a96;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+/* ---------- The explanation of the selected entry ---------- */
+.ghw-explanation {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	max-height: 55vh;
+	overflow-y: auto;
+	margin-bottom: 1.5em;
+	padding: 0.9em 1.25em;
+	border-radius: 4px;
+	border: solid 1px #459a96;
+	border-left: solid 6px #49bf9d;
+	background: #ffffff;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+.ghw-explanation h3 {
+	margin: 0 0 0.5em 0;
+	font-size: 1.1em;
+}
+.ghw-explanation p {
+	margin: 0 0 0.6em 0;
+}
+.ghw-explanation p:last-child { margin-bottom: 0; }
+.ghw-explanation .ghw-kind {
+	font-weight: bold;
+	margin-right: 0.25em;
+}
+#main .ghw-close {
+	float: right;
+	margin-left: 1em;
+	cursor: pointer;
+	border-bottom: none;
+	font-size: 1.2em;
+	line-height: 1;
+}
+.ghw-permalink { font-size: 0.85em; }
+
+.ghw-references li {
+	font-size: 0.9em;
+	margin-bottom: 0.4em;
+}
+
+/* ---------- Dark mode (as on the main page) ---------- */
+.dark-mode .ghw-choice {
+	background: rgba(255, 255, 255, 0.05);
+	border: solid 1px rgba(255, 255, 255, 0.1);
+}
+.dark-mode #main .ghw-choice { border-bottom: solid 1px rgba(255, 255, 255, 0.1); }
+.dark-mode #main .ghw-choice.ghw-current {
+	background: #49bf9d;
+	border-color: #49bf9d;
+}
+.dark-mode .ghw-code {
+	background-color: rgba(255, 255, 255, 0.02);
+	border: solid 1px rgba(255, 255, 255, 0.15);
+}
+.dark-mode #main a.ghw-cell {
+	background: rgba(255, 255, 255, 0.05);
+	border: solid 1px rgba(255, 255, 255, 0.1);
+}
+.dark-mode #main a.ghw-cell:hover { border-color: #49bf9d; }
+.dark-mode #main a.ghw-cell.ghw-open,
+.dark-mode .ghw-open-sample {
+	background: rgba(73, 191, 157, 0.22);
+	border-color: #49bf9d;
+}
+.dark-mode .ghw-head { color: #888888; }
+.dark-mode .ghw-explanation {
+	background: #1E2329;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* ---------- Small screens ---------- */
+@media screen and (max-width: 736px) {
+	.ghw-code-label { width: 4.5em; }
+	.ghw-code-label .ghw-degree { font-size: 1.1em; }
+	.ghw-code-content { padding: 8px; }
+	.ghw-grid {
+		grid-template-columns: 2em repeat(10, minmax(2.4em, max-content));
+		gap: 3px;
+		font-size: 0.75em;
+	}
+	.ghw-explanation {
+		max-height: 45vh;
+		font-size: 0.9em;
+	}
+}

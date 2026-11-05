@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<!--
+	Tables of generalized Hamming weights of projective Reed-Muller codes.
+	The style is that of https://rodrigosanjose.github.io (based on Strata by HTML5 UP):
+	the files under /assets and /images are those of the personal webpage.
+	The tables are computed by src/generate.py and read from data/ by ghw.js.
+-->
+<html>
+	<head>
+		<script defer src="https://cloud.umami.is/script.js" data-website-id="6c3573da-71d0-4f6e-9d45-f848a93e9aa7"></script>
+
+		<title>Generalized Hamming weights of projective Reed–Muller codes</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="description" content="Bounds and exact values for the generalized Hamming weights of projective Reed–Muller codes, with a justification for every value." />
+		<link rel="stylesheet" href="/assets/css/main.css" />
+		<link rel="stylesheet" href="ghw.css" />
+
+		<!-- MathJax, as on the main page: math in <span class="math"> stays hidden until it is typeset. -->
+		<style>html.mj-loading .math { visibility: hidden; }</style>
+		<script>
+			document.documentElement.classList.add('mj-loading');
+			function mjShow() { document.documentElement.classList.remove('mj-loading'); }
+			setTimeout(mjShow, 3000);
+			window.MathJax = { startup: { pageReady: () => MathJax.startup.defaultPageReady().then(mjShow) } };
+		</script>
+		<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js"></script>
+
+		<link rel="canonical" href="https://rodrigosanjose.github.io/ghw-tables/" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+		<script>
+			(function() {
+				const saved = localStorage.getItem('darkMode');
+				if (saved === null || saved === 'true') {
+					document.documentElement.classList.add('dark-mode');
+				}
+			})();
+		</script>
+	</head>
+
+	<body class="is-preload">
+		<button id="dark-mode-toggle" title="Toggle dark mode">
+			<i class="fas fa-moon"></i>
+		</button>
+
+		<!-- Header (as on the main page) -->
+			<header id="header">
+				<div class="inner">
+					<a href="/" class="image avatar" title="Main page"><img src="/images/Rodrigo.JPG" alt="" /></a>
+					<h1 style="margin-bottom: 1rem;"><strong><a href="/" class="name-link">Rodrigo San-José</a></strong><br /> </h1>
+					<a href="https://www.vt.edu/" target="_blank" rel="noopener noreferrer">Virginia Tech</a> <br />
+					<a href="https://math.vt.edu/" target="_blank" rel="noopener noreferrer">Department of Mathematics</a> <br />
+				</div>
+				<div class="inner">
+					<ul class="icons">
+						<li><a href="https://scholar.google.com/citations?user=F5GiN1MAAAAJ" class="fa-brands fa-google-scholar" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+						<li><a href="https://www.researchgate.net/profile/Rodrigo-San-Jose" class="ai ai-researchgate-square" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+						<li><a href="https://www.linkedin.com/in/rodrigo-san-jose-rubio/" class="fa-brands fa-linkedin" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+						<li><a href="https://orcid.org/0000-0002-0944-7584" class="fa-brands fa-orcid" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+						<li><a href="https://www.scopus.com/authid/detail.uri?authorId=57471166500" class="ai ai-scopus-square" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+						<li><a href="https://www.webofscience.com/wos/author/record/HZH-6725-2023" class="ai ai-clarivate-square" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+						<li><a href="https://github.com/RodrigoSanJose" class="fa-brands fa-github" style='border-bottom: none;font-size:36px' target="_blank" rel="noopener noreferrer"><span class="label"></span></a></li>
+					</ul>
+				</div>
+			</header>
+
+		<!-- Main -->
+			<div id="main">
+				<section id="tables">
+					<header class="major">
+						<h2>Generalized Hamming weights of projective Reed–Muller codes</h2>
+					</header>
+					<p>
+						Bounds and exact values for the generalized Hamming weights
+						<span class="math">\(d_r(\mathrm{PRM}_q(d,m))\)</span> of projective Reed–Muller codes.
+						Choose <span class="math">\(q\)</span> and <span class="math">\(m\)</span>: each block below is a code
+						<span class="math">\(\mathrm{PRM}_q(d,m)\)</span>, and the entry in row <span class="math">\(a\)</span> and
+						column <span class="math">\(b\)</span> is the weight <span class="math">\(d_{a+b}\)</span>.
+						A single number is the exact value, and <span class="ghw-open-sample">a–b</span>
+						means <span class="math">\(a \le d_r \le b\)</span>.
+						<strong>Click on any entry</strong> to see where its bounds come from.
+					</p>
+
+					<div class="ghw-controls">
+						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="math">\(q\)</span></span> <span id="ghw-q-choices"></span></div>
+						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="math">\(m\)</span></span> <span id="ghw-m-choices"></span></div>
+					</div>
+					<p id="ghw-summary"></p>
+
+					<div id="ghw-explanation" class="ghw-explanation" hidden></div>
+
+					<div id="ghw-codes">
+						<p id="ghw-loading">Loading the tables…</p>
+					</div>
+				</section>
+
+				<section id="about">
+					<header class="major">
+						<h2>Where the bounds come from</h2>
+					</header>
+					<ul>
+						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [PRM, Thm 1.1],
+							for <span class="math">\((m-1)(q-1) &lt; d &lt; m(q-1)\)</span> [PRM, Cor 4.2], and for <span class="math">\(d \ge m(q-1)\)</span>;
+							the minimum distance [Sør91]; and the first weights for the degrees of [PRM, Prop 6.12].</li>
+						<li><strong>Upper bound.</strong> The bound <span class="math">\(B_r(q,d,m)\)</span> of [PRM, Thm 6.7], valid in every degree.
+							It is sharp for <span class="math">\(d &lt; q\)</span>, and [PRM, Conj 6.9] states that it is always sharp.</li>
+						<li><strong>Lower bound.</strong> The recursive bound of [SJ24, Thm 7], applied with the best bounds known for
+							<span class="math">\(\mathrm{PRM}_q(d,m-1)\)</span> and <span class="math">\(\mathrm{PRM}_q(d-q+1,m-1)\)</span>.</li>
+						<li><strong>Computed values.</strong> Values computed with the GHWs package [GHWs], with their source.</li>
+					</ul>
+					<p>
+						All the bounds are applied again and again until none of them improves.
+						The code that computes the tables, and a detailed description, will be available in a public repository.
+					</p>
+
+					<h3 id="references">References</h3>
+					<ul id="ghw-references" class="ghw-references"></ul>
+				</section>
+			</div>
+
+		<!-- Footer (as on the main page) -->
+			<footer id="footer">
+				<div class="inner">
+					<ul class="icons"> <a href=mailto:rsanjose@vt.edu class="icon solid fa-envelope"><span class="label">Email</span>  rsanjose@vt.edu </a> </ul>
+					<ul class="copyright">
+						<li> <span style="font-size: 16px;"> &copy; RSJ. All rights reserved. Design: <a href="http://html5up.net" target="_blank" rel="noopener noreferrer">HTML5 UP</a></span></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts (as on the main page) -->
+			<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/jquery.poptrox.min.js"></script>
+			<script src="/assets/js/browser.min.js"></script>
+			<script src="/assets/js/breakpoints.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/main.js"></script>
+
+		<script> // Dark/light mode, as on the main page
+			const toggle = document.getElementById('dark-mode-toggle');
+			const icon = toggle.querySelector('i');
+			const savedMode = localStorage.getItem('darkMode');
+			const isDark = savedMode === null ? true : savedMode === 'true';
+			if (isDark) {
+				document.body.classList.add('dark-mode');
+				document.documentElement.classList.add('dark-mode');
+				icon.classList.replace('fa-moon', 'fa-sun');
+			} else {
+				document.documentElement.classList.remove('dark-mode');
+			}
+			toggle.addEventListener('click', () => {
+				document.body.classList.toggle('dark-mode');
+				document.documentElement.classList.toggle('dark-mode');
+				const nowDark = document.body.classList.contains('dark-mode');
+				localStorage.setItem('darkMode', nowDark);
+				if (nowDark) {
+					icon.classList.replace('fa-moon', 'fa-sun');
+				} else {
+					icon.classList.replace('fa-sun', 'fa-moon');
+				}
+			});
+		</script>
+		<script src="ghw.js"></script>
+	</body>
+</html>
