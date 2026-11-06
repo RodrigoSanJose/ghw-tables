@@ -1,10 +1,11 @@
 cff-version: 1.2.0
 title: Tables of generalized Hamming weights of projective Reed-Muller codes
 message: >-
-  If you use these tables, please cite them as below, together with the paper
-  where the bounds are proved: R. San-José, Common zeros of homogeneous
-  polynomials and the weight hierarchy of projective Reed-Muller codes,
-  arXiv:2611.08203 (2026).
+  If you use these tables, please cite them as below, together with the papers
+  where the main bounds are proved: R. San-José, A recursive construction for
+  projective Reed-Muller codes, IEEE Trans. Inform. Theory 70(12) (2024),
+  8511-8523; and R. San-José, Common zeros of homogeneous polynomials and the
+  weight hierarchy of projective Reed-Muller codes, arXiv:2611.08203 (2026).
 type: dataset
 authors:
   - given-names: Rodrigo

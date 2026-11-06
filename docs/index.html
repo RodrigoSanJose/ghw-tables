@@ -26,7 +26,15 @@
 			document.documentElement.classList.add('mj-loading');
 			function mjShow() { document.documentElement.classList.remove('mj-loading'); }
 			setTimeout(mjShow, 3000);
-			window.MathJax = { startup: { pageReady: () => MathJax.startup.defaultPageReady().then(mjShow) } };
+			window.MathJax = {
+				startup: { pageReady: () => MathJax.startup.defaultPageReady().then(mjShow) },
+				// MathJax 4 would also compute a spoken description and Braille for every formula, after
+				// downloading a large speech engine: this page has many formulas, so we skip it, which makes
+				// the page faster.  Screen readers still read the formulas, through the hidden MathML
+				// that MathJax then adds to each of them (assistive MathML).  These are the defaults of the
+				// MathJax menu (right click on a formula), where a reader can still turn them on.
+				options: { menuOptions: { settings: { enrich: false, speech: false, braille: false, assistiveMml: true } } }
+			};
 		</script>
 		<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js"></script>
 
@@ -83,21 +91,19 @@
 						<h2>Generalized Hamming weights of projective Reed–Muller codes</h2>
 					</header>
 					<p>
-						<!-- The formulas of this paragraph and of the tables are plain HTML in a math-like font (class
-						     ghw-tex), so that they appear at once, without waiting for MathJax. -->
 						Bounds and exact values for the generalized Hamming weights
-						<span class="ghw-tex"><i>d</i><sub><i>r</i></sub>(PRM<sub><i>q</i></sub>(<i>d</i>, <i>m</i>))</span> of projective Reed–Muller codes.
-						Choose <span class="ghw-tex"><i>q</i></span> and <span class="ghw-tex"><i>m</i></span>: each block below is a code
-						<span class="ghw-tex">PRM<sub><i>q</i></sub>(<i>d</i>, <i>m</i>)</span>, and the entry in row <span class="ghw-tex"><i>i</i></span> and
-						column <span class="ghw-tex"><i>j</i></span> is the weight <span class="ghw-tex"><i>d</i><sub><i>i</i>+<i>j</i></sub></span>.
+						<span class="math">\(d_r(\mathrm{PRM}_q(d,m))\)</span> of projective Reed–Muller codes.
+						Choose <span class="math">\(q\)</span> and <span class="math">\(m\)</span>: each block below is a code
+						<span class="math">\(\mathrm{PRM}_q(d,m)\)</span>, and the entry in row <span class="math">\(i\)</span> and
+						column <span class="math">\(j\)</span> is the weight <span class="math">\(d_{i+j}\)</span>.
 						A single number is the exact value, and <span class="ghw-open-sample">a–b</span>
-						means <span class="ghw-tex"><i>a</i> ≤ <i>d</i><sub><i>r</i></sub> ≤ <i>b</i></span>.
+						means <span class="math">\(a \le d_r \le b\)</span>.
 						<strong>Click on any entry</strong> to see where its bounds come from.
 					</p>
 
 					<div class="ghw-controls" data-analytics-section="GHW tables / Controls">
-						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="ghw-tex"><i>q</i></span></span> <span id="ghw-q-choices"></span></div>
-						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="ghw-tex"><i>m</i></span></span> <span id="ghw-m-choices"></span></div>
+						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="math">\(q\)</span></span> <span id="ghw-q-choices"></span></div>
+						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="math">\(m\)</span></span> <span id="ghw-m-choices"></span></div>
 					</div>
 					<p id="ghw-notice" hidden></p>
 					<p id="ghw-summary"></p>
@@ -142,7 +148,7 @@
 					<h3 id="cite">How to cite</h3>
 					<div id="ghw-citation" data-analytics-section="GHW tables / Citation">
 					<p class="ghw-cite-text">
-						If you use these tables, please consider citing them and the paper [SJ24,SJ26] where the main bounds are proved.
+						If you use these tables, please consider citing them and the papers [SJ24,SJ26] where the main bounds are proved.
 						The tables are archived on Zenodo with the DOI
 						<a href="https://doi.org/10.5281/zenodo.24020768" target="_blank" rel="noopener noreferrer" data-publication-title="Tables of generalized Hamming weights of projective Reed-Muller codes" data-publication-short="GHW tables" data-link-type="Zenodo archive">10.5281/zenodo.24020768</a>,
 						which always points to the latest version.

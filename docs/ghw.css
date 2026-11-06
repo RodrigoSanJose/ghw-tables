@@ -14,6 +14,9 @@
 	margin: 0 0 1.25em 0;
 }
 #ghw-notice { font-weight: bold; }
+/* New math (after changing q or m, or in an explanation) stays hidden until MathJax has typeset it
+   (see typeset in ghw.js), as the math of the whole page when it loads (see index.html). */
+.mj-pending .math { visibility: hidden; }
 /* While the tables load, keep the text below them out of sight, so that it does not jump. */
 #ghw-codes:has(#ghw-loading) { min-height: 100vh; }
 #about .ghw-cite-text { margin: 0 0 1em 0; }
@@ -106,11 +109,7 @@
 	text-align: center;
 	line-height: 1.3;
 }
-/* The labels of the tables are plain HTML, not MathJax (they are many, and they appear at once).
-   This serif font imitates the math font of MathJax. */
-.ghw-tex { font-family: "Latin Modern Math", "STIX Two Math", "Cambria Math", "Times New Roman", serif; }
-.ghw-code-title .ghw-tex { font-size: 1.1em; }
-.ghw-code-label .ghw-degree { font-size: 1.35em; }
+.ghw-code-label .ghw-degree { font-weight: bold; font-size: 1.35em; }
 .ghw-code-label .ghw-dimension { font-size: 0.8em; }
 .ghw-complete .ghw-code-label { background-color: #49bf9d; }   /* every weight is known */
 .ghw-partial .ghw-code-label { background-color: #586e75; }    /* some weights are only bounded */

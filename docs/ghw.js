@@ -83,13 +83,23 @@ function binomial(a, b) {
 	return Math.round(result);
 }
 
+const typesetting = new WeakMap();       // element -> number of typesettings of it not finished yet
+
 function typeset(element) {
 	// Ask MathJax to typeset new content.  If MathJax has not started yet, there is nothing to do:
-	// when it starts, it typesets the whole page.  Otherwise we wait until it is ready.
+	// when it starts, it typesets the whole page, whose math stays hidden until then (index.html).
+	// Otherwise we wait until it is ready.  Meanwhile the math of the element is hidden too (the class
+	// mj-pending, see ghw.css), so that its TeX source never shows, also after changing q or m.
 	if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
+		typesetting.set(element, (typesetting.get(element) || 0) + 1);
+		element.classList.add("mj-pending");
 		MathJax.startup.promise = MathJax.startup.promise
 			.then(() => MathJax.typesetPromise([element]))
-			.catch(error => console.log("MathJax: " + error.message));
+			.catch(error => console.log("MathJax: " + error.message))
+			.finally(() => {                     // show it after the last typesetting asked for it
+				typesetting.set(element, typesetting.get(element) - 1);
+				if (typesetting.get(element) === 0) element.classList.remove("mj-pending");
+			});
 	}
 }
 
@@ -115,10 +125,6 @@ function download(file) {                  // the contents of data/file, request
 		downloaded[file].catch(() => { delete downloaded[file]; });    // after an error, try again next time
 	}
 	return downloaded[file];
-}
-
-function plainPRM(q, d, m) {               // PRM_q(d,m) in HTML, for the many labels of the tables:
-	return '<span class="ghw-tex">PRM<sub>' + q + "</sub>(" + d + ", " + m + ")</span>";   // no MathJax needed
 }
 
 function tableInfo(q, m) {                 // the entry of index.json for the table (q, m), if any
@@ -404,15 +410,15 @@ function codeBlockHTML(q, m, code) {
 	let exact = 0;
 	for (let r = 1; r <= code.k; r++) if (code.lower[r] === code.upper[r]) exact += 1;
 	const complete = exact === code.k;
-	let title = plainPRM(q, code.d, m) + ": " + code.k + " weights, ";
+	let title = math(PRM(q, code.d, m)) + ": " + code.k + " weights, ";
 	title += complete ? "all known." : exact + " known, " + (code.k - exact) + " only bounded.";
 	const open = isExpanded(code);
 	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '"'
 		+ analyticsAttributes(open ? "Hide weights" : "Show weights", q, m, code.d) + '>'
 		+ (open ? "Hide" : "Show") + "</a>";
 	return '<div class="ghw-code ' + (complete ? "ghw-complete" : "ghw-partial") + '" id="code-' + code.d + '">'
-		+ '<div class="ghw-code-label"><span class="ghw-degree ghw-tex"><i>d</i> = ' + code.d + "</span>"
-		+ '<span class="ghw-dimension ghw-tex"><i>k</i> = ' + code.k + "</span></div>"
+		+ '<div class="ghw-code-label"><span class="ghw-degree">' + math("d = " + code.d) + "</span>"
+		+ '<span class="ghw-dimension">' + math("k = " + code.k) + "</span></div>"
 		+ '<div class="ghw-code-content"><div class="ghw-code-title">' + title + "</div>"
 		+ '<div class="ghw-grid-wrapper">' + (open ? gridHTML(q, m, code) : "") + "</div></div></div>";
 }
@@ -437,14 +443,15 @@ function drawTable() {
 	const {q, m, data} = shown;
 	const info = tableInfo(q, m);
 	const summary = document.getElementById("ghw-summary");
-	// Plain HTML, like the labels of the codes, so that the line appears together with the tables.
-	summary.innerHTML = 'Length <span class="ghw-tex"><i>p</i><sub>' + m + "</sub> = " + data.n + "</span>. Codes "
-		+ plainPRM(q, "<i>d</i>", m) + ' with <span class="ghw-tex">1 ≤ <i>d</i> ≤ ' + Math.max(...info.degrees)
-		+ "</span>: " + info.weights + " weights, " + info.exact + " known exactly"
+	summary.innerHTML = "Length " + math("p_" + m + " = " + data.n) + ". Codes " + math(PRM(q, "d", m))
+		+ " with " + math("1 \\le d \\le " + Math.max(...info.degrees)) + ": " + info.weights + " weights, "
+		+ info.exact + " known exactly"
 		+ (info.exact < info.weights ? ", " + (info.weights - info.exact) + " only bounded." : ".")
-		+ (q === 2 ? ' Note: for <span class="ghw-tex"><i>q</i> = 2</span> PRM codes are shortened RM codes at the origin.' : "");
+		+ (q === 2 ? " Note: for " + math("q=2") + " PRM codes are shortened RM codes at the origin." : "");
 	const container = document.getElementById("ghw-codes");
-	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");   // no MathJax inside
+	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");
+	typeset(summary);
+	typeset(container);
 }
 
 function highlightSelected() {             // mark the entry selected in the address, if it is drawn
@@ -460,6 +467,7 @@ function toggleCode(degree, keepFocus) {
 	expanded[degree] = !isExpanded(code);
 	const block = document.getElementById("code-" + degree);
 	block.outerHTML = codeBlockHTML(shown.q, shown.m, code);
+	typeset(document.getElementById("code-" + degree));
 	highlightSelected();
 	if (keepFocus) document.querySelector("#code-" + degree + " .ghw-toggle").focus();
 }

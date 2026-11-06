@@ -256,7 +256,7 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 
 ## Citation
 
-If you use these tables, please consider citing them and the paper [SJ26] where the bounds are proved.
+If you use these tables, please consider citing them and the papers [SJ24,SJ26] where the main bounds are proved.
 
 The tables are archived on Zenodo with the DOI
 [10.5281/zenodo.24020768](https://doi.org/10.5281/zenodo.24020768), which always points to the latest version.

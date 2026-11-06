@@ -311,6 +311,30 @@ class TrackingTests(unittest.TestCase):
                 self.assert_event(name, name, ORIGIN + href, "Navigation")
         self.assertEqual(self.page.locator("#header .avatar[href], #header h1 a").count(), 0)
 
+    def test_math_stays_hidden_until_typeset_after_changing_the_table(self):
+        """When the page loads, its math is hidden until MathJax has typeset it.  The math drawn later
+        (another table, an explanation) must stay hidden too, so that its TeX source never shows."""
+        self.page.evaluate("""() => {     // a MathJax that finishes only when the test releases it
+            window.__gate = new Promise(resolve => { window.__release = resolve; });
+            MathJax.typesetPromise = () => window.__gate;
+        }""")
+        visibility = "elements => elements.map(element => getComputedStyle(element).visibility)"
+        self.page.locator('#ghw-q-choices a[href="#q=2&m=3"]').click()
+        self.page.wait_for_selector('#ghw-q-choices a.ghw-current[href="#q=2&m=3"]')
+        self.page.locator("#entry-1-1").click()
+        self.page.wait_for_selector("#ghw-explanation:not([hidden])")
+        for selector in ("#ghw-summary .math", "#ghw-codes .math", "#ghw-explanation .math"):
+            with self.subTest(selector=selector, released=False):
+                values = self.page.locator(selector).evaluate_all(visibility)
+                self.assertTrue(values)
+                self.assertEqual(set(values), {"hidden"})
+        self.page.evaluate("window.__release()")
+        self.page.wait_for_function("!document.querySelector('.mj-pending')")
+        for selector in ("#ghw-summary .math", "#ghw-codes .math", "#ghw-explanation .math"):
+            with self.subTest(selector=selector, released=True):
+                self.assertEqual(set(self.page.locator(selector).evaluate_all(visibility)), {"visible"})
+        self.assertEqual(self.errors, [])
+
     def test_all_current_links_and_new_large_table_cells_are_covered(self):
         results = self.page.evaluate(r"""() => {
             const selector = 'a[href], area[href], button, input[type="button"], ' +
