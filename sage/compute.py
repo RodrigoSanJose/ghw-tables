@@ -81,6 +81,27 @@ def csv_line(q, d, m, r, lower, upper, note):
     return text.getvalue()
 
 
+def report(code, q, d, m, r, computed_lower, computed_upper, note):
+    """Print what was computed about d_r(PRM_q(d,m)), compared with its data in the tables (code).
+    Returns the line for data/manual.csv, or None if there is nothing new."""
+    value = computed_lower                                   # in every case, d_r >= computed_lower = value
+    lower, upper = code["lower"][r], code["upper"][r]
+    if value < lower or value > upper:
+        print(f"WARNING: d_{r} = {value} contradicts the tables ({lower} <= d_{r} <= {upper}). Please report this.")
+        return None
+    if lower == upper:
+        print(f"d_{r} = {value} agrees with the tables.", flush=True)
+        return None
+    if value < upper:
+        print(f"d_{r} = {value} is smaller than the upper bound {upper}, so it is smaller than B_{r}: "
+              f"this is a COUNTEREXAMPLE to [SJ26, Conj 6.9]! Please check it carefully.")
+    else:
+        print(f"d_{r} = {value}: new value.")
+    line = csv_line(q, d, m, r, computed_lower, computed_upper, f"{note}, {date.today()}")
+    print(f"    {line}", flush=True)
+    return line
+
+
 def ghws_version():
     try:
         return version("GHWs")
@@ -99,13 +120,16 @@ if C.length() != n or C.dimension() != k:
 software = f"GHWs {ghws_version()}, SageMath {sage_version}"
 print(f"PRM_{q}({d},{m}): length {C.length()}, dimension {k}.", flush=True)
 
-# results[r] = (lower, upper, note): the bounds for d_r that were computed, and how
-results = {}
+
+
+# Each result is printed as soon as it is computed, so a long run can be stopped without losing them.
+new_lines = []
 if which == "all":
     start = time.time()
     H = [0] + list(hierarchy(C, verbose=VERBOSE))            # H[r] = d_r, as in the tables
+    note = f"hierarchy(C), {software}, {time.time() - start:.0f} s for all the weights"
     for r in range(1, k + 1):
-        results[r] = (H[r], H[r], f"hierarchy(C), {software}, {time.time() - start:.0f} s for all the weights")
+        new_lines.append(report(table, q, d, m, r, H[r], H[r], note))
 else:
     if which == "open":
         rs = [r for r in range(1, k + 1) if table["lower"][r] < table["upper"][r]]
@@ -117,29 +141,14 @@ else:
         start = time.time()
         if lower < upper and GHW_bound(C, r, upper, bound_type="lower", verbose=VERBOSE):
             # GHWs proves d_r >= upper; the tables already have d_r <= upper, so d_r = upper.
-            results[r] = (upper, "", f"GHW_bound(C, {r}, {upper}) = True, {software}, {time.time() - start:.0f} s")
+            note = f"GHW_bound(C, {r}, {upper}) = True, {software}, {time.time() - start:.0f} s"
+            new_lines.append(report(table, q, d, m, r, upper, "", note))
         else:
             value = GHW(C, r, verbose=VERBOSE)
-            results[r] = (value, value, f"GHW(C, {r}), {software}, {time.time() - start:.0f} s")
+            note = f"GHW(C, {r}), {software}, {time.time() - start:.0f} s"
+            new_lines.append(report(table, q, d, m, r, value, value, note))
 
-print()
-new_lines = []
-for r in sorted(results):
-    computed_lower, computed_upper, note = results[r]
-    value = computed_lower                                   # in every case, d_r >= computed_lower = value
-    lower, upper = table["lower"][r], table["upper"][r]
-    if value < lower or value > upper:
-        print(f"WARNING: d_{r} = {value} contradicts the tables ({lower} <= d_{r} <= {upper}). Please report this.")
-    elif lower == upper:
-        print(f"d_{r} = {value} agrees with the tables.")
-    else:
-        if value < upper:
-            print(f"d_{r} = {value} is smaller than the upper bound {upper}, so it is smaller than B_{r}: "
-                  f"this is a COUNTEREXAMPLE to [SJ26, Conj 6.9]! Please check it carefully.")
-        else:
-            print(f"d_{r} = {value}: new value.")
-        new_lines.append(csv_line(q, d, m, r, computed_lower, computed_upper, f"{note}, {date.today()}"))
-
+new_lines = [line for line in new_lines if line is not None]
 print()
 if new_lines:
     print("Add these lines to data/manual.csv, then run  python3 src/generate.py :")
