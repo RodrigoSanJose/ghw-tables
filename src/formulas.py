@@ -17,7 +17,23 @@ How to read this file:
     power).  We write q**j for q^j, and a // b and a % b for the quotient and the remainder of
     the division of a by b.  The tests check that "/" and "^" do not appear.
   * The field size q always comes first: for instance B(q, d, m, r) is B_r(q, d, m) of [PRM].
-  * range(a, b) is the list of integers a, a+1, ..., b-1 (b is NOT included).
+
+Python notation used below:
+
+  * range(a, b) is the list of integers a, a+1, ..., b-1 (b is NOT included), and range(b) is
+    range(0, b), that is 0, 1, ..., b-1.  Both are empty if b <= a (resp. b <= 0).
+    range(a, b, -1) counts down: a, a-1, ..., b+1.
+  * sum(f(i) for i in range(a, b)) is the sum of f(i) for a <= i < b (an empty sum is 0), and
+    tuple(f(i) for i in range(a, b)) is the tuple (f(a), f(a+1), ..., f(b-1)).  Adding
+    "if condition" at the end keeps only the i satisfying the condition.
+  * (0,) is the tuple with the single entry 0 (the comma is needed), and + joins two tuples:
+    (0,) + (5, 7) = (0, 5, 7).  H[1:] is H without its first entry H[0].
+  * A function can return several values ("return a, s, b"), and "a, s, b = leading_term(q, n)"
+    gives a name to each of them.
+  * {f(w) for w in S} is a set, and {r: f(r) for r in S} is a dictionary, in which weights[r] is f(r).
+  * @cache, written above a function, makes Python remember its results, so that each value is
+    computed only once.  It does not change the results.
+  * None means "no value", and "x is None" tests it.
 
 To use these functions in Sage, start Sage in the repository folder and type
 load("src/formulas.py").  Sage reads .py files without modifying them.
@@ -43,7 +59,7 @@ def p(q, j):
 
     p_m is the number of points of P^m(F_q), that is, the length of PRM_q(d, m).
     """
-    return sum(q**i for i in range(j + 1))
+    return sum(q**i for i in range(j + 1))       # for j < 0, range(j + 1) is empty and the sum is 0
 
 
 def floor_q_power(q, mu):
@@ -82,6 +98,7 @@ def macaulay(h, d):
         h = binom(mu_1 + 1, 1) + binom(mu_2 + 2, 2) + ... + binom(mu_d + d, d).
     We compute nu_i = mu_i + i for i = d, d-1, ..., 1: nu_i is the largest integer
     with binom(nu_i, i) <= (what is left of h).
+    (Inside this function, h is this integer, as in (1.2), and not the function h_d(n) below.)
     """
     mu = [0] * (d + 1)               # mu[i] will be mu_i; position 0 is not used
     for i in range(d, 0, -1):        # i = d, d-1, ..., 1
@@ -107,7 +124,7 @@ def dim_RM(q, d, m):
     if d < 0:
         return 0
     if m == 0:
-        return 1
+        return 1                     # only the empty tuple, whose sum 0 is <= d
     return sum(dim_RM(q, d - c, m - 1) for c in range(q))
 
 
@@ -115,9 +132,11 @@ def A(q, t, D):
     """A(t, D) = the number of integers 0 <= i < t with sigma_q(i) <= D  ([PRM], Section 6.2).
 
     Write t = a q^s + b.  The integers i < a q^s are i = c q^s + j with 0 <= c < a and
-    0 <= j < q^s, and sigma_q(i) = c + sigma_q(j); for each c there are dim RM_q(D - c, s)
-    of them.  The integers a q^s <= i < t are i = a q^s + j with 0 <= j < b, and
-    sigma_q(i) = a + sigma_q(j).
+    0 <= j < q^s, and sigma_q(i) = c + sigma_q(j).  The s base-q digits of such a j form a tuple
+    in {0, ..., q-1}^s with sum sigma_q(j), so for each c there are dim RM_q(D - c, s) of them.
+    The integers a q^s <= i < t are i = a q^s + j with 0 <= j < b, and sigma_q(i) = a + sigma_q(j),
+    so there are A(b, D - a) of them.  Hence
+        A(t, D) = dim RM_q(D, s) + dim RM_q(D - 1, s) + ... + dim RM_q(D - a + 1, s) + A(b, D - a).
     """
     if t == 0 or D < 0:
         return 0
@@ -161,7 +180,8 @@ def h(q, d, n):
 
 def attaining_set(q, d, n):
     """Which of the two sets of [PRM, Section 6.2] gives h_d(n): "-" for Z_n^-, "+" for Z_n^+,
-    and "-+" if both have the same Hilbert function.  (Used only to explain the bounds.)
+    and "-+" if H_{Z_n^-}(d) = H_{Z_n^+}(d), so that both sets give h_d(n).
+    (Used only to explain the bounds.)
 
     It follows the recursion of h: in the first case Z_n^- and Z_n^+ differ only in Z_b^- and Z_b^+.
     """
@@ -180,12 +200,15 @@ def attaining_set(q, d, n):
 
 
 @cache
-def largest_point_sets(q, d, m):
+def largest_n(q, d, m):
     """The tuple N with N[v] = max{ 0 <= n <= p_m : h_d(n) <= v }, for v = 0, 1, ..., k_d(m)."""
     k = dim_PRM(q, d, m)
     N = [0] * (k + 1)
     for n in range(p(q, m) + 1):
-        N[h(q, d, n)] = n                # n increases, so at the end N[v] = max{ n : h_d(n) = v }
+        # h_d(n) <= k_d(m), because a set of points imposes at most k_d(m) conditions on the forms
+        # of degree d, so the position N[h_d(n)] exists.  Since n increases, at the end of this
+        # loop N[v] = max{ n : h_d(n) = v }.
+        N[h(q, d, n)] = n
     for v in range(1, k + 1):            # now pass from "h_d(n) = v" to "h_d(n) <= v"
         N[v] = max(N[v], N[v - 1])
     return tuple(N)
@@ -200,7 +223,7 @@ def upper_bound_hierarchy(q, d, m):
     [PRM, Conj. 6.9] says that equality always holds.
     """
     k = dim_PRM(q, d, m)
-    N = largest_point_sets(q, d, m)
+    N = largest_n(q, d, m)
     return (0,) + tuple(p(q, m) - N[k - r] for r in range(1, k + 1))
 
 
@@ -215,13 +238,15 @@ def B(q, d, m, r):
 
 def bdg_weight(q, d, m, r):
     """d_r(PRM_q(d, m)) for 1 <= d < q and 1 <= r <= binom(m + d, d)  ([PRM], Thm 1.1).
+    (bdg stands for Beelen, Datta and Ghorpade, who conjectured this formula [BDG22].)
 
     With (mu_1, ..., mu_d) the Macaulay tuple of binom(m + d, d) - r,
-        d_r = p_m - p_{mu_d} - ( floor(q^mu_1) + ... + floor(q^mu_{d-1}) ).
+        e_r(d, m) = p_{mu_d} + floor(q^mu_1) + ... + floor(q^mu_{d-1})     ([PRM], (1.3)),
+        d_r = p_m - e_r(d, m)                                                ([PRM], (1.4)).
     """
-    mu = macaulay(binom(m + d, d) - r, d)       # mu[0] is mu_1, ..., mu[d-1] is mu_d
-    zeros = p(q, mu[d - 1]) + sum(floor_q_power(q, mu[i]) for i in range(d - 1))
-    return p(q, m) - zeros
+    mu = (None,) + macaulay(binom(m + d, d) - r, d)    # now mu[i] is mu_i, for 1 <= i <= d
+    e_r = p(q, mu[d]) + sum(floor_q_power(q, mu[i]) for i in range(1, d))
+    return p(q, m) - e_r
 
 
 def bdg_hierarchy(q, d, m):
@@ -279,8 +304,9 @@ def large_degree_hierarchy(q, d, m):
 
 def known_hierarchy(q, d, m):
     """For d >= 1: the complete hierarchy (0, d_1, ..., d_k) of PRM_q(d, m) when one of the results
-    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result.
-    Otherwise, and also for d <= 0, it returns (None, None).
+    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result: "PRM Thm 1.1",
+    "PRM Cor 4.2", "whole space" or "dual is all-ones".  Otherwise, and also for d <= 0, it
+    returns (None, None).
     """
     if d <= 0:
         return None, None
@@ -288,8 +314,10 @@ def known_hierarchy(q, d, m):
         return bdg_hierarchy(q, d, m), "PRM Thm 1.1"
     if (m - 1) * (q - 1) < d < m * (q - 1):
         return high_degree_hierarchy(q, d, m), "PRM Cor 4.2"
-    if d >= m * (q - 1):
-        return large_degree_hierarchy(q, d, m), "large degree"
+    if d > m * (q - 1):
+        return large_degree_hierarchy(q, d, m), "whole space"
+    if d == m * (q - 1):
+        return large_degree_hierarchy(q, d, m), "dual is all-ones"
     return None, None
 
 
@@ -299,17 +327,17 @@ def lifted_weights(q, d, m):
     Let 0 <= t <= m-1 and h = m - t.
       (a) If d = 1 + t(q-1):              d_r = q^h + q^(h-1) + ... + q^(h-r+1)  for 1 <= r <= h+1.
       (b) If q >= 3 and d = 2 + t(q-1):   d_r = q^h - q^(h-r)  for 1 <= r <= h,  and  d_(h+1) = q^h.
-    (Below, hh stands for the h of the paper, because h is already the name of a function.)
+    (Inside this function, h is the number m - t of the paper, and not the function h_d(n) above.)
     """
     for t in range(m):
-        hh = m - t
+        h = m - t
         if d == 1 + t * (q - 1):
             # q^h + ... + q^(h-r+1) = p_h - p_(h-r), as in the proof of [PRM, Prop. 6.12]
             # (for r = h+1 this is p_h, because p_(-1) = 0).
-            return {r: p(q, hh) - p(q, hh - r) for r in range(1, hh + 2)}
+            return {r: p(q, h) - p(q, h - r) for r in range(1, h + 2)}
         if q >= 3 and d == 2 + t * (q - 1):
-            weights = {r: q**hh - q**(hh - r) for r in range(1, hh + 1)}
-            weights[hh + 1] = q**hh
+            weights = {r: q**h - q**(h - r) for r in range(1, h + 1)}
+            weights[h + 1] = q**h
             return weights
     return {}
 
@@ -332,32 +360,38 @@ def affine_hierarchy(q, d, m):
     return (0,) + tuple(i + 1 for i in range(q**m) if digit_sum(q, i) > m * (q - 1) - d - 1)
 
 
-def recursive_lower_bound(q, d, m, r, same_degree, lower_degree):
-    """The lower bound of [SJ24, Thm 7] for d_r(PRM_q(d, m)), where m >= 2, 1 <= d <= m(q-1)
-    and 2 <= r <= k_d(m).  Returns (bound, alpha, gamma), with (alpha, gamma) attaining the minimum.
+def recursive_lower_bound(q, d, m, r, PRM_d, PRM_d_minus_q_plus_1):
+    """The lower bound of [SJ24, Thm 7] for d_r(PRM_q(d, m)), where 1 <= d <= m(q-1) and
+    2 <= r <= k_d(m), for m >= 2.  Returns (bound, alpha, gamma), with (alpha, gamma) attaining
+    the minimum.
 
-    The inputs are lower bounds for the weights of the two smaller codes:
-        same_degree[alpha]  <=  d_alpha(PRM_q(d, m-1))          for 0 <= alpha <= k_d(m-1),
-        lower_degree[gamma] <=  d_gamma(PRM_q(d-q+1, m-1))      for 0 <= gamma <= k_{d-q+1}(m-1),
-    with same_degree[0] = lower_degree[0] = 0.  We may use lower bounds instead of the true values
+    The names follow [SJ24, Thm 7], where the two smaller codes are PRM_d(m-1) and
+    PRM_{d-(q-1)}(m-1), both in dimension m-1.  The inputs are lower bounds for their weights:
+        PRM_d[alpha]                <= d_alpha(PRM_q(d, m-1))        for 0 <= alpha <= k_d(m-1),
+        PRM_d_minus_q_plus_1[gamma] <= d_gamma(PRM_q(d-q+1, m-1))    for 0 <= gamma <= k_{d-q+1}(m-1),
+    with PRM_d[0] = PRM_d_minus_q_plus_1[0] = 0.  We may use lower bounds instead of the true values
     because B_{alpha,gamma} below can only decrease when they decrease.
 
     The bound is the minimum of
         B_{alpha,gamma} = max( d_{r-gamma}(RM_q(d, m)), d_{r-alpha}(RM_q(d-1, m)) )
-                          + max( same_degree[alpha], lower_degree[gamma] )
+                          + max( d_alpha(PRM_q(d, m-1)), d_gamma(PRM_q(d-q+1, m-1)) )
     over the set Y of pairs (alpha, gamma) with
         max(r - dim RM_q(d-1, m), 0)  <=  alpha  <=  min(k_d(m-1), r),
         max(r - dim RM_q(d, m), 0)    <=  gamma  <=  min(k_{d-q+1}(m-1), alpha).
+    Y is not empty: it contains the first pair visited below, alpha = max(r - dim RM_q(d-1, m), 0)
+    and gamma = max(r - dim RM_q(d, m), 0).  This follows from r <= k_d(m), from
+    k_d(m) = dim RM_q(d-1, m) + k_d(m-1) = dim RM_q(d, m) + k_{d-q+1}(m-1)  ([PRM], Section 6.2 and
+    the proof of Lemma 6.10; see test_recursions), and from dim RM_q(d, m) >= dim RM_q(d-1, m).
+    If several pairs attain the minimum, the one with the smallest alpha (and then the smallest
+    gamma) is returned.
     """
-    RM_d = affine_hierarchy(q, d, m)              # RM_d[i] = d_i(RM_q(d, m))
-    RM_d_minus_1 = affine_hierarchy(q, d - 1, m)  # RM_d_minus_1[i] = d_i(RM_q(d-1, m))
-    k_same = len(same_degree) - 1                 # = k_d(m-1)
-    k_lower = len(lower_degree) - 1               # = k_{d-q+1}(m-1)
-    best = None
-    for alpha in range(max(r - dim_RM(q, d - 1, m), 0), min(k_same, r) + 1):
-        for gamma in range(max(r - dim_RM(q, d, m), 0), min(k_lower, alpha) + 1):
+    RM_d = affine_hierarchy(q, d, m)                # RM_d[i] = d_i(RM_q(d, m))
+    RM_d_minus_1 = affine_hierarchy(q, d - 1, m)    # RM_d_minus_1[i] = d_i(RM_q(d-1, m))
+    best = None                                     # (value, alpha, gamma) of the smallest value so far
+    for alpha in range(max(r - dim_RM(q, d - 1, m), 0), min(dim_PRM(q, d, m - 1), r) + 1):
+        for gamma in range(max(r - dim_RM(q, d, m), 0), min(dim_PRM(q, d - q + 1, m - 1), alpha) + 1):
             value = (max(RM_d[r - gamma], RM_d_minus_1[r - alpha])
-                     + max(same_degree[alpha], lower_degree[gamma]))
-            if best is None or value < best[0]:
+                     + max(PRM_d[alpha], PRM_d_minus_q_plus_1[gamma]))
+            if best is None or value < best[0]:     # the first pair of Y, or a smaller value
                 best = (value, alpha, gamma)
     return best

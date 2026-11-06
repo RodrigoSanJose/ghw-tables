@@ -6,20 +6,23 @@
 	  - data/q{q}_m{m}.json contains, for every code PRM_q(d,m), the lists lower, upper,
 	    lower_reason and upper_reason, indexed by r (position 0 holds d_0 = 0).
 
-	The address of the page says what is shown, for instance #q=3&m=3&d=4&r=7 (the table for q = 3,
-	m = 3, with the entry d_7(PRM_3(4,3)) selected).  So every entry has its own link, and the
-	links in the explanations are ordinary links.
+	The address of the page says what is shown:
+	  #q=3&m=3            the table for q = 3, m = 3;
+	  #q=3&m=3&d=4        the same table, scrolled to the code PRM_3(4,3);
+	  #q=3&m=3&d=4&r=7    the same table, with the entry d_7(PRM_3(4,3)) selected and explained.
+	So every entry has its own link, and the links in the explanations are ordinary links.
 */
 
 "use strict";
 
-const COLUMNS = 10;            // row a and column b of a grid hold d_{a+b}, for b = 1, ..., 10
+const COLUMNS = 10;            // row i and column j of a grid hold d_{i+j}, for j = 1, ..., 10
 const EXPANDED_UP_TO = 60;     // codes with at most this many weights are shown expanded
 
 let index = null;              // the contents of data/index.json
 const downloaded = {};         // file name -> contents, for the tables already downloaded
 let shown = null;              // {q, m, data}: the table currently shown
 const expanded = {};           // "d" -> true or false, for the codes expanded or collapsed by hand
+let followCount = 0;           // the number of calls of follow(), to ignore out-of-date ones
 
 
 // ---------------------------------------------------------------------------------------------
@@ -42,7 +45,7 @@ function RM(q, d, m) {
 	return "\\mathrm{RM}_{" + q + "}(" + d + "," + m + ")";
 }
 
-function address(q, m, d, r) {             // the link to a table, or to one of its entries
+function address(q, m, d, r) {             // the link to a table, a code, or an entry
 	let hash = "#q=" + q + "&m=" + m;
 	if (d !== undefined) hash += "&d=" + d;
 	if (r !== undefined) hash += "&r=" + r;
@@ -69,6 +72,19 @@ function typeset(element) {
 		MathJax.startup.promise = MathJax.startup.promise
 			.then(() => MathJax.typesetPromise([element]))
 			.catch(error => console.log("MathJax: " + error.message));
+	}
+}
+
+function afterTypesetting(action) {
+	// Run action once MathJax has typeset everything: typesetting changes the height of the text,
+	// and so the place of the cells.  Before the page has finished loading, MathJax may not have
+	// started yet, so we wait for the "load" event; if MathJax could not be loaded, we do not wait.
+	if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
+		MathJax.startup.promise.finally(action);
+	} else if (document.readyState !== "complete") {
+		window.addEventListener("load", () => afterTypesetting(action), {once: true});
+	} else {
+		action();
 	}
 }
 
@@ -109,12 +125,16 @@ function explain(reason, q, d, m, r, value, k) {
 	switch (reason.rule) {
 
 	case "PRM Thm 1.1": {
-		const mu = reason.mu.join(",");
-		return "Since " + math("d < q") + ", the weight is given by [PRM, Thm 1.1]: if "
-			+ math("(\\mu_1,\\dots,\\mu_d)") + " is the Macaulay tuple of "
+		const mu = reason.mu;              // mu[0] is mu_1, ..., mu[d-1] is mu_d
+		const tuple = d === 1 ? "\\mu_1 = " + mu[0]
+			: "(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu.join(",") + ")";
+		const terms = [p(q, mu[d - 1])];   // p_{mu_d}, then floor(q^mu_i) for i < d
+		for (let i = 0; i < d - 1; i++) terms.push(mu[i] >= 0 ? q ** mu[i] : 0);
+		return "Since " + math("d < q") + ", the weight is given by [PRM, Thm 1.1], conjectured by Beelen, Datta"
+			+ " and Ghorpade [BDG22]: if " + math("(\\mu_1,\\dots,\\mu_d)") + " is the Macaulay tuple of "
 			+ math("\\binom{m+d}{d} - r = " + (binomial(m + d, d) - r)) + " in degree " + math("d")
 			+ ", then " + math("d_r = p_m - p_{\\mu_d} - \\sum_{i=1}^{d-1} \\lfloor q^{\\mu_i} \\rfloor")
-			+ ". Here " + math("(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu + ")") + ".";
+			+ ". Here " + math(tuple) + ", so " + math("d_r = " + n + " - " + terms.join(" - ") + " = " + value) + ".";
 	}
 
 	case "PRM Cor 4.2": {
@@ -122,7 +142,9 @@ function explain(reason, q, d, m, r, value, k) {
 		return "Since " + math("(m-1)(q-1) < d < m(q-1)") + ", the dual code is "
 			+ '<a href="' + address(q, m, e) + '">' + math(PRM(q, e, m)) + "</a>"
 			+ " [Sør91], whose weights are given by [PRM, Thm 1.1] because " + math(e + " < q")
-			+ ". Wei duality [Wei91] then gives the whole hierarchy [PRM, Cor 4.2].";
+			+ ". By Wei duality [Wei91], " + math("d_r") + " is the " + math("r") + "-th integer of "
+			+ math("\\{1,\\dots,p_m\\}") + " that is not of the form " + math("p_m + 1 - d_s(" + PRM(q, e, m) + ")")
+			+ " [PRM, Cor 4.2].";
 	}
 
 	case "whole space":
@@ -138,11 +160,15 @@ function explain(reason, q, d, m, r, value, k) {
 
 	case "PRM Prop 6.12": {
 		let text = "Given by [PRM, Prop 6.12], which determines the first weights when ";
-		if ((d - 1) % (q - 1) === 0) {
-			text += math("d = 1 + t(q-1)") + " (here " + math("t = " + (d - 1) / (q - 1)) + ").";
-		} else {
-			text += math("d = 2 + t(q-1)") + " and " + math("q \\ge 3") + " (here "
-				+ math("t = " + (d - 2) / (q - 1)) + ").";
+		if ((d - 1) % (q - 1) === 0) {                         // case (a): d = 1 + t(q-1)
+			const t = (d - 1) / (q - 1), h = m - t;
+			text += math("d = 1 + t(q-1)") + ": here " + math("t = " + t) + ", " + math("h = m - t = " + h)
+				+ " and " + math("d_r = q^h + q^{h-1} + \\dots + q^{h-r+1} = " + value) + ".";
+		} else {                                               // case (b): d = 2 + t(q-1), q >= 3
+			const t = (d - 2) / (q - 1), h = m - t;
+			const formula = r <= h ? "d_r = q^h - q^{h-r} = " : "d_{h+1} = q^h = ";
+			text += math("d = 2 + t(q-1)") + " and " + math("q \\ge 3") + ": here " + math("t = " + t) + ", "
+				+ math("h = m - t = " + h) + " and " + math(formula + value) + ".";
 		}
 		return text;
 	}
@@ -150,7 +176,8 @@ function explain(reason, q, d, m, r, value, k) {
 	case "PRM Thm 6.7": {
 		const points = reason.n;
 		let text = "By [PRM, Thm 6.7], " + math("d_r \\le B_r(q,d,m) = p_m - n") + ", where " + math("n = " + points)
-			+ " is the largest integer with " + math("h_d(n) \\le k_d(m) - r = " + (k - r)) + ".";
+			+ " is the largest integer " + math("0 \\le n \\le p_m") + " with "
+			+ math("h_d(n) \\le k_d(m) - r = " + (k - r)) + ".";
 		if (points === 0) {
 			return text + " Here the bound is just the length " + math("p_m = " + n) + ".";
 		}
@@ -158,8 +185,8 @@ function explain(reason, q, d, m, r, value, k) {
 		if (reason.set === "-") set = math("Z_{" + points + "}^-");
 		else if (reason.set === "+") set = math("Z_{" + points + "}^+");
 		else set = math("Z_{" + points + "}^-") + " (or " + math("Z_{" + points + "}^+") + ", which gives the same value)";
-		return text + " The forms of degree " + math("d") + " vanishing on the set " + set + " of "
-			+ math("n") + " points of " + math("\\mathbb{P}^{" + m + "}(\\mathbb{F}_{" + q + "})")
+		return text + " The evaluations of the forms of degree " + math("d") + " vanishing on the set " + set
+			+ " of " + math("n") + " points of " + math("\\mathbb{P}^{" + m + "}(\\mathbb{F}_{" + q + "})")
 			+ " (described in [PRM, Section 6.2]) form a subcode of dimension at least " + math("r")
 			+ ", supported on the remaining " + math("p_m - n = " + value) + " points.";
 	}
@@ -172,17 +199,17 @@ function explain(reason, q, d, m, r, value, k) {
 			+ " (see [SJ24] for the set " + math("Y") + "). The minimum is attained at "
 			+ math("(\\alpha,\\gamma) = (" + a + "," + g + ")") + ": "
 			+ math("B_{" + a + "," + g + "} = \\max\\{" + reason.RM_d + "," + reason.RM_d_minus_1 + "\\} + \\max\\{"
-				+ reason.same_degree + "," + reason.lower_degree + "\\} = " + value)
+				+ reason.PRM_d + "," + reason.PRM_d_minus_q_plus_1 + "\\} = " + value)
 			+ ". Here " + math("d_{" + (r - g) + "}(" + RM(q, d, m) + ") = " + reason.RM_d)
 			+ " and " + math("d_{" + (r - a) + "}(" + RM(q, d - 1, m) + ") = " + reason.RM_d_minus_1)
 			+ " (Heijnen and Pellikaan [HP98], see [SJ24, Thm 6]), and we use "
-			+ inputWeight(q, d, m - 1, a, reason.same_degree) + " and "
-			+ inputWeight(q, d - q + 1, m - 1, g, reason.lower_degree) + ".";
+			+ inputWeight(q, d, m - 1, a, reason.PRM_d) + " and "
+			+ inputWeight(q, d - q + 1, m - 1, g, reason.PRM_d_minus_q_plus_1) + ".";
 	}
 
 	case "computed": {
-		let text = "Computed value [" + escapeHTML(reason.source) + "]";
-		if (reason.note) text += ": " + escapeHTML(reason.note);
+		let text = "Source: [" + escapeHTML(reason.source) + "].";
+		if (reason.note) text += " " + escapeHTML(reason.note);
 		return text;
 	}
 
@@ -241,11 +268,11 @@ function entryText(code, r) {
 
 function gridHTML(q, m, code) {
 	let html = '<div class="ghw-head"></div>';
-	for (let b = 1; b <= COLUMNS; b++) html += '<div class="ghw-head">' + b + "</div>";
-	for (let a = 0; a < code.k; a += COLUMNS) {
-		html += '<div class="ghw-head">' + a + "</div>";
-		for (let b = 1; b <= COLUMNS; b++) {
-			const r = a + b;
+	for (let j = 1; j <= COLUMNS; j++) html += '<div class="ghw-head">' + j + "</div>";
+	for (let i = 0; i < code.k; i += COLUMNS) {
+		html += '<div class="ghw-head">' + i + "</div>";
+		for (let j = 1; j <= COLUMNS; j++) {
+			const r = i + j;
 			if (r > code.k) {
 				html += "<div></div>";
 				continue;
@@ -270,7 +297,8 @@ function codeBlockHTML(q, m, code) {
 	let title = math(PRM(q, code.d, m)) + ": " + code.k + " weights, ";
 	title += complete ? "all known." : exact + " known, " + (code.k - exact) + " only bounded.";
 	const open = isExpanded(code);
-	title += ' <a class="ghw-toggle" data-degree="' + code.d + '">' + (open ? "Hide" : "Show") + "</a>";
+	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '">'
+		+ (open ? "Hide" : "Show") + "</a>";
 	return '<div class="ghw-code ' + (complete ? "ghw-complete" : "ghw-partial") + '" id="code-' + code.d + '">'
 		+ '<div class="ghw-code-label"><span class="ghw-degree">' + math("d = " + code.d) + "</span>"
 		+ '<span class="ghw-dimension">' + math("k = " + code.k) + "</span></div>"
@@ -306,32 +334,64 @@ function drawTable() {
 	typeset(container);
 }
 
-function toggleCode(degree) {
+function highlightSelected() {             // mark the entry selected in the address, if it is drawn
+	const params = new URLSearchParams(location.hash.slice(1));
+	if (params.has("d") && params.has("r")) {
+		const cell = document.getElementById("entry-" + Number(params.get("d")) + "-" + Number(params.get("r")));
+		if (cell) cell.classList.add("ghw-selected");
+	}
+}
+
+function toggleCode(degree, keepFocus) {
 	const code = codeOf(shown.q, degree, shown.m);
 	expanded[degree] = !isExpanded(code);
 	const block = document.getElementById("code-" + degree);
 	block.outerHTML = codeBlockHTML(shown.q, shown.m, code);
 	typeset(document.getElementById("code-" + degree));
+	highlightSelected();
+	if (keepFocus) document.querySelector("#code-" + degree + " .ghw-toggle").focus();
+}
+
+function showCode(d) {                     // expand the block of PRM_q(d,m) and scroll to it
+	const code = codeOf(shown.q, d, shown.m);
+	if (!code) return;
+	if (!isExpanded(code)) toggleCode(d);
+	afterTypesetting(() => document.getElementById("code-" + d).scrollIntoView({behavior: "smooth"}));
+}
+
+function showSelectedCell() {
+	// If the selected cell is hidden, scroll its grid sideways (on narrow screens), and scroll the
+	// page so that the cell appears just below the explanation, which then sticks to the top.
+	const cell = document.querySelector(".ghw-selected");
+	if (!cell) return;
+	const wrapper = cell.closest(".ghw-grid-wrapper");
+	const grid = wrapper.getBoundingClientRect();
+	let box = cell.getBoundingClientRect();
+	if (box.left < grid.left || box.right > grid.right) {
+		wrapper.scrollLeft += box.left - grid.left - (grid.width - box.width) / 2;
+		box = cell.getBoundingClientRect();
+	}
+	const panel = document.getElementById("ghw-explanation");
+	if (box.top < panel.getBoundingClientRect().bottom || box.bottom > window.innerHeight) {
+		cell.style.scrollMarginTop = (panel.offsetHeight + 20) + "px";
+		cell.scrollIntoView({block: "start", behavior: "smooth"});
+	}
 }
 
 function select(d, r) {
 	document.querySelectorAll(".ghw-selected").forEach(cell => cell.classList.remove("ghw-selected"));
-	if (d === null) {
-		document.getElementById("ghw-explanation").hidden = true;
+	const box = document.getElementById("ghw-explanation");
+	const code = d === null ? null : codeOf(shown.q, d, shown.m);
+	if (!code || r < 1 || r > code.k) {    // nothing selected, or an entry that does not exist
+		box.hidden = true;
 		return;
 	}
-	const code = codeOf(shown.q, d, shown.m);
-	if (!code) return;
 	if (!isExpanded(code)) toggleCode(d);
 	showExplanation(shown.q, d, shown.m, r);
 	const cell = document.getElementById("entry-" + d + "-" + r);
 	if (cell) {
 		cell.classList.add("ghw-selected");
-		const box = cell.getBoundingClientRect();
-		const panel = document.getElementById("ghw-explanation").getBoundingClientRect();
-		if (box.top < panel.bottom || box.bottom > window.innerHeight) {
-			window.scrollBy({top: box.top - panel.bottom - 20, behavior: "smooth"});
-		}
+		afterTypesetting(showSelectedCell);
 	}
 }
 
@@ -341,22 +401,42 @@ function select(d, r) {
 // ---------------------------------------------------------------------------------------------
 
 async function follow() {
+	const call = ++followCount;
 	const params = new URLSearchParams(location.hash.slice(1));
-	if (location.hash && !params.has("q")) return;      // an ordinary anchor, such as #references
+	const anchor = location.hash !== "" && !params.has("q");   // an ordinary anchor, such as #references
+	if (anchor && shown) return;                                 // keep the table; the browser scrolls
 	let q = Number(params.get("q")), m = Number(params.get("m"));
-	if (!tableInfo(q, m)) {                               // default: q = 3, m = 3
+	const notice = document.getElementById("ghw-notice");
+	notice.hidden = true;
+	let missing = false;
+	if (!tableInfo(q, m)) {                                      // default: q = 3, m = 3
+		missing = params.has("q");
+		if (missing) {
+			notice.textContent = "There is no table for q = " + params.get("q") + " and m = " + (params.get("m") || "?")
+				+ " in this version; the table for q = 3 and m = 3 is shown instead.";
+			notice.hidden = false;
+		}
 		q = 3;
 		m = 3;
 	}
 	if (!shown || shown.q !== q || shown.m !== m) {
 		const data = await download(tableInfo(q, m).file);
+		if (call !== followCount) return;                        // the address changed meanwhile
 		shown = {q, m, data};
 		for (const key in expanded) delete expanded[key];
 		drawChoices();
 		drawTable();
 	}
-	if (params.has("d") && params.has("r")) {
+	if (anchor) {                                                // opened at an anchor: the table
+		const target = document.getElementById(location.hash.slice(1));   // has pushed it down
+		if (target) afterTypesetting(() => target.scrollIntoView());
+	} else if (missing) {
+		select(null, null);
+	} else if (params.has("d") && params.has("r")) {
 		select(Number(params.get("d")), Number(params.get("r")));
+	} else if (params.has("d")) {                                // a code, such as #q=3&m=3&d=4
+		select(null, null);
+		showCode(Number(params.get("d")));
 	} else {
 		select(null, null);
 	}
@@ -379,11 +459,19 @@ async function start() {
 		return;
 	}
 	drawReferences();
-	document.getElementById("ghw-codes").addEventListener("click", event => {
+	const codes = document.getElementById("ghw-codes");
+	codes.addEventListener("click", event => {
 		const toggle = event.target.closest(".ghw-toggle");
 		if (toggle) {
 			event.preventDefault();
-			toggleCode(Number(toggle.dataset.degree));
+			toggleCode(Number(toggle.dataset.degree), true);
+		}
+	});
+	codes.addEventListener("keydown", event => {               // the space bar also works on Show/Hide
+		const toggle = event.target.closest(".ghw-toggle");
+		if (toggle && event.key === " ") {
+			event.preventDefault();
+			toggleCode(Number(toggle.dataset.degree), true);
 		}
 	});
 	window.addEventListener("hashchange", follow);

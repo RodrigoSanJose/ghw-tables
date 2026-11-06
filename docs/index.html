@@ -11,7 +11,7 @@
 
 		<title>Generalized Hamming weights of projective Reed–Muller codes</title>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content="Bounds and exact values for the generalized Hamming weights of projective Reed–Muller codes, with a justification for every value." />
 		<link rel="stylesheet" href="/assets/css/main.css" />
 		<link rel="stylesheet" href="ghw.css" />
@@ -76,8 +76,8 @@
 						Bounds and exact values for the generalized Hamming weights
 						<span class="math">\(d_r(\mathrm{PRM}_q(d,m))\)</span> of projective Reed–Muller codes.
 						Choose <span class="math">\(q\)</span> and <span class="math">\(m\)</span>: each block below is a code
-						<span class="math">\(\mathrm{PRM}_q(d,m)\)</span>, and the entry in row <span class="math">\(a\)</span> and
-						column <span class="math">\(b\)</span> is the weight <span class="math">\(d_{a+b}\)</span>.
+						<span class="math">\(\mathrm{PRM}_q(d,m)\)</span>, and the entry in row <span class="math">\(i\)</span> and
+						column <span class="math">\(j\)</span> is the weight <span class="math">\(d_{i+j}\)</span>.
 						A single number is the exact value, and <span class="ghw-open-sample">a–b</span>
 						means <span class="math">\(a \le d_r \le b\)</span>.
 						<strong>Click on any entry</strong> to see where its bounds come from.
@@ -87,6 +87,7 @@
 						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="math">\(q\)</span></span> <span id="ghw-q-choices"></span></div>
 						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="math">\(m\)</span></span> <span id="ghw-m-choices"></span></div>
 					</div>
+					<p id="ghw-notice" hidden></p>
 					<p id="ghw-summary"></p>
 
 					<div id="ghw-explanation" class="ghw-explanation" hidden></div>
@@ -101,7 +102,8 @@
 						<h2>Where the bounds come from</h2>
 					</header>
 					<ul>
-						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [PRM, Thm 1.1],
+						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [PRM, Thm 1.1]
+							(conjectured by Beelen, Datta and Ghorpade [BDG22]),
 							for <span class="math">\((m-1)(q-1) &lt; d &lt; m(q-1)\)</span> [PRM, Cor 4.2], and for <span class="math">\(d \ge m(q-1)\)</span>;
 							the minimum distance [Sør91]; and the first weights for the degrees of [PRM, Prop 6.12].</li>
 						<li><strong>Upper bound.</strong> The bound <span class="math">\(B_r(q,d,m)\)</span> of [PRM, Thm 6.7], valid in every degree.

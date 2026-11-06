@@ -2,37 +2,34 @@
 The rules used to fill the table.
 
 Each rule looks at one code PRM_q(d, m), proposes bounds for its weights together with the reason,
-and returns how many bounds it improved.  A rule can only raise a lower bound or lower an upper
-bound (see Table.improve_lower and Table.improve_upper), so the order of the rules does not matter
-for the final table.  It only matters for the credit: when two rules give the same bound, the one
-applied first keeps it.
+and returns the number of changes it made to the table.  A rule can only raise a lower bound or lower
+an upper bound (see Table.improve_lower and Table.improve_upper), and the bound proposed by each rule
+can only improve when the bounds it uses improve (only the recursive bound uses other bounds).
+Hence the order of the rules does not matter for the final table.  It only matters for the credit:
+when two rules give the same bound, the one applied first keeps it.
 
 The list RULES at the end of this file is the list of rules that generate.py uses.
 """
 
-from formulas import (affine_hierarchy, attaining_set, dim_PRM, known_hierarchy, largest_point_sets,
-                      lifted_weights, macaulay, binom, p, recursive_lower_bound,
-                      sorensen_minimum_distance)
+from formulas import (affine_hierarchy, attaining_set, binom, dim_PRM, known_hierarchy, largest_n,
+                      lifted_weights, macaulay, p, recursive_lower_bound, sorensen_minimum_distance)
 
 
 def exact_values(table, q, d, m):
     """Exact values: the complete hierarchy when it is known ([PRM, Thm 1.1] for d < q, [PRM, Cor. 4.2]
-    for (m-1)(q-1) < d < m(q-1), and the large degrees d >= m(q-1)); the minimum distance
-    (Sorensen); and the first weights given by [PRM, Prop. 6.12]."""
+    for (m-1)(q-1) < d < m(q-1), and the degrees d >= m(q-1)); the minimum distance (Sorensen);
+    and the first weights given by [PRM, Prop. 6.12]."""
     code = (q, d, m)
     changes = 0
 
-    H, result = known_hierarchy(q, d, m)
+    H, name = known_hierarchy(q, d, m)  # name: "PRM Thm 1.1", "PRM Cor 4.2", "whole space" or "dual is all-ones"
     if H is not None:
         for r in range(1, len(H)):
-            if result == "PRM Thm 1.1":
-                reason = {"rule": result, "mu": macaulay(binom(m + d, d) - r, d)}
-            elif result == "PRM Cor 4.2":
-                reason = {"rule": result, "dual_degree": m * (q - 1) - d}
-            elif d > m * (q - 1):
-                reason = {"rule": "whole space"}
-            else:
-                reason = {"rule": "dual is all-ones"}       # d = m(q-1)
+            reason = {"rule": name}
+            if name == "PRM Thm 1.1":
+                reason["mu"] = macaulay(binom(m + d, d) - r, d)
+            if name == "PRM Cor 4.2":
+                reason["dual_degree"] = m * (q - 1) - d
             changes += table.improve_lower(code, r, H[r], reason)
             changes += table.improve_upper(code, r, H[r], reason)
 
@@ -48,11 +45,12 @@ def exact_values(table, q, d, m):
 
 
 def upper_bound(table, q, d, m):
-    """The upper bound B_r(q, d, m) = p_m - n of [PRM, Thm 6.7], where n is the largest integer with
-    h_d(n) <= k_d(m) - r.  The reason records n and which of the sets Z_n^-, Z_n^+ is used."""
+    """The upper bound B_r(q, d, m) = p_m - n of [PRM, Thm 6.7], where n is the largest integer
+    0 <= n <= p_m with h_d(n) <= k_d(m) - r.  The reason records n and which of the sets Z_n^-, Z_n^+
+    is used."""
     code = (q, d, m)
     k = dim_PRM(q, d, m)
-    N = largest_point_sets(q, d, m)        # N[v] = max{ n : h_d(n) <= v }
+    N = largest_n(q, d, m)                 # N[v] = max{ n : h_d(n) <= v }
     changes = 0
     for r in range(1, k + 1):
         n = N[k - r]
@@ -64,33 +62,42 @@ def upper_bound(table, q, d, m):
 def recursive_bound(table, q, d, m):
     """The lower bound of [SJ24, Thm 7], using the current lower bounds for the codes PRM_q(d, m-1)
     and PRM_q(d-q+1, m-1).  Since the codes are treated by increasing m, these bounds are final when
-    this rule reaches PRM_q(d, m), and a new value for a smaller code is automatically used here."""
-    if m < 2 or d > m * (q - 1):          # Thm 7 needs m >= 2 and 1 <= d <= m(q-1)
+    this rule reaches PRM_q(d, m), and a new value for a smaller code is automatically used here.
+
+    The bound is computed for every r, also where the weight is already known: there it cannot
+    improve anything, but generate.py then checks that it agrees with the known value.
+    """
+    # Thm 7 needs 1 <= d <= m(q-1).  We use it for m >= 2: for m = 1 every weight is already known,
+    # and the smaller codes PRM_q(., 0) are not in the tables.
+    if m < 2 or d > m * (q - 1):
         return 0
     code = (q, d, m)
-    same_degree = table.lower_bounds(q, d, m - 1)
-    lower_degree = table.lower_bounds(q, d - q + 1, m - 1)
+    PRM_d = table.lower_bounds(q, d, m - 1)                          # lower bounds for PRM_q(d, m-1)
+    PRM_d_minus_q_plus_1 = table.lower_bounds(q, d - q + 1, m - 1)   # lower bounds for PRM_q(d-q+1, m-1)
 
-    # The bound only depends on these two tuples.  If they are the same as the last time that this
-    # rule was applied to this code, it cannot give anything new, so we save the work.
-    if table.recursive_inputs.get(code) == (same_degree, lower_degree):
+    # The bound only depends on these two tuples.  This is the slowest rule, so if they are the same
+    # as the last time that this rule was applied to this code, we do not compute it again (otherwise
+    # the last pass of generate.py, which only confirms that nothing changes, would take twice as long).
+    if table.recursive_inputs.get(code) == (PRM_d, PRM_d_minus_q_plus_1):
         return 0
-    table.recursive_inputs[code] = (same_degree, lower_degree)
+    table.recursive_inputs[code] = (PRM_d, PRM_d_minus_q_plus_1)
 
     RM_d = affine_hierarchy(q, d, m)
     RM_d_minus_1 = affine_hierarchy(q, d - 1, m)
     changes = 0
     for r in range(2, dim_PRM(q, d, m) + 1):
-        if table.is_exact(code, r):
-            continue                      # nothing left to improve
-        bound, alpha, gamma = recursive_lower_bound(q, d, m, r, same_degree, lower_degree)
+        bound, alpha, gamma = recursive_lower_bound(q, d, m, r, PRM_d, PRM_d_minus_q_plus_1)
         reason = {"rule": "SJ24 Thm 7", "alpha": alpha, "gamma": gamma,
                   # the four numbers in B_{alpha,gamma} at the pair attaining the minimum:
-                  "RM_d": RM_d[r - gamma],                    # d_{r-gamma}(RM_q(d, m))
-                  "RM_d_minus_1": RM_d_minus_1[r - alpha],    # d_{r-alpha}(RM_q(d-1, m))
-                  "same_degree": same_degree[alpha],          # bound for d_alpha(PRM_q(d, m-1))
-                  "lower_degree": lower_degree[gamma]}        # bound for d_gamma(PRM_q(d-q+1, m-1))
-        changes += table.improve_lower(code, r, bound, reason)
+                  "RM_d": RM_d[r - gamma],                       # d_{r-gamma}(RM_q(d, m))
+                  "RM_d_minus_1": RM_d_minus_1[r - alpha],       # d_{r-alpha}(RM_q(d-1, m))
+                  "PRM_d": PRM_d[alpha],                         # bound for d_alpha(PRM_q(d, m-1))
+                  "PRM_d_minus_q_plus_1": PRM_d_minus_q_plus_1[gamma]}   # bound for d_gamma(PRM_q(d-q+1, m-1))
+        if bound == table.lower[code][r] and table.lower_reason[code][r]["rule"] == "SJ24 Thm 7":
+            # The same bound as before, but obtained from newer inputs: keep the explanation up to date.
+            table.lower_reason[code][r] = reason
+        else:
+            changes += table.improve_lower(code, r, bound, reason)
     return changes
 
 
@@ -99,7 +106,7 @@ def computed_values(table, q, d, m):
     literature, read from data/manual.csv.  Each entry may give a lower bound, an upper bound, or both."""
     code = (q, d, m)
     changes = 0
-    for entry in table.computed.get(code, []):
+    for entry in table.computed.get(code, []):   # the lines of data/manual.csv for this code (none if it has no line)
         reason = {"rule": "computed", "source": entry["source"], "note": entry["note"]}
         if entry["lower"] is not None:
             changes += table.improve_lower(code, entry["r"], entry["lower"], reason)

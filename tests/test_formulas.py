@@ -20,7 +20,7 @@ import unittest
 from itertools import product
 from pathlib import Path
 
-SRC = Path(__file__).resolve().parent.parent / "src"
+SRC = Path(__file__).resolve().parent.parent.joinpath("src")
 sys.path.insert(0, str(SRC))
 
 from formulas import (A, B, affine_hierarchy, attaining_set, bdg_hierarchy, binom, digit_sum,  # noqa: E402
@@ -204,14 +204,18 @@ class TestAffine(unittest.TestCase):
         """d_1(RM_q(d, m)) = (q - b) q^(m-a-1) for d = a(q-1) + b, 0 <= b < q-1, d < m(q-1)."""
         for q, d, m in self.AFFINE:
             if d < m * (q - 1):
-                a, b = divmod(d, q - 1)
+                a = d // (q - 1)
+                b = d % (q - 1)
                 self.assertEqual(affine_hierarchy(q, d, m)[1], (q - b) * q**(m - a - 1), (q, d, m))
 
     def test_against_A(self):
-        """Second description: d_r(RM_q(d, m)) = q^m - max{t : A(t, d) <= dim RM_q(d, m) - r}."""
+        """A cross-check of affine_hierarchy ([SJ24, Thm 6]) with the counting function A:
+        d_r(RM_q(d, m)) = q^m - max{t : A(t, d) <= dim RM_q(d, m) - r}, the affine analogue of B_r."""
         for q, d, m in self.AFFINE:
             k = dim_RM(q, d, m)
-            largest = [0] * (k + 1)              # largest[v] = max{t <= q^m : A(t, d) = v}
+            # A(t+1, d) - A(t, d) is 0 or 1, with A(0, d) = 0 and A(q^m, d) = k, so every v = 0, ..., k
+            # is attained, and max{t : A(t, d) = v} = max{t : A(t, d) <= v}.
+            largest = [0] * (k + 1)              # largest[v] = max{t <= q^m : A(t, d) <= v}
             for t in range(q**m + 1):
                 largest[A(q, t, d)] = t
             expected = (0,) + tuple(q**m - largest[k - r] for r in range(1, k + 1))
@@ -267,10 +271,10 @@ SJ24_TABLE_RANGES = {
 
 def thm7_with_exact_inputs(q, d, m, r):
     """[SJ24, Thm 7] for d_r(PRM_q(d, m)), using the exact hierarchies of the two smaller codes
-    (they are known for m - 1 <= 2)."""
-    same_degree = known_hierarchy(q, d, m - 1)[0]
-    lower_degree = known_hierarchy(q, d - q + 1, m - 1)[0] if d - q + 1 >= 1 else (0,)
-    return recursive_lower_bound(q, d, m, r, same_degree, lower_degree)
+    (they are known for m - 1 <= 2).  For d - q + 1 <= 0, PRM_q(d-q+1, m-1) = {0}, as in [SJ24]."""
+    PRM_d = known_hierarchy(q, d, m - 1)[0]
+    PRM_d_minus_q_plus_1 = known_hierarchy(q, d - q + 1, m - 1)[0] if d - q + 1 >= 1 else (0,)
+    return recursive_lower_bound(q, d, m, r, PRM_d, PRM_d_minus_q_plus_1)
 
 
 class TestRecursiveBound(unittest.TestCase):

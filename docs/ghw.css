@@ -16,9 +16,11 @@
 	The paragraphs of this page that come after other elements need their own margins. */
 #ghw-summary,
 #ghw-loading,
+#ghw-notice,
 #about ul + p {
 	margin: 0 0 1.25em 0;
 }
+#ghw-notice { font-weight: bold; }
 #about .ghw-cite-text { margin: 0 0 1em 0; }
 #about pre { margin-bottom: 1.5em; }
 
@@ -106,9 +108,12 @@
 }
 .ghw-grid-wrapper { overflow-x: auto; }
 
-/* The grid: row a and column b hold d_{a+b}. */
+/* The grid: row i and column j hold d_{i+j}.
+   It is as wide as its columns need, so that no entry spills into the next one;
+   on a narrow screen the wrapper scrolls sideways. */
 .ghw-grid {
 	display: grid;
+	width: max-content;
 	grid-template-columns: 2.6em repeat(10, minmax(2.8em, max-content));
 	gap: 4px;
 	font-size: 0.85em;

@@ -96,7 +96,7 @@ Every source above is a *rule*: it looks at one code, proposes bounds, and recor
 
 1. starts from the trivial bounds $r \le d_r \le p_m$;
 2. applies all the rules to all the codes, by increasing $m$;
-3. repeats step 2 until a full pass improves nothing.
+3. repeats step 2 until a full pass changes nothing.
 
 A rule can only raise a lower bound or lower an upper bound, and the result of every rule can only
 improve when its inputs improve. Hence the final tables do not depend on the order in which the
@@ -105,8 +105,9 @@ the larger codes.
 
 Everything is recomputed from scratch from the formulas and `data/manual.csv`. The generator stops
 if some lower bound is larger than the corresponding upper bound, which would reveal a wrong value
-or a bug. An upper bound below $B_r(q,d,m)$ would be a counterexample to [PRM, Conj 6.9]; the generator
-reports it as such.
+or a bug. The recursive bound is also computed where the weight is already known, so it checks the
+exact values too. An upper bound below $B_r(q,d,m)$ would be a counterexample to [PRM, Conj 6.9]; the
+generator reports it as such.
 
 ## Adding a computed value
 
@@ -119,16 +120,17 @@ q,d,m,r,lower,upper,source,note
 
 * Leave `lower` (or `upper`) empty if the computation only gives an upper (or a lower) bound.
 * `source` is a key of [`data/references.csv`](data/references.csv).
-* `note` says how to reproduce the value.
+* `note` says how to reproduce the value. Write it between double quotes if it contains a comma.
 
-Then run the generator, read its report, and commit the changes.
+Then run the generator, read its report, and commit the changes. If a line is not valid, the
+generator stops and says which line it is.
 
 ## Using the code
 
 Only Python 3.9 or later is needed; there are no other dependencies. From the repository folder:
 
 ```
-python3 src/generate.py                        # compute the tables (about a minute)
+python3 src/generate.py                        # compute the tables (about a minute and a half)
 python3 -m unittest discover -s tests -v       # run the tests (a few seconds)
 FULL_CHECK=1 python3 -m unittest discover -s tests -v
 ```
@@ -225,7 +227,8 @@ The website uses the style of https://rodrigosanjose.github.io, which is based o
   systems of homogeneous polynomial equations over finite fields*, Moscow Math. J. 22(4) (2022), 565–593.
   [doi:10.17323/1609-4514-2022-22-4-565-593](https://doi.org/10.17323/1609-4514-2022-22-4-565-593).
 * **[HP98]** P. Heijnen, R. Pellikaan, *Generalized Hamming weights of q-ary Reed–Muller codes*,
-  IEEE Trans. Inform. Theory 44(1) (1998), 181–196.
+  IEEE Trans. Inform. Theory 44(1) (1998), 181–196. [doi:10.1109/18.651015](https://doi.org/10.1109/18.651015).
 * **[Sør91]** A. B. Sørensen, *Projective Reed–Muller codes*, IEEE Trans. Inform. Theory 37(6) (1991), 1567–1576.
+  [doi:10.1109/18.104317](https://doi.org/10.1109/18.104317).
 * **[Wei91]** V. K. Wei, *Generalized Hamming weights for linear codes*,
-  IEEE Trans. Inform. Theory 37(5) (1991), 1412–1418.
+  IEEE Trans. Inform. Theory 37(5) (1991), 1412–1418. [doi:10.1109/18.133259](https://doi.org/10.1109/18.133259).
