@@ -21,10 +21,7 @@ keywords:
   - coding theory
 repository-code: 'https://github.com/RodrigoSanJose/ghw-tables'
 url: 'https://rodrigosanjose.github.io/ghw-tables/'
+# The Zenodo DOI that covers all versions, and always points to the latest one.
+doi: 10.5281/zenodo.24020768
 # The tables, data and documentation are licensed under CC BY 4.0, and the code under the MIT license (see the README).
 license: CC-BY-4.0
-# After the first release on Zenodo, add the DOI that covers all versions:
-# identifiers:
-#   - type: doi
-#     value: 10.5281/zenodo.XXXXXXX
-#     description: Zenodo archive (all versions)

@@ -3,9 +3,9 @@
 Bounds and exact values for the generalized Hamming weights of projective Reed–Muller codes,
 with a justification for every value, in the spirit of [codetables.de](https://www.codetables.de).
 
-> **Status: work in progress.** The tables will be available at
-> https://rodrigosanjose.github.io/ghw-tables/, and every release will be archived on Zenodo with a DOI
-> (see [Citation](#citation)).
+> **Status: work in progress.** The tables are available at
+> https://rodrigosanjose.github.io/ghw-tables/, and every release is archived on Zenodo,
+> [doi:10.5281/zenodo.24020768](https://doi.org/10.5281/zenodo.24020768) (see [Citation](#citation)).
 
 ## The codes
 
@@ -39,6 +39,10 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 | 8 | 1, 2, 3 | 585 |
 | 9 | 1, 2, 3 | 820 |
 
+For $q = 2$ every weight is known exactly. In that case PRM codes are shortened Reed–Muller codes: since
+$x^2 = x$ on $\mathbb{F}_2$, $\mathrm{PRM}_2(d,m)$ is $\mathrm{RM}_2(d,m+1)$ shortened at the origin, and
+its dual is the punctured code $\mathrm{RM}_2(m-d,m+1)^*$.
+
 ## Where the bounds come from
 
 Theorem numbers refer to [SJ26] ([arXiv:2611.08203v1](https://arxiv.org/abs/2611.08203v1)) and to the
@@ -48,12 +52,12 @@ published version of [SJ24].
 
 | Range | Value | Source |
 |---|---|---|
-| $d < q$ | complete hierarchy | [SJ26, Thm 1.1], conjectured by Beelen, Datta and Ghorpade [BDG22] |
-| $(m-1)(q-1) < d < m(q-1)$ | complete hierarchy | [SJ26, Cor 4.2]: Wei duality [Wei91] and Sørensen's description of the dual [Sør91] |
+| $d < q$ | complete hierarchy | [SJ26, Thm. 1.1], conjectured by Beelen, Datta and Ghorpade [BDG22] |
+| $(m-1)(q-1) < d < m(q-1)$ | complete hierarchy | [SJ26, Cor. 4.2]: Wei duality [Wei91] and Sørensen's description of the dual [Sør91] |
 | $d = m(q-1)$ | $d_r = r + 1$ | the dual code is spanned by the all-ones vector [Sør91] |
 | $d > m(q-1)$ | $d_r = r$ | the code is the whole space |
 | $r = 1$ | minimum distance | [Sør91] |
-| $d = 1 + t(q-1)$, or $d = 2 + t(q-1)$ with $q \ge 3$ | the first $m - t + 1$ weights | [SJ26, Prop 6.12] |
+| $d = 1 + t(q-1)$, or $d = 2 + t(q-1)$ with $q \ge 3$ | the first $m - t + 1$ weights | [SJ26, Prop. 6.12] |
 
 For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the Macaulay tuple of $\binom{m+d}{d} - r$ in degree $d$,
 
@@ -65,7 +69,7 @@ In particular, the complete weight hierarchy is known for $m \le 2$.
 
 ### Upper bound, valid in every degree
 
-By [SJ26, Thm 6.7], for $1 \le r \le k_d(m)$,
+By [SJ26, Thm. 6.7], for $1 \le r \le k_d(m)$,
 
 ```math
 d_r(\mathrm{PRM}_q(d,m)) \;\le\; B_r(q,d,m) = p_m - \max\{\, 0 \le n \le p_m : h_d(n) \le k_d(m) - r \,\}.
@@ -73,22 +77,22 @@ d_r(\mathrm{PRM}_q(d,m)) \;\le\; B_r(q,d,m) = p_m - \max\{\, 0 \le n \le p_m : h
 
 Here $h_d(n)$ is the smaller of the Hilbert functions in degree $d$ of two explicit sets
 $Z_n^-, Z_n^+ \subseteq \mathbb{P}^m(\mathbb{F}_q)$ with $n$ points, built by filling affine spaces and their
-points at infinity. It is computed with the recursion of [SJ26, Prop 6.6]. The bound comes from the
+points at infinity. It is computed with the recursion of [SJ26, Prop. 6.6]. The bound comes from the
 subcode of polynomials vanishing on the corresponding set. Equality holds for $d < q$, and
-[SJ26, Conj 6.9] states that it always holds.
+[SJ26, Conj. 6.9] states that it always holds.
 
 ### Lower bounds
 
-* **Recursive bound** [SJ24, Thm 7]. It comes from the recursive construction of
-  $\mathrm{PRM}_q(d,m)$ from $\mathrm{RM}_q(d-1,m)$ and $\mathrm{PRM}_q(d,m-1)$ [SJ24, Thm 4], and bounds
+* **Recursive bound** [SJ24, Thm. 7]. It comes from the recursive construction of
+  $\mathrm{PRM}_q(d,m)$ from $\mathrm{RM}_q(d-1,m)$ and $\mathrm{PRM}_q(d,m-1)$ [SJ24, Thm. 4], and bounds
   $d_r(\mathrm{PRM}_q(d,m))$ from below by a minimum, over pairs $(\alpha,\gamma)$, of expressions
   involving two kinds of weights:
-  * those of the affine codes $\mathrm{RM}_q(d,m)$ and $\mathrm{RM}_q(d-1,m)$, known by Heijnen and Pellikaan [HP98] (we use the form of [SJ24, Thm 6]);
+  * those of the affine codes $\mathrm{RM}_q(d,m)$ and $\mathrm{RM}_q(d-1,m)$, known by Heijnen and Pellikaan [HP98] (we use the form of [SJ24, Thm. 6]);
   * those of the smaller codes $\mathrm{PRM}_q(d,m-1)$ and $\mathrm{PRM}_q(d-q+1,m-1)$.
 
   The tables use the best bounds available for these smaller codes, so any improvement for them
   propagates to the larger codes.
-* **Duality** [Wei91; SJ24, Thm 9], as in [SJ24, Section V-C]. Let $1 \le d \le m(q-1)-1$ and
+* **Duality** [Wei91; SJ24, Thm. 9], as in [SJ24, Section V-C]. Let $1 \le d \le m(q-1)-1$ and
   $e = m(q-1)-d$. The dual of $\mathrm{PRM}_q(d,m)$ is $\mathrm{PRM}_q(e,m)$ if $q-1$ does not divide $d$, and
   $\mathrm{PRM}_q(e,m) + \langle (1,\dots,1) \rangle$ if it does [Sør91]. In the second case, a subspace of the
   dual of dimension $s$ meets $\mathrm{PRM}_q(e,m)$ in dimension at least $s-1$, so
@@ -105,8 +109,40 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
   weights of $C$. This applies to all the bounds above, in both directions, and the improved bounds
   are also used by the recursive bound for the larger codes. ([SJ24, Section V-C] uses the first case;
   the second one is new here.)
-* **Monotonicity** $d_1 < d_2 < \dots < d_k$ [SJ24, Thm 5]: $d_r$ is at least the lower bound of
-  $d_{r-1}$ plus one, and at most the upper bound of $d_{r+1}$ minus one.
+* **Classical bounds**, valid for every linear code of length $n$ (here $n = p_m$) and dimension $k$
+  over $\mathbb{F}_q$, each one used in both directions:
+  * the *fundamental relation*, the case $s = r - 1$ of [HKLY95, Thm. 1] ([HKY92, Thm. 1] for $q = 2$),
+    ```math
+    (q^r - q)\, d_r \ge (q^r - 1)\, d_{r-1}, \qquad 2 \le r \le k,
+    ```
+    which gives lower bounds for $d_r$ from those of $d_{r-1}$, and upper bounds for $d_{r-1}$ from
+    those of $d_r$;
+  * the *residual code bound* (from the proof of [HKLY95, Thm. 4])
+    ```math
+    n - d_r \ge \sum_{i=0}^{k-r-1} \left\lceil \frac{d_{r+1} - d_r}{q^i} \right\rceil, \qquad 0 \le r \le k-1.
+    ```
+    Deleting the support of an $r$-dimensional subcode with $d_r$ coordinates in its support gives a
+    code of length $n - d_r$, dimension $k - r$ and minimum distance at least $d_{r+1} - d_r$, and this is
+    the Griesmer bound for it. It gives upper bounds for $d_{r+1}$ from those of $d_r$ (for $r = 0$,
+    with $d_0 = 0$, it is the Griesmer bound for $d_1$), and lower bounds for $d_r$ from those of $d_{r+1}$.
+
+  These two contain the other bounds of [Wei91], [HKY92] and [HKLY95] that can be evaluated from
+  bounds for the weights, so these are not applied separately:
+  * the strict increase $d_{r-1} < d_r$ [Wei91, Thm. 1; SJ24, Thm. 5], since $(q^r - 1)/(q^r - q) > 1$;
+  * the other cases of [HKLY95, Thm. 1], [HKLY95, Cor. 1], and the Griesmer-type lower bound
+    $d_r \ge \sum_{i=0}^{r-1} \lceil d_1/q^i \rceil$ ([Wei91, Thm. 4 and Lemma 1], there for $q = 2$), which
+    follow by iterating the fundamental relation upwards;
+  * the generalized Singleton bound $d_r \le n - k + r$ [Wei91, Cor. 1], the Plotkin-type bound
+    [HKLY95, Thm. 2] and the generalized Griesmer bound [HKLY95, Thm. 4] ([HKY92, Thm. 5] for $q = 2$),
+    which follow by iterating it downwards from $d_k \le n$;
+  * [HKY92, Thm. 9], whose proof works over every field, and whose form over $\mathbb{F}_q$ is the
+    residual code bound without the ceilings.
+
+  [HKY92, Lemma 5] gives a code over $\mathbb{F}_{q^r}$ with minimum distance $d_r$, so every bound for
+  the minimum distance, such as the sphere-packing bound, gives an upper bound for $d_r$ that depends only
+  on $n$, $k$ and $r$. For these codes, neither the sphere-packing bound nor the Griesmer bound improves
+  any upper bound of the tables, and since the upper bounds can only decrease, they never will, so they
+  are not used.
 * **Computed values.** Values computed with the Sage package GHWs [GHWs], and values from the
   literature, listed in [`data/manual.csv`](data/manual.csv) with their source.
 
@@ -121,13 +157,14 @@ Every source above is a *rule*: it looks at one code, proposes bounds, and recor
 A rule can only raise a lower bound or lower an upper bound, and the result of every rule can only
 improve when its inputs improve. Hence the final tables do not depend on the order in which the
 rules are applied, and a new computed value is automatically used by the recursive bound for all
-the larger codes, and by duality and monotonicity.
+the larger codes, and by duality and the classical bounds.
 
 Everything is recomputed from scratch from the formulas and `data/manual.csv`. The generator stops
 if some lower bound is larger than the corresponding upper bound, which would reveal a wrong value
-or a bug; thanks to monotonicity, this includes computed values that do not increase with $r$. The
-recursive bound is also computed where the weight is already known, so it checks the exact values too.
-An upper bound below $B_r(q,d,m)$ would be a counterexample to [SJ26, Conj 6.9]; the generator reports it
+or a bug; since the fundamental relation contains the strict increase of the weights, this includes
+computed values that do not increase with $r$. The recursive bound is also computed where the weight
+is already known, so it checks the exact values too.
+An upper bound below $B_r(q,d,m)$ would be a counterexample to [SJ26, Conj. 6.9]; the generator reports it
 as such.
 
 ## Adding a computed value
@@ -159,7 +196,7 @@ sage -python sage/compute.py 3 4 3 all    # all the weights of PRM_3(4,3), to co
 ```
 
 When $d_r$ is not known, the tables give $a \le d_r \le b$ with $a < b$ and $b \le B_r(q,d,m)$, and
-[SJ26, Conj 6.9] says that $d_r = B_r(q,d,m)$. So the script first asks `GHW_bound` whether $d_r \ge b$,
+[SJ26, Conj. 6.9] says that $d_r = B_r(q,d,m)$. So the script first asks `GHW_bound` whether $d_r \ge b$,
 which is usually much faster than computing $d_r$. If the answer is yes, then $d_r = b$, and the line
 for `data/manual.csv` only gives the lower bound $b$ (the upper bound is already in the tables). If the
 answer is no, the script computes $d_r$ with `GHW`, and reports a counterexample to the conjecture.
@@ -177,10 +214,10 @@ FULL_CHECK=1 python3 -m unittest discover -s tests -v
 
 The tests reproduce the examples and the computational checks of [SJ26]:
 
-* the formula of Thm 1.1 for $d < q$, Sørensen's minimum distance, Cor 4.2, Prop 6.12, Lemma 6.10 and Cor 5.2;
-* the examples of Section 6, and the remark verifying Conj 6.9 for $q = 3$, $m = 3$.
+* the formula of Thm. 1.1 for $d < q$, Sørensen's minimum distance, Cor. 4.2, Prop. 6.12, Lemma 6.10 and Cor. 5.2;
+* the examples of Section 6, and the remark verifying Conj. 6.9 for $q = 3$, $m = 3$.
 
-They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm 7] at every entry of
+They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm. 7] at every entry of
 [SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$b$. They reproduce
 [SJ24, Example 6] too: duality and monotonicity turn the row $d = 3$ of [SJ24, Table III] into the exact
 values of [SJ24, Table VI]. They also check by brute force, on random binary codes, the inequalities
@@ -221,19 +258,21 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 
 If you use these tables, please consider citing them and the paper [SJ26] where the bounds are proved.
 
-> [!NOTE]
-> The tables will be archived on Zenodo with the first release. The DOI below, `10.5281/zenodo.XXXXXXX`,
-> is a placeholder until then.
+The tables are archived on Zenodo with the DOI
+[10.5281/zenodo.24020768](https://doi.org/10.5281/zenodo.24020768), which always points to the latest version.
 
 ### Citation for the tables
 ```
-@Misc{ghwTables,
-    AUTHOR = {San-Jos\'{e}, Rodrigo},
-    TITLE = {Tables of generalized {H}amming weights of projective {R}eed--{M}uller codes},
-    year = "2026",
-    publisher = "Zenodo",
-    doi = "10.5281/zenodo.XXXXXXX",
-    howpublished = "Available online: \url{https://rodrigosanjose.github.io/ghw-tables/}"
+@misc{sanjoseGHWTables,
+  author       = {San-Jos{\'e}, Rodrigo},
+  title        = {Tables of generalized {H}amming weights of
+                  projective {Reed--Muller} codes},
+  year         = {2026},
+  howpublished = {Zenodo},
+  note         = {Interactive tables:
+                  \url{https://rodrigosanjose.github.io/ghw-tables/}.
+                  Permanent DOI:
+                  \url{https://doi.org/10.5281/zenodo.24020768}}
 }
 ```
 
@@ -279,3 +318,7 @@ The website uses the style of https://rodrigosanjose.github.io, which is based o
   [doi:10.1109/18.104317](https://doi.org/10.1109/18.104317).
 * **[Wei91]** V. K. Wei, *Generalized Hamming weights for linear codes*,
   IEEE Trans. Inform. Theory 37(5) (1991), 1412–1418. [doi:10.1109/18.133259](https://doi.org/10.1109/18.133259).
+* **[HKY92]** T. Helleseth, T. Kløve, Ø. Ytrehus, *Generalized Hamming weights of linear codes*,
+  IEEE Trans. Inform. Theory 38(3) (1992), 1133–1140. [doi:10.1109/18.135655](https://doi.org/10.1109/18.135655).
+* **[HKLY95]** T. Helleseth, T. Kløve, V. I. Levenshtein, Ø. Ytrehus, *Bounds on the minimum support weights*,
+  IEEE Trans. Inform. Theory 41(2) (1995), 432–440. [doi:10.1109/18.370144](https://doi.org/10.1109/18.370144).

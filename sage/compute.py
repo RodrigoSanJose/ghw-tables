@@ -11,11 +11,11 @@ folder, with the Python of SageMath:
     sage -python sage/compute.py q d m all    all the weights of PRM_q(d,m), to compare them with the tables
 
 If a weight is not known, the tables give  lower <= d_r <= upper  with lower < upper, and upper <= B_r,
-the bound of [SJ26, Thm 6.7].  By [SJ26, Conj 6.9], d_r = B_r, so the script first asks GHW_bound
+the bound of [SJ26, Thm. 6.7].  By [SJ26, Conj. 6.9], d_r = B_r, so the script first asks GHW_bound
 whether d_r >= upper.  GHW_bound stops as soon as it knows the answer, so this is usually much faster
 than computing d_r.  If the answer is yes, then d_r = upper, and the line for data/manual.csv only gives
 this lower bound (the upper bound is already justified in the tables).  If the answer is no, then
-d_r < upper <= B_r, a counterexample to [SJ26, Conj 6.9]: the script computes d_r with GHW and says so.
+d_r < upper <= B_r, a counterexample to [SJ26, Conj. 6.9]: the script computes d_r with GHW and says so.
 
 Add the lines printed at the end to data/manual.csv, and run  python3 src/generate.py.
 """
@@ -94,7 +94,7 @@ def report(code, q, d, m, r, computed_lower, computed_upper, note):
         return None
     if value < upper:
         print(f"d_{r} = {value} is smaller than the upper bound {upper}, so it is smaller than B_{r}: "
-              f"this is a COUNTEREXAMPLE to [SJ26, Conj 6.9]! Please check it carefully.")
+              f"this is a COUNTEREXAMPLE to [SJ26, Conj. 6.9]! Please check it carefully.")
     else:
         print(f"d_{r} = {value}: new value.")
     line = csv_line(q, d, m, r, computed_lower, computed_upper, f"{note}, {date.today()}")

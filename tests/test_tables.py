@@ -57,16 +57,16 @@ class TestTables(unittest.TestCase):
                 self.assertTrue(table.is_exact((3, d, 3), r), (d, r))
                 self.assertEqual(table.lower[3, d, 3][r], B(3, d, 3, r), (d, r))
         self.assertEqual(table.lower_reason[3, 4, 3][7]["rule"], "computed")
-        self.assertEqual(table.upper_reason[3, 4, 3][7]["rule"], "SJ26 Thm 6.7")
+        self.assertEqual(table.upper_reason[3, 4, 3][7]["rule"], "SJ26 Thm. 6.7")
 
     def test_without_the_computed_value(self):
-        """Without the computation, [SJ24, Thm 7] and B_r only give 15 <= d_7(PRM_3(4,3)) <= 16."""
+        """Without the computation, [SJ24, Thm. 7] and B_r only give 15 <= d_7(PRM_3(4,3)) <= 16."""
         table = small_table(HEADER)
         self.assertEqual(table.lower[3, 4, 3][7], 15)
         self.assertEqual(table.upper[3, 4, 3][7], 16)
 
     def test_new_value_propagates(self):
-        """The value d_7(PRM_3(4,3)) = 16 improves [SJ24, Thm 7] for the larger code PRM_3(6,4)."""
+        """The value d_7(PRM_3(4,3)) = 16 improves [SJ24, Thm. 7] for the larger code PRM_3(6,4)."""
         self.assertEqual(small_table(HEADER).lower[3, 6, 4][30], 42)
         self.assertEqual(small_table().lower[3, 6, 4][30], 43)
 
@@ -99,7 +99,8 @@ class TestTables(unittest.TestCase):
                          ("Wei duality", True, 11, 12))
 
     def test_bounds_increase_with_r(self):
-        """After monotonicity ([SJ24, Thm 5]), the lower and the upper bounds increase strictly with r."""
+        """The fundamental relation contains the strict increase ([SJ24, Thm. 5]): the lower and the upper
+        bounds increase strictly with r."""
         table = small_table()
         for code in table.codes:
             for r in range(1, len(table.lower[code]) - 1):
@@ -119,7 +120,7 @@ class TestTables(unittest.TestCase):
             check(table)
 
     def test_wrong_value_caught_in_any_rule_order(self):
-        """A computed value below the bound of [SJ24, Thm 7] (here d_7(PRM_3(4,3)) >= 15) is impossible,
+        """A computed value below the bound of [SJ24, Thm. 7] (here d_7(PRM_3(4,3)) >= 15) is impossible,
         and generate.py must stop whatever the order of the rules."""
         original = list(rules.RULES)
         try:

@@ -143,27 +143,27 @@ function explain(reason, q, d, m, r, value, k) {
 	const n = p(q, m);
 	switch (reason.rule) {
 
-	case "SJ26 Thm 1.1": {
+	case "SJ26 Thm. 1.1": {
 		const mu = reason.mu;              // mu[0] is mu_1, ..., mu[d-1] is mu_d
 		const tuple = d === 1 ? "\\mu_1 = " + mu[0]
 			: "(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu.join(",") + ")";
 		const terms = [p(q, mu[d - 1])];   // p_{mu_d}, then floor(q^mu_i) for i < d
 		for (let i = 0; i < d - 1; i++) terms.push(mu[i] >= 0 ? q ** mu[i] : 0);
-		return "Since " + math("d < q") + ", the weight is given by [SJ26, Thm 1.1], conjectured by Beelen, Datta"
+		return "Since " + math("d < q") + ", the weight is given by [SJ26, Thm. 1.1], conjectured by Beelen, Datta"
 			+ " and Ghorpade [BDG22]: if " + math("(\\mu_1,\\dots,\\mu_d)") + " is the Macaulay tuple of "
 			+ math("\\binom{m+d}{d} - r = " + (binomial(m + d, d) - r)) + " in degree " + math("d")
 			+ ", then " + math("d_r = p_m - p_{\\mu_d} - \\sum_{i=1}^{d-1} \\lfloor q^{\\mu_i} \\rfloor")
 			+ ". Here " + math(tuple) + ", so " + math("d_r = " + n + " - " + terms.join(" - ") + " = " + value) + ".";
 	}
 
-	case "SJ26 Cor 4.2": {
+	case "SJ26 Cor. 4.2": {
 		const e = reason.dual_degree;
 		return "Since " + math("(m-1)(q-1) < d < m(q-1)") + ", the dual code is "
 			+ '<a href="' + address(q, m, e) + '"' + analyticsAttributes("Referenced code", q, m, e) + '>' + math(PRM(q, e, m)) + "</a>"
-			+ " [Sør91], whose weights are given by [SJ26, Thm 1.1] because " + math(e + " < q")
+			+ " [Sør91], whose weights are given by [SJ26, Thm. 1.1] because " + math(e + " < q")
 			+ ". By Wei duality [Wei91], " + math("d_r") + " is the " + math("r") + "-th integer of "
 			+ math("\\{1,\\dots,p_m\\}") + " that is not of the form " + math("p_m + 1 - d_s(" + PRM(q, e, m) + ")")
-			+ " [SJ26, Cor 4.2].";
+			+ " [SJ26, Cor. 4.2].";
 	}
 
 	case "whole space":
@@ -177,8 +177,8 @@ function explain(reason, q, d, m, r, value, k) {
 	case "Sorensen":
 		return "This is the minimum distance of " + math(PRM(q, d, m)) + ", computed by Sørensen [Sør91].";
 
-	case "SJ26 Prop 6.12": {
-		let text = "Given by [SJ26, Prop 6.12], which determines the first weights when ";
+	case "SJ26 Prop. 6.12": {
+		let text = "Given by [SJ26, Prop. 6.12], which determines the first weights when ";
 		if ((d - 1) % (q - 1) === 0) {                         // case (a): d = 1 + t(q-1)
 			const t = (d - 1) / (q - 1), h = m - t;
 			text += math("d = 1 + t(q-1)") + ": here " + math("t = " + t) + ", " + math("h = m - t = " + h)
@@ -192,9 +192,9 @@ function explain(reason, q, d, m, r, value, k) {
 		return text;
 	}
 
-	case "SJ26 Thm 6.7": {
+	case "SJ26 Thm. 6.7": {
 		const points = reason.n;
-		let text = "By [SJ26, Thm 6.7], " + math("d_r \\le B_r(q,d,m) = p_m - n") + ", where " + math("n = " + points)
+		let text = "By [SJ26, Thm. 6.7], " + math("d_r \\le B_r(q,d,m) = p_m - n") + ", where " + math("n = " + points)
 			+ " is the largest integer " + math("0 \\le n \\le p_m") + " with "
 			+ math("h_d(n) \\le k_d(m) - r = " + (k - r)) + ".";
 		if (points === 0) {
@@ -210,9 +210,9 @@ function explain(reason, q, d, m, r, value, k) {
 			+ ", supported on the remaining " + math("p_m - n = " + value) + " points.";
 	}
 
-	case "SJ24 Thm 7": {
+	case "SJ24 Thm. 7": {
 		const a = reason.alpha, g = reason.gamma;
-		return "By the recursive bound [SJ24, Thm 7], " + math("d_r \\ge \\min_{(\\alpha,\\gamma) \\in Y} B_{\\alpha,\\gamma}")
+		return "By the recursive bound [SJ24, Thm. 7], " + math("d_r \\ge \\min_{(\\alpha,\\gamma) \\in Y} B_{\\alpha,\\gamma}")
 			+ ", where " + math("B_{\\alpha,\\gamma} = \\max\\{d_{r-\\gamma}(\\mathrm{RM}_q(d,m)),\\, d_{r-\\alpha}(\\mathrm{RM}_q(d-1,m))\\}"
 				+ " + \\max\\{d_\\alpha(\\mathrm{PRM}_q(d,m-1)),\\, d_\\gamma(\\mathrm{PRM}_q(d-q+1,m-1))\\}")
 			+ " (see [SJ24] for the set " + math("Y") + "). The minimum is attained at "
@@ -221,7 +221,7 @@ function explain(reason, q, d, m, r, value, k) {
 				+ reason.PRM_d + "," + reason.PRM_d_minus_q_plus_1 + "\\} = " + value)
 			+ ". Here " + math("d_{" + (r - g) + "}(" + RM(q, d, m) + ") = " + reason.RM_d)
 			+ " and " + math("d_{" + (r - a) + "}(" + RM(q, d - 1, m) + ") = " + reason.RM_d_minus_1)
-			+ " (Heijnen and Pellikaan [HP98], see [SJ24, Thm 6]), and we use "
+			+ " (Heijnen and Pellikaan [HP98], see [SJ24, Thm. 6]), and we use "
 			+ inputWeight(q, d, m - 1, a, reason.PRM_d) + " and "
 			+ inputWeight(q, d - q + 1, m - 1, g, reason.PRM_d_minus_q_plus_1) + ".";
 	}
@@ -241,7 +241,7 @@ function explain(reason, q, d, m, r, value, k) {
 		} else {
 			text = "The dual code is " + link + " [Sør91].";
 		}
-		text += " By Wei duality [Wei91; SJ24, Thm 9], the number " + math("N(w)") + " of weights of "
+		text += " By Wei duality [Wei91; SJ24, Thm. 9], the number " + math("N(w)") + " of weights of "
 			+ math(PRM(q, d, m)) + " that are at most " + math("w") + " is "
 			+ math("N(w) = w - (p_m - k) + \\#\\{s : d_s(" + dual + ") \\le p_m - w\\}") + ". Take "
 			+ math("w = " + w) + ", so that " + math("p_m - w = " + (n - w)) + ": ";
@@ -263,15 +263,48 @@ function explain(reason, q, d, m, r, value, k) {
 		return text;
 	}
 
-	case "monotonicity": {
+	case "fundamental relation": {
+		// The relation (q^j - q) d_j >= (q^j - 1) d_{j-1}: with j = r for a lower bound (from d_{r-1}),
+		// and with j = r + 1 for an upper bound (from d_{r+1}).
 		const s = reason.from_r, b = reason.from_bound;
 		const link = '<a href="' + address(q, m, d, s) + '"' + analyticsAttributes("Referenced weight", q, m, d, s) + '>';
+		const text = "By the fundamental relation " + math("(q^j - q)\\, d_j \\ge (q^j - 1)\\, d_{j-1}")
+			+ ", valid for every linear code [HKLY95, Thm. 1] ([HKY92, Thm. 1] for " + math("q = 2")
+			+ "), which also shows that the weights increase strictly. ";
 		if (s < r) {
-			return "The weights increase strictly [SJ24, Thm 5], so " + math("d_r \\ge d_{" + s + "} + 1")
-				+ ", and " + link + math("d_{" + s + "} \\ge " + b) + "</a>.";
+			return text + "With " + math("j = r = " + r) + " and " + link + math("d_{" + s + "} \\ge " + b) + "</a>, "
+				+ math("d_r \\ge \\left\\lceil \\frac{(" + q + "^{" + r + "} - 1) \\cdot " + b + "}{" + q + "^{" + r + "} - " + q
+					+ "} \\right\\rceil = " + value) + ".";
 		}
-		return "The weights increase strictly [SJ24, Thm 5], so " + math("d_r \\le d_{" + s + "} - 1")
-			+ ", and " + link + math("d_{" + s + "} \\le " + b) + "</a>.";
+		return text + "With " + math("j = r + 1 = " + s) + " and " + link + math("d_{" + s + "} \\le " + b) + "</a>, "
+			+ math("d_r \\le \\left\\lfloor \\frac{(" + q + "^{" + s + "} - " + q + ") \\cdot " + b + "}{" + q + "^{" + s
+				+ "} - 1} \\right\\rfloor = " + value) + ".";
+	}
+
+	case "residual code": {
+		// The bound for the pair (d_j, d_{j+1}): j = r - 1 for an upper bound (from d_{r-1}, possibly
+		// d_0 = 0), and j = r for a lower bound (from d_{r+1}).  reason.total is the sum that exceeds p_m.
+		const s = reason.from_r, b = reason.from_bound, total = reason.total;
+		const link = '<a href="' + address(q, m, d, s) + '"' + analyticsAttributes("Referenced weight", q, m, d, s) + '>';
+		let text = "By the residual code bound, valid for every linear code [HKLY95, proof of Thm. 4]: if a subcode of"
+			+ " dimension " + math("j") + " is supported on " + math("d_j") + " coordinates, deleting them from all the"
+			+ " codewords gives a code of length " + math("p_m - d_j") + ", dimension " + math("k - j")
+			+ " and minimum distance at least " + math("d_{j+1} - d_j") + ", so by the Griesmer bound "
+			+ math("p_m \\ge d_j + \\sum_{i=0}^{k-j-1} \\lceil (d_{j+1} - d_j)/q^i \\rceil") + ". The right-hand side"
+			+ " does not decrease when " + math("d_{j+1}") + " grows, and does not increase when " + math("d_j")
+			+ " grows (its term " + math("i = 0") + " is " + math("d_{j+1} - d_j") + "). ";
+		if (s < r) {
+			const from = s === 0 ? math("d_0 = 0") + " (this case is the Griesmer bound)"
+				: link + math("d_{" + s + "} \\le " + b) + "</a>";
+			return text + "With " + math("j = r - 1 = " + s) + " and " + from + ": if " + math("d_r \\ge " + (value + 1))
+				+ ", then " + math("p_m \\ge " + b + " + \\sum_{i=0}^{" + (k - s - 1) + "} \\lceil " + (value + 1 - b) + "/"
+					+ q + "^i \\rceil = " + total) + ", which is false because " + math("p_m = " + n) + ". So "
+				+ math("d_r \\le " + value) + ".";
+		}
+		return text + "With " + math("j = r = " + r) + " and " + link + math("d_{" + s + "} \\ge " + b) + "</a>: if "
+			+ math("d_r \\le " + (value - 1)) + ", then " + math("p_m \\ge " + (value - 1) + " + \\sum_{i=0}^{" + (k - r - 1)
+				+ "} \\lceil " + (b - value + 1) + "/" + q + "^i \\rceil = " + total) + ", which is false because "
+			+ math("p_m = " + n) + ". So " + math("d_r \\ge " + value) + ".";
 	}
 
 	case "computed": {
@@ -314,8 +347,8 @@ function showExplanation(q, d, m, r) {
 		html += '<p><span class="ghw-kind">Upper bound ' + upper + ".</span> "
 			+ explain(upperReason, q, d, m, r, upper, code.k) + "</p>";
 	}
-	if (lower < upper && upperReason.rule === "SJ26 Thm 6.7") {
-		html += "<p>[SJ26, Conj 6.9] predicts that " + math(name + " = " + upper) + ".</p>";
+	if (lower < upper && upperReason.rule === "SJ26 Thm. 6.7") {
+		html += "<p>[SJ26, Conj. 6.9] predicts that " + math(name + " = " + upper) + ".</p>";
 	}
 	html += '<p class="ghw-permalink">Link to this entry: <a href="' + address(q, m, d, r) + '"'
 		+ analyticsAttributes("Entry permalink", q, m, d, r) + '>'
@@ -400,7 +433,10 @@ function drawTable() {
 	summary.innerHTML = "Length " + math("p_" + m + " = " + data.n) + ". Codes " + math(PRM(q, "d", m))
 		+ " with " + math("1 \\le d \\le " + Math.max(...info.degrees)) + ": " + info.weights + " weights, "
 		+ info.exact + " known exactly"
-		+ (info.exact < info.weights ? ", " + (info.weights - info.exact) + " only bounded." : ".");
+		+ (info.exact < info.weights ? ", " + (info.weights - info.exact) + " only bounded." : ".")
+		+ (q === 2 ? " For " + math("q = 2") + ", PRM codes are shortened Reed–Muller codes: " + math(PRM(2, "d", m))
+			+ " is " + math(RM(2, "d", m + 1)) + " shortened at the origin, and its dual is the punctured code "
+			+ math(RM(2, m + "-d", m + 1) + "^*") + "." : "");
 	const container = document.getElementById("ghw-codes");
 	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");
 	typeset(summary);
@@ -528,6 +564,29 @@ function drawReferences() {
 	}).join("");
 }
 
+// The citation.  The button copies exactly the BibTeX entry shown on the page; the download is the
+// file sanjoseGHWTables.bib, which the tests check against the page and the README.
+function setUpCitation() {
+	const button = document.getElementById("ghw-copy-bibtex");
+	const status = document.getElementById("ghw-copy-status");
+	const entry = document.querySelector("#ghw-bibtex code");
+	if (!button || !status || !entry) return;
+	button.addEventListener("click", async () => {
+		try {
+			await navigator.clipboard.writeText(entry.textContent);
+			status.textContent = "Copied.";
+		} catch (error) {
+			// Without access to the clipboard, select the entry so that it can be copied by hand.
+			const range = document.createRange();
+			range.selectNodeContents(entry);
+			const selection = window.getSelection();
+			selection.removeAllRanges();
+			selection.addRange(range);
+			status.textContent = "The entry is selected: press Ctrl+C (⌘+C on a Mac) to copy it.";
+		}
+	});
+}
+
 async function start() {
 	try {
 		index = await download("index.json");
@@ -555,4 +614,5 @@ async function start() {
 	await follow();
 }
 
+setUpCitation();
 start();

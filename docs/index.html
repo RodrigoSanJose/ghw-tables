@@ -104,17 +104,23 @@
 						<h2>Where the bounds come from</h2>
 					</header>
 					<ul>
-						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [SJ26, Thm 1.1]
+						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [SJ26, Thm. 1.1]
 							(conjectured by Beelen, Datta and Ghorpade [BDG22]),
-							for <span class="math">\((m-1)(q-1) &lt; d &lt; m(q-1)\)</span> [SJ26, Cor 4.2], and for <span class="math">\(d \ge m(q-1)\)</span>;
-							the minimum distance [Sør91]; and the first weights for the degrees of [SJ26, Prop 6.12].</li>
-						<li><strong>Upper bound.</strong> The bound <span class="math">\(B_r(q,d,m)\)</span> of [SJ26, Thm 6.7], valid in every degree.
-							It is sharp for <span class="math">\(d &lt; q\)</span>, and [SJ26, Conj 6.9] states that it is always sharp.</li>
-						<li><strong>Lower bound.</strong> The recursive bound of [SJ24, Thm 7], applied with the best bounds known for
+							for <span class="math">\((m-1)(q-1) &lt; d &lt; m(q-1)\)</span> [SJ26, Cor. 4.2], and for <span class="math">\(d \ge m(q-1)\)</span>;
+							the minimum distance [Sør91]; and the first weights for the degrees of [SJ26, Prop. 6.12].</li>
+						<li><strong>Upper bound.</strong> The bound <span class="math">\(B_r(q,d,m)\)</span> of [SJ26, Thm. 6.7], valid in every degree.
+							It is sharp for <span class="math">\(d &lt; q\)</span>, and [SJ26, Conj. 6.9] states that it is always sharp.</li>
+						<li><strong>Lower bound.</strong> The recursive bound of [SJ24, Thm. 7], applied with the best bounds known for
 							<span class="math">\(\mathrm{PRM}_q(d,m-1)\)</span> and <span class="math">\(\mathrm{PRM}_q(d-q+1,m-1)\)</span>.</li>
-						<li><strong>Duality and monotonicity.</strong> Wei duality [Wei91; SJ24, Thm 9] between <span class="math">\(\mathrm{PRM}_q(d,m)\)</span>
+						<li><strong>Duality.</strong> Wei duality [Wei91; SJ24, Thm. 9] between <span class="math">\(\mathrm{PRM}_q(d,m)\)</span>
 							and its dual, which is <span class="math">\(\mathrm{PRM}_q(m(q-1)-d,m)\)</span>, plus the all-ones vector when <span class="math">\(q-1\)</span> divides <span class="math">\(d\)</span> [Sør91],
-							and the strict increase <span class="math">\(d_r &lt; d_{r+1}\)</span> [SJ24, Thm 5], as in [SJ24, Section V-C].</li>
+							as in [SJ24, Section V-C].</li>
+						<li><strong>Classical bounds.</strong> Two bounds valid for every linear code, used in both directions:
+							the fundamental relation <span class="math">\((q^r-q)\,d_r \ge (q^r-1)\,d_{r-1}\)</span> [HKLY95, Thm. 1] ([HKY92, Thm. 1] for <span class="math">\(q = 2\)</span>),
+							which contains the strict increase <span class="math">\(d_{r-1} &lt; d_r\)</span> [Wei91, Thm. 1; SJ24, Thm. 5],
+							and the residual code bound <span class="math">\(n - d_r \ge \sum_{i=0}^{k-r-1} \lceil (d_{r+1}-d_r)/q^i \rceil\)</span> [HKLY95, proof of Thm. 4],
+							which contains the Griesmer bound. Together they contain the other bounds of [Wei91], [HKY92] and [HKLY95]
+							that can be evaluated from bounds for the weights, such as the generalized Singleton, Plotkin-type and Griesmer-type bounds.</li>
 						<li><strong>Computed values.</strong> Values computed with the GHWs package [GHWs], with their source.</li>
 					</ul>
 					<p>
@@ -124,20 +130,33 @@
 					</p>
 
 					<h3 id="cite">How to cite</h3>
+					<div id="ghw-citation" data-analytics-section="GHW tables / Citation">
 					<p class="ghw-cite-text">
 						If you use these tables, please consider citing them and the paper [SJ26]
 						(<a href="https://doi.org/10.48550/arXiv.2611.08203" target="_blank" rel="noopener noreferrer" data-publication-title="Common zeros of homogeneous polynomials and the weight hierarchy of projective Reed-Muller codes" data-publication-short="Common zeros and PRM weights">arXiv:2611.08203</a>)
 						where the bounds are proved.
-						The tables will be archived on Zenodo; the DOI below is a placeholder until the first release.
+						The tables are archived on Zenodo with the DOI
+						<a href="https://doi.org/10.5281/zenodo.24020768" target="_blank" rel="noopener noreferrer" data-publication-title="Tables of generalized Hamming weights of projective Reed-Muller codes" data-publication-short="GHW tables" data-link-type="Zenodo archive">10.5281/zenodo.24020768</a>,
+						which always points to the latest version.
 					</p>
-<pre><code>@Misc{ghwTables,
-    AUTHOR = {San-Jos\'{e}, Rodrigo},
-    TITLE = {Tables of generalized {H}amming weights of projective {R}eed--{M}uller codes},
-    year = "2026",
-    publisher = "Zenodo",
-    doi = "10.5281/zenodo.XXXXXXX",
-    howpublished = "Available online: \url{https://rodrigosanjose.github.io/ghw-tables/}"
+<!-- The same BibTeX entry is in README.md and in sanjoseGHWTables.bib (the download below); the tests check that they agree. -->
+<pre id="ghw-bibtex"><code>@misc{sanjoseGHWTables,
+  author       = {San-Jos{\'e}, Rodrigo},
+  title        = {Tables of generalized {H}amming weights of
+                  projective {Reed--Muller} codes},
+  year         = {2026},
+  howpublished = {Zenodo},
+  note         = {Interactive tables:
+                  \url{https://rodrigosanjose.github.io/ghw-tables/}.
+                  Permanent DOI:
+                  \url{https://doi.org/10.5281/zenodo.24020768}}
 }</code></pre>
+					<p class="ghw-cite-actions">
+						<button type="button" id="ghw-copy-bibtex" class="button small" data-analytics-label="GHW tables. Copy BibTeX">Copy BibTeX</button>
+						<a id="ghw-download-bibtex" class="button small" href="sanjoseGHWTables.bib" download="sanjoseGHWTables.bib" data-analytics-label="GHW tables. Download BibTeX">Download .bib</a>
+						<span id="ghw-copy-status" class="ghw-copy-status" role="status" aria-live="polite"></span>
+					</p>
+					</div>
 
 					<h3 id="references">References</h3>
 					<ul id="ghw-references" class="ghw-references" data-analytics-section="GHW tables / References"></ul>

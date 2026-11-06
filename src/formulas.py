@@ -151,7 +151,7 @@ def dim_PRM(q, d, m):
     dim RM_q(d-1, j)).  At the levels j with d > j(q-1), where Cor. 1 is not stated, both codes are
     whole spaces and the identity is p_j = q^j + p_{j-1}; the last term is dim RM_q(d-1, 0) = 1 =
     dim PRM_q(d, 0), since P^0 is a single point.  The result agrees with the closed formula of
-    [SJ24, Thm 1].  As in [SJ24], PRM_q(d, m) = {0} for d <= 0.
+    [SJ24, Thm. 1].  As in [SJ24], PRM_q(d, m) = {0} for d <= 0.
     """
     if d <= 0:
         return 0
@@ -159,7 +159,7 @@ def dim_PRM(q, d, m):
 
 
 # ---------------------------------------------------------------------------------------------
-# The upper bound B_r(q, d, m) of [SJ26, Thm 6.7]
+# The upper bound B_r(q, d, m) of [SJ26, Thm. 6.7]
 # ---------------------------------------------------------------------------------------------
 
 def h(q, d, n):
@@ -215,7 +215,7 @@ def largest_n(q, d, m):
 
 
 def upper_bound_hierarchy(q, d, m):
-    """(0, B_1, ..., B_k), where k = k_d(m) and   ([SJ26], Thm 6.7)
+    """(0, B_1, ..., B_k), where k = k_d(m) and   ([SJ26], Thm. 6.7)
 
         B_r(q, d, m) = p_m - max{ 0 <= n <= p_m : h_d(n) <= k_d(m) - r }.
 
@@ -228,7 +228,7 @@ def upper_bound_hierarchy(q, d, m):
 
 
 def B(q, d, m, r):
-    """B_r(q, d, m) of [SJ26, Thm 6.7], for 1 <= r <= k_d(m)."""
+    """B_r(q, d, m) of [SJ26, Thm. 6.7], for 1 <= r <= k_d(m)."""
     return upper_bound_hierarchy(q, d, m)[r]
 
 
@@ -237,7 +237,7 @@ def B(q, d, m, r):
 # ---------------------------------------------------------------------------------------------
 
 def bdg_weight(q, d, m, r):
-    """d_r(PRM_q(d, m)) for 1 <= d < q and 1 <= r <= binom(m + d, d)  ([SJ26], Thm 1.1).
+    """d_r(PRM_q(d, m)) for 1 <= d < q and 1 <= r <= binom(m + d, d)  ([SJ26], Thm. 1.1).
     (bdg stands for Beelen, Datta and Ghorpade, who conjectured this formula [BDG22].)
 
     With (mu_1, ..., mu_d) the Macaulay tuple of binom(m + d, d) - r,
@@ -250,12 +250,12 @@ def bdg_weight(q, d, m, r):
 
 
 def bdg_hierarchy(q, d, m):
-    """(0, d_1, ..., d_k) for PRM_q(d, m) with 1 <= d < q  ([SJ26], Thm 1.1)."""
+    """(0, d_1, ..., d_k) for PRM_q(d, m) with 1 <= d < q  ([SJ26], Thm. 1.1)."""
     return (0,) + tuple(bdg_weight(q, d, m, r) for r in range(1, binom(m + d, d) + 1))
 
 
 def sorensen_minimum_distance(q, d, m):
-    """d_1(PRM_q(d, m)) for d >= 1 (Sorensen 1991; see also [SJ24, Thm 1]).
+    """d_1(PRM_q(d, m)) for d >= 1 (Sorensen 1991; see also [SJ24, Thm. 1]).
 
     If d <= m(q-1), write d - 1 = a(q-1) + b with 0 <= b < q-1; then d_1 = (q - b) q^(m-a-1).
     If d > m(q-1), the code is the whole space and d_1 = 1.
@@ -268,7 +268,7 @@ def sorensen_minimum_distance(q, d, m):
 
 
 def wei_dual(dual_hierarchy, n):
-    """Wei duality (Wei 1991; [SJ24, Thm 9]): the hierarchy of a code C of length n,
+    """Wei duality (Wei 1991; [SJ24, Thm. 9]): the hierarchy of a code C of length n,
     from the hierarchy (0, d_1(C^perp), d_2(C^perp), ...) of its dual.
 
     The weights of C are the integers in {1, ..., n} that are not of the form n + 1 - d_s(C^perp).
@@ -280,9 +280,9 @@ def wei_dual(dual_hierarchy, n):
 def high_degree_hierarchy(q, d, m):
     """(0, d_1, ..., d_k) for PRM_q(d, m) with (m-1)(q-1) < d < m(q-1)  ([SJ26], Cor. 4.2).
 
-    The dual is PRM_q(e, m) with e = m(q-1) - d < q-1 (Sorensen; [SJ24, Thm 2]), whose
-    weights are given by Thm 1.1, and we apply Wei duality.  In this range d lies strictly between
-    the multiples (m-1)(q-1) and m(q-1) of q-1, so d is not a multiple of q-1, and by [SJ24, Thm 2]
+    The dual is PRM_q(e, m) with e = m(q-1) - d < q-1 (Sorensen; [SJ24, Thm. 2]), whose
+    weights are given by Thm. 1.1, and we apply Wei duality.  In this range d lies strictly between
+    the multiples (m-1)(q-1) and m(q-1) of q-1, so d is not a multiple of q-1, and by [SJ24, Thm. 2]
     the dual is exactly PRM_q(e, m), with no all-ones vector added.
     """
     e = m * (q - 1) - d
@@ -293,7 +293,7 @@ def large_degree_hierarchy(q, d, m):
     """(0, d_1, ..., d_k) for PRM_q(d, m) with d >= m(q-1).
 
     If d > m(q-1), the code is the whole space F_q^{p_m}, so d_r = r.
-    If d = m(q-1), the dual code is spanned by the all-ones vector (Sorensen; [SJ24, Thm 2]),
+    If d = m(q-1), the dual code is spanned by the all-ones vector (Sorensen; [SJ24, Thm. 2]),
     whose only weight is p_m, and Wei duality gives d_r = r + 1.
     """
     n = p(q, m)
@@ -304,16 +304,16 @@ def large_degree_hierarchy(q, d, m):
 
 def known_hierarchy(q, d, m):
     """For d >= 1: the complete hierarchy (0, d_1, ..., d_k) of PRM_q(d, m) when one of the results
-    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result: "SJ26 Thm 1.1",
-    "SJ26 Cor 4.2", "whole space" or "dual is all-ones".  Otherwise, and also for d <= 0, it
+    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result: "SJ26 Thm. 1.1",
+    "SJ26 Cor. 4.2", "whole space" or "dual is all-ones".  Otherwise, and also for d <= 0, it
     returns (None, None).
     """
     if d <= 0:
         return None, None
     if d < q:
-        return bdg_hierarchy(q, d, m), "SJ26 Thm 1.1"
+        return bdg_hierarchy(q, d, m), "SJ26 Thm. 1.1"
     if (m - 1) * (q - 1) < d < m * (q - 1):
-        return high_degree_hierarchy(q, d, m), "SJ26 Cor 4.2"
+        return high_degree_hierarchy(q, d, m), "SJ26 Cor. 4.2"
     if d > m * (q - 1):
         return large_degree_hierarchy(q, d, m), "whole space"
     if d == m * (q - 1):
@@ -343,14 +343,14 @@ def lifted_weights(q, d, m):
 
 
 # ---------------------------------------------------------------------------------------------
-# Affine Reed-Muller codes, and the recursive lower bound of [SJ24, Thm 7]
+# Affine Reed-Muller codes, and the recursive lower bound of [SJ24, Thm. 7]
 # ---------------------------------------------------------------------------------------------
 
 @cache
 def affine_hierarchy(q, d, m):
     """(0, d_1, ..., d_k) for the affine Reed-Muller code RM_q(d, m), d >= 0.
 
-    By Heijnen and Pellikaan, in the form of [SJ24, Thm 6]: d_r - 1 is the r-th smallest
+    By Heijnen and Pellikaan, in the form of [SJ24, Thm. 6]: d_r - 1 is the r-th smallest
     integer i in {0, ..., q^m - 1} whose base-q digit sum is larger than m(q-1) - d - 1.
     (The base-q digits of i, from the most significant one, are the tuple beta of [SJ24],
     and the lexicographic order of these tuples is the usual order of the integers.)
@@ -361,11 +361,11 @@ def affine_hierarchy(q, d, m):
 
 
 def recursive_lower_bound(q, d, m, r, PRM_d, PRM_d_minus_q_plus_1):
-    """The lower bound of [SJ24, Thm 7] for d_r(PRM_q(d, m)), where 1 <= d <= m(q-1) and
+    """The lower bound of [SJ24, Thm. 7] for d_r(PRM_q(d, m)), where 1 <= d <= m(q-1) and
     2 <= r <= k_d(m), for m >= 2.  Returns (bound, alpha, gamma), with (alpha, gamma) attaining
     the minimum.
 
-    The names follow [SJ24, Thm 7], where the two smaller codes are PRM_d(m-1) and
+    The names follow [SJ24, Thm. 7], where the two smaller codes are PRM_d(m-1) and
     PRM_{d-(q-1)}(m-1), both in dimension m-1.  The inputs are lower bounds for their weights:
         PRM_d[alpha]                <= d_alpha(PRM_q(d, m-1))        for 0 <= alpha <= k_d(m-1),
         PRM_d_minus_q_plus_1[gamma] <= d_gamma(PRM_q(d-q+1, m-1))    for 0 <= gamma <= k_{d-q+1}(m-1),
@@ -402,7 +402,7 @@ def recursive_lower_bound(q, d, m, r, PRM_d, PRM_d_minus_q_plus_1):
 # ---------------------------------------------------------------------------------------------
 
 def dual_degree(q, d, m):
-    """The degree e = m(q-1) - d of the dual code.  By Sorensen ([SJ24, Thm 2]), for 1 <= d <= m(q-1) - 1,
+    """The degree e = m(q-1) - d of the dual code.  By Sorensen ([SJ24, Thm. 2]), for 1 <= d <= m(q-1) - 1,
 
         PRM_q(d, m)^perp = PRM_q(e, m)                     if q-1 does not divide d,
         PRM_q(d, m)^perp = PRM_q(e, m) + <(1, ..., 1)>     if q-1 divides d (for q = 2, always).
@@ -433,7 +433,7 @@ def bounds_after_adding_a_vector(n, lower, upper):
 
 def wei_duality_bounds(n, k, dual_lower, dual_upper):
     """Bounds for the weights of a code C of length n and dimension k, obtained from bounds for the
-    weights of its dual code C^perp by Wei duality ([SJ24, Thm 9]):
+    weights of its dual code C^perp by Wei duality ([SJ24, Thm. 9]):
 
         dual_lower[s] <= d_s(C^perp) <= dual_upper[s]      for 1 <= s <= n - k.
 
@@ -485,3 +485,113 @@ def wei_duality_bounds(n, k, dual_lower, dual_upper):
             found -= 1
             lower[found] = (w + 1, w, count)
     return lower, upper
+
+
+# ---------------------------------------------------------------------------------------------
+# Classical bounds, valid for every linear code
+# ---------------------------------------------------------------------------------------------
+#
+# The two relations below hold for every linear code C of length n and dimension k over F_q, with
+# weights 0 = d_0 < d_1 < ... < d_k <= n.  Each one is used in both directions, and together they
+# contain the other classical bounds of [Wei91], [HKY92] and [HKLY95] (see the README).
+#
+#   [Wei91]   V. K. Wei, Generalized Hamming weights for linear codes, IEEE Trans. Inform. Theory
+#             37(5) (1991), 1412-1418.
+#   [HKY92]   T. Helleseth, T. Klove, O. Ytrehus, Generalized Hamming weights of linear codes,
+#             IEEE Trans. Inform. Theory 38(3) (1992), 1133-1140.
+#   [HKLY95]  T. Helleseth, T. Klove, V. I. Levenshtein, O. Ytrehus, Bounds on the minimum support
+#             weights, IEEE Trans. Inform. Theory 41(2) (1995), 432-440.
+
+def ceil_div(a, b):
+    """The smallest integer that is at least a/b, for integers a and b > 0 (exact for numbers of any size)."""
+    return -(-a // b)
+
+
+def fundamental_lower(q, r, lower_previous):
+    """The fundamental relation (the case s = r - 1 of [HKLY95, Thm. 1], and [HKY92, Thm. 1] for q = 2):
+    for 2 <= r <= k,
+
+        (q^r - q) d_r >= (q^r - 1) d_{r-1}.
+
+    Given d_{r-1} >= lower_previous, it gives  d_r >= ceil((q^r - 1) lower_previous / (q^r - q)),  which is
+    returned.  Since (q^r - 1)/(q^r - q) > 1, this is at least lower_previous + 1: the relation contains
+    the strict increase d_{r-1} < d_r ([Wei91, Thm. 1]; [SJ24, Thm. 5])."""
+    return ceil_div((q**r - 1) * lower_previous, q**r - q)
+
+
+def fundamental_upper(q, r, upper_next):
+    """The fundamental relation for r + 1, read the other way: for 1 <= r <= k - 1, given
+    d_{r+1} <= upper_next, it gives  d_r <= floor((q^(r+1) - q) upper_next / (q^(r+1) - 1)),  which is
+    returned.  It is at most upper_next - 1."""
+    return (q**(r + 1) - q) * upper_next // (q**(r + 1) - 1)
+
+
+def griesmer_sum(q, k, a):
+    """sum_{i=0}^{k-1} ceil(a / q^i), for k >= 0 and a >= 0.  By the Griesmer bound, a linear code over F_q
+    of dimension k and minimum distance at least a has at least this length."""
+    total = 0
+    power = 1                                # power = q^i
+    for i in range(k):
+        if power >= a:                       # then ceil(a / q^j) = min(a, 1) for every j >= i
+            return total + (k - i) * min(a, 1)
+        total += ceil_div(a, power)
+        power *= q
+    return total
+
+
+def residual_length(q, k, r, a, b):
+    """a + sum_{i=0}^{k-r-1} ceil((b - a) / q^i), for 0 <= a < b.
+
+    The residual code bound ([HKLY95, proof of Thm. 4]) says that, for 0 <= r <= k - 1,
+
+        n - d_r >= sum_{i=0}^{k-r-1} ceil((d_{r+1} - d_r) / q^i),
+
+    that is, residual_length(q, k, r, d_r, d_{r+1}) <= n.  Proof: let D be a subcode of dimension r whose
+    support has d_r elements.  Deleting these d_r coordinates from the codewords of C gives a code of
+    length n - d_r and dimension k - r (the codewords of C that vanish outside the support of D are those
+    of D, since one more would give d_{r+1} <= d_r), whose nonzero codewords have weight at least
+    d_{r+1} - d_r.  Apply the Griesmer bound to it.  For r = 0 (d_0 = 0) this is the Griesmer bound.
+
+    As a function of a (with b fixed) this does not increase, because the term i = 0 is b - a and the
+    other terms do not increase.  As a function of b (with a fixed) it does not decrease."""
+    return a + griesmer_sum(q, k - r, b - a)
+
+
+def residual_upper(q, n, k, r, upper_r):
+    """An upper bound for d_{r+1}, 0 <= r <= k - 1, from the residual code bound and d_r <= upper_r.
+
+    Let b >= upper_r.  If d_{r+1} >= b + 1, then d_r <= upper_r < b + 1 <= d_{r+1}, and the monotonicity
+    of residual_length gives  n >= residual_length(d_r, d_{r+1}) >= residual_length(upper_r, b + 1).
+    So if  residual_length(upper_r, b + 1) > n,  then d_{r+1} <= b.  Returns (b, total) for the smallest
+    such b, with total = residual_length(upper_r, b + 1).  (b = n always works, since total >= b + 1.)"""
+    def too_long(b):
+        return residual_length(q, k, r, upper_r, b + 1) > n
+    low, high = upper_r, max(n, upper_r)     # too_long(high) holds; find the smallest b with too_long(b)
+    while low < high:
+        middle = (low + high) // 2
+        if too_long(middle):
+            high = middle
+        else:
+            low = middle + 1
+    return low, residual_length(q, k, r, upper_r, low + 1)
+
+
+def residual_lower(q, n, k, r, lower_next):
+    """A lower bound for d_r, 1 <= r <= k - 1, from the residual code bound and d_{r+1} >= lower_next.
+
+    Let 1 <= a <= lower_next.  If d_r <= a - 1, then d_r <= a - 1 < lower_next <= d_{r+1}, and the
+    monotonicity of residual_length gives  n >= residual_length(d_r, d_{r+1}) >= residual_length(a - 1, lower_next).
+    So if  residual_length(a - 1, lower_next) > n,  then d_r >= a.  Returns (a, total) for the largest
+    such a, with total = residual_length(a - 1, lower_next), or (0, None) if there is none."""
+    def too_long(a):
+        return residual_length(q, k, r, a - 1, lower_next) > n
+    if lower_next < 1 or not too_long(1):
+        return 0, None
+    low, high = 1, lower_next                # too_long(low) holds; find the largest a with too_long(a)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if too_long(middle):
+            low = middle
+        else:
+            high = middle - 1
+    return low, residual_length(q, k, r, low - 1, lower_next)

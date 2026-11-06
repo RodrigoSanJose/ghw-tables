@@ -25,9 +25,10 @@ SRC = Path(__file__).resolve().parent.parent.joinpath("src")
 sys.path.insert(0, str(SRC))
 
 from formulas import (A, B, affine_hierarchy, attaining_set, bdg_hierarchy, binom,  # noqa: E402
-                      bounds_after_adding_a_vector, digit_sum,
-                      dim_PRM, dim_RM, dual_degree, h, high_degree_hierarchy, known_hierarchy,
-                      large_degree_hierarchy, lifted_weights, macaulay, p, recursive_lower_bound,
+                      bounds_after_adding_a_vector, ceil_div, digit_sum,
+                      dim_PRM, dim_RM, dual_degree, fundamental_lower, fundamental_upper, griesmer_sum, h,
+                      high_degree_hierarchy, known_hierarchy, large_degree_hierarchy, lifted_weights,
+                      macaulay, p, recursive_lower_bound, residual_length, residual_lower, residual_upper,
                       sorensen_minimum_distance, upper_bound_hierarchy, wei_duality_bounds)
 from parameters import codes  # noqa: E402
 
@@ -157,7 +158,7 @@ class TestUpperBound(unittest.TestCase):
             self.assertEqual(H[-1], p(q, m), (q, d, m))
 
     def test_theorem_1_1(self):
-        """Thm 6.7: B_r(q, d, m) is the formula of Thm 1.1 when d < q."""
+        """Thm. 6.7: B_r(q, d, m) is the formula of Thm. 1.1 when d < q."""
         for q, d, m in CHECKED_CODES:
             if d < q:
                 self.assertEqual(upper_bound_hierarchy(q, d, m), bdg_hierarchy(q, d, m), (q, d, m))
@@ -193,7 +194,7 @@ class TestUpperBound(unittest.TestCase):
 
 
 class TestAffine(unittest.TestCase):
-    """The weights of the affine codes RM_q(d, m): Heijnen-Pellikaan [HP98, Thm 5.10], in the form of [SJ24, Thm 6]."""
+    """The weights of the affine codes RM_q(d, m): Heijnen-Pellikaan [HP98, Thm. 5.10], in the form of [SJ24, Thm. 6]."""
 
     AFFINE = [(q, d, m) for q, top in ((2, 9), (3, 6), (4, 4), (5, 4), (7, 3), (8, 3), (9, 3))
               for m in range(1, top + 1) for d in range(0, m * (q - 1) + 1)]
@@ -211,7 +212,7 @@ class TestAffine(unittest.TestCase):
                 self.assertEqual(affine_hierarchy(q, d, m)[1], (q - b) * q**(m - a - 1), (q, d, m))
 
     def test_against_A(self):
-        """A cross-check of affine_hierarchy ([SJ24, Thm 6]) with the counting function A:
+        """A cross-check of affine_hierarchy ([SJ24, Thm. 6]) with the counting function A:
         d_r(RM_q(d, m)) = q^m - max{t : A(t, d) <= dim RM_q(d, m) - r}, the affine analogue of B_r."""
         for q, d, m in self.AFFINE:
             k = dim_RM(q, d, m)
@@ -224,7 +225,7 @@ class TestAffine(unittest.TestCase):
             self.assertEqual(affine_hierarchy(q, d, m), expected, (q, d, m))
 
     def test_corollary_5_2(self):
-        """[SJ26] Cor 5.2: for d < q, the weights of PRM_q(d, m) are those of RM_q(d-1, m),
+        """[SJ26] Cor. 5.2: for d < q, the weights of PRM_q(d, m) are those of RM_q(d-1, m),
         followed by q^m + (the weights of PRM_q(d, m-1))."""
         for q, d, m in codes():
             if d < q:
@@ -253,11 +254,11 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(attaining_set(4, 2, 9), "-+")
 
 
-# Entries "a-b" of [SJ24, Tables II-V]: a is the value of [SJ24, Thm 7], and b is the best upper bound
-# used in [SJ24] (Lemma 1 and monotonicity).  [SJ24] writes a range when Thm 7 is not sharp OR when the
+# Entries "a-b" of [SJ24, Tables II-V]: a is the value of [SJ24, Thm. 7], and b is the best upper bound
+# used in [SJ24] (Lemma 1 and monotonicity).  [SJ24] writes a range when Thm. 7 is not sharp OR when the
 # true value was not known (see the text after the tables), so a may be the true value: for instance
 # d_2(PRM_3(3,2)) = 4 [SJ24, p. 8522] and d_3(PRM_3(3,3)) = 13 [SJ24, Example 6].  At all the other
-# entries with r >= 2, the paper states that Thm 7 gives the true value.  Only a is tested here.
+# entries with r >= 2, the paper states that Thm. 7 gives the true value.  Only a is tested here.
 # Keys: (q, m) -> {(d, r): a}.
 SJ24_TABLE_RANGES = {
     (3, 2): {(3, 2): 4},                                                              # Table II
@@ -272,7 +273,7 @@ SJ24_TABLE_RANGES = {
 
 
 def thm7_with_exact_inputs(q, d, m, r):
-    """[SJ24, Thm 7] for d_r(PRM_q(d, m)), using the exact hierarchies of the two smaller codes
+    """[SJ24, Thm. 7] for d_r(PRM_q(d, m)), using the exact hierarchies of the two smaller codes
     (they are known for m - 1 <= 2).  For d - q + 1 <= 0, PRM_q(d-q+1, m-1) = {0}, as in [SJ24]."""
     PRM_d = known_hierarchy(q, d, m - 1)[0]
     PRM_d_minus_q_plus_1 = known_hierarchy(q, d - q + 1, m - 1)[0] if d - q + 1 >= 1 else (0,)
@@ -280,7 +281,7 @@ def thm7_with_exact_inputs(q, d, m, r):
 
 
 class TestRecursiveBound(unittest.TestCase):
-    """The lower bound of [SJ24, Thm 7], compared with the examples and tables of [SJ24]."""
+    """The lower bound of [SJ24, Thm. 7], compared with the examples and tables of [SJ24]."""
 
     def test_examples(self):
         self.assertEqual(thm7_with_exact_inputs(4, 5, 2, 2)[0], 4)     # Example 2
@@ -301,7 +302,7 @@ class TestRecursiveBound(unittest.TestCase):
                     self.assertEqual(thm7_with_exact_inputs(q, d, m, r)[0], expected, (q, d, m, r))
 
     def test_bound_is_attained_in_Y(self):
-        """The returned pair (alpha, gamma) satisfies the conditions defining Y in [SJ24, Thm 7]."""
+        """The returned pair (alpha, gamma) satisfies the conditions defining Y in [SJ24, Thm. 7]."""
         for q, d, m in [(3, 3, 3), (3, 4, 3), (4, 5, 3), (2, 2, 3)]:
             for r in range(2, dim_PRM(q, d, m) + 1):
                 bound, alpha, gamma = thm7_with_exact_inputs(q, d, m, r)
@@ -389,7 +390,7 @@ class TestBruteForce(unittest.TestCase):
 
     def test_brute_force_satisfies_wei_duality(self):
         """For random codes over GF(2), GF(3) and GF(5), the brute-force hierarchies of a code and of its
-        dual satisfy Wei duality [Wei91, Thm 3], and the dual has the right dimension."""
+        dual satisfy Wei duality [Wei91, Thm. 3], and the dual has the right dimension."""
         generator = random.Random(2026)
         for trial in range(60):
             q = generator.choice([2, 3, 5])
@@ -405,8 +406,107 @@ class TestBruteForce(unittest.TestCase):
             self.assertEqual(len(weights) + len(dual_weights), n)
 
 
+class TestClassicalBounds(unittest.TestCase):
+    """The fundamental relation and the residual code bound (formulas.py), and the classical bounds that
+    the README says they contain."""
+
+    def random_hierarchies(self, count):
+        """(q, n, k, hierarchy) for random codes over GF(2), GF(3) and GF(5), computed by brute force."""
+        generator = random.Random(1995)
+        for trial in range(count):
+            q = generator.choice([2, 3, 5])
+            n = generator.randint(2, {2: 9, 3: 7, 5: 6}[q])
+            k = generator.randint(1, min(n, 4 if q == 2 else 3))
+            yield q, n, k, brute_force_hierarchy(random_code(generator, q, n, k), q)
+
+    def test_the_bounds_hold_by_brute_force(self):
+        """For random codes, the bounds computed from any valid bounds of the other weights contain the
+        true weights: lower bounds for d_{r-1} (resp. upper bounds for d_{r+1}) never give a lower
+        (resp. upper) bound for d_r that excludes it, and the same for the residual code bound."""
+        for q, n, k, H in self.random_hierarchies(80):
+            with self.subTest(q=q, hierarchy=H):
+                for r in range(2, k + 1):
+                    self.assertGreaterEqual((q**r - q) * H[r], (q**r - 1) * H[r - 1])
+                    for lower_previous in range(1, H[r - 1] + 1):
+                        self.assertLessEqual(fundamental_lower(q, r, lower_previous), H[r])
+                for r in range(1, k):
+                    for upper_next in range(H[r + 1], n + 1):
+                        self.assertGreaterEqual(fundamental_upper(q, r, upper_next), H[r])
+                for r in range(0, k):
+                    self.assertLessEqual(residual_length(q, k, r, H[r], H[r + 1]), n)
+                    for upper_r in range(H[r], n + 1):
+                        self.assertGreaterEqual(residual_upper(q, n, k, r, upper_r)[0], H[r + 1])
+                    if r >= 1:
+                        for lower_next in range(1, H[r + 1] + 1):
+                            self.assertLessEqual(residual_lower(q, n, k, r, lower_next)[0], H[r])
+
+    def test_residual_bounds_against_a_direct_search(self):
+        """residual_upper and residual_lower give the best bound allowed by their argument, and the number
+        that exceeds n in the explanation."""
+        for q in (2, 3, 4):
+            for n in range(1, 30):
+                for k in range(1, n + 1):
+                    for r in range(0, k):
+                        for upper_r in range(0, n + 1):
+                            b, total = residual_upper(q, n, k, r, upper_r)
+                            best = next(c for c in range(upper_r, n + 1)
+                                        if residual_length(q, k, r, upper_r, c + 1) > n)
+                            self.assertEqual((b, total), (best, residual_length(q, k, r, upper_r, b + 1)))
+                        if r == 0:
+                            continue
+                        for lower_next in range(1, n + 1):
+                            a, total = residual_lower(q, n, k, r, lower_next)
+                            works = [c for c in range(1, lower_next + 1)
+                                     if residual_length(q, k, r, c - 1, lower_next) > n]
+                            if works:
+                                self.assertEqual((a, total), (max(works), residual_length(q, k, r, a - 1, lower_next)))
+                            else:
+                                self.assertEqual((a, total), (0, None))
+
+    def test_griesmer_sum(self):
+        for q in (2, 3, 4, 9):
+            for k in range(0, 12):
+                for a in range(0, 200):
+                    self.assertEqual(griesmer_sum(q, k, a), sum(ceil_div(a, q**i) for i in range(k)))
+
+    def test_contained_bounds(self):
+        """The bounds that the README says are contained in the two relations: the strict increase; the
+        Griesmer-type lower bound d_r >= sum_{i<r} ceil(d_1/q^i) by iterating upwards; the generalized
+        Singleton, Plotkin-type and generalized Griesmer bounds by iterating downwards from d_k <= n; and
+        [HKY92, Thm. 9] over F_q, (q^(k-r) - 1)(n - d_{r-1}) <= (q^(k-r+1) - 1)(n - d_r), from the residual
+        code bound."""
+        for q in (2, 3, 4, 5, 7, 8, 9):
+            for r in range(2, 12):
+                for x in range(1, 300):
+                    self.assertGreaterEqual(fundamental_lower(q, r, x), x + 1)
+                    self.assertLessEqual(fundamental_upper(q, r - 1, x), x - 1)
+            for d1 in range(1, 300):
+                lower = d1
+                for r in range(2, 12):
+                    lower = fundamental_lower(q, r, lower)
+                    self.assertGreaterEqual(lower, griesmer_sum(q, r, d1))
+        for q in (2, 3, 4, 5, 7):
+            for k in range(1, 8):
+                for n in range(k, 80):
+                    upper = [None] * k + [n]                 # upper[k] = n, then downwards
+                    for r in range(k - 1, 0, -1):
+                        upper[r] = fundamental_upper(q, r, upper[r + 1])
+                    for r in range(1, k + 1):
+                        self.assertLessEqual(upper[r], n - k + r)                                 # Singleton
+                        self.assertLessEqual(upper[r] * (q**k - 1), n * q**(k - r) * (q**r - 1))  # Plotkin
+                        griesmer = max(a for a in range(n + 1)                                  # generalized
+                                       if a + sum(ceil_div((q - 1) * a, q**i * (q**r - 1))      # Griesmer
+                                                  for i in range(1, k - r + 1)) <= n)
+                        self.assertLessEqual(upper[r], griesmer)
+                    for r in range(1, k):                    # [HKY92, Thm. 9] for d_r, from d_{r-1} <= u
+                        for u in range(0, n):
+                            thm9 = max(b for b in range(u, n + 1)
+                                       if (q**(k - r) - 1) * (n - u) <= (q**(k - r + 1) - 1) * (n - b))
+                            self.assertLessEqual(residual_upper(q, n, k, r - 1, u)[0], max(thm9, u))
+
+
 class TestDuality(unittest.TestCase):
-    """Wei duality applied to bounds ([SJ24, Thm 9 and Section V-C])."""
+    """Wei duality applied to bounds ([SJ24, Thm. 9 and Section V-C])."""
 
     def test_dual_degree(self):
         """For 1 <= d <= m(q-1)-1 the dual is PRM_q(e, m), e = m(q-1)-d, plus the all-ones vector if q-1
@@ -477,7 +577,7 @@ class TestDuality(unittest.TestCase):
             new_lower, new_upper = wei_duality_bounds(40, 20, lower, upper)
             new_lower = [0] + [max(lower[r], new_lower[r][0]) for r in range(1, 21)]
             new_upper = [0] + [min(upper[r], new_upper[r][0]) for r in range(1, 21)]
-            for r in range(2, 21):                       # monotonicity, [SJ24, Thm 5]
+            for r in range(2, 21):                       # monotonicity, [SJ24, Thm. 5]
                 new_lower[r] = max(new_lower[r], new_lower[r - 1] + 1)
             for r in range(19, 0, -1):
                 new_upper[r] = min(new_upper[r], new_upper[r + 1] - 1)

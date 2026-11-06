@@ -274,6 +274,46 @@ class TrackingTests(unittest.TestCase):
                                   PAGE + href, "GHW tables / Explanation", **target_context)
         self.assertEqual(seen, {"GHW. Referenced code", "GHW. Referenced weight"})
 
+    def test_citation_copy_and_download_match_the_displayed_entry_and_are_tracked(self):
+        displayed = self.page.locator("#ghw-bibtex code").text_content()
+        self.assertTrue(displayed.startswith("@misc{sanjoseGHWTables,"))
+        self.context.grant_permissions(["clipboard-read", "clipboard-write"], origin=ORIGIN)
+        section = "GHW tables / Citation"
+        for method in ("click", "Enter", "Space"):
+            with self.subTest(method=method):
+                self.page.evaluate("navigator.clipboard.writeText('')")
+                self.reset_events()
+                button = self.page.locator("#ghw-copy-bibtex")
+                if method == "click":
+                    button.click()
+                else:
+                    button.focus()
+                    button.press(method)
+                self.page.wait_for_function("document.getElementById('ghw-copy-status').textContent === 'Copied.'")
+                self.assertEqual(self.page.evaluate("navigator.clipboard.readText()"), displayed)
+                self.assert_event("GHW tables. Copy BibTeX", "GHW tables. Copy BibTeX", PAGE, section)
+                self.page.evaluate("document.getElementById('ghw-copy-status').textContent = ''")
+        self.reset_events()
+        with self.page.expect_download() as download_info:
+            self.page.locator("#ghw-download-bibtex").click()
+        self.assertEqual(download_info.value.suggested_filename, "sanjoseGHWTables.bib")
+        # The download request bypasses the local test routes, and the test origin does not exist, so
+        # the browser cancels it: read the file at the same address through the routes instead.
+        downloaded = self.page.evaluate(
+            "fetch(document.getElementById('ghw-download-bibtex').href).then(response => response.text())")
+        self.assertEqual(downloaded, displayed + "\n")
+        self.assertEqual(self.page.url, PAGE)
+        self.assert_event("GHW tables. Download BibTeX", "GHW tables. Download BibTeX",
+                          PAGE + "sanjoseGHWTables.bib", section)
+        self.reset_events()
+        self.stop_navigation()
+        self.page.locator('#ghw-citation a[href="https://doi.org/10.5281/zenodo.24020768"]').dispatch_event(
+            "click", {"button": 0})
+        self.assert_event("GHW tables. Zenodo archive",
+                          "Tables of generalized Hamming weights of projective Reed-Muller codes. Zenodo archive",
+                          "https://doi.org/10.5281/zenodo.24020768", section)
+        self.assertEqual(self.errors, [])
+
     def test_all_current_links_and_new_large_table_cells_are_covered(self):
         results = self.page.evaluate(r"""() => {
             const selector = 'a[href], area[href], button, input[type="button"], ' +

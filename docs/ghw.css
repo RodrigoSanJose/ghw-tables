@@ -22,7 +22,10 @@
 }
 #ghw-notice { font-weight: bold; }
 #about .ghw-cite-text { margin: 0 0 1em 0; }
-#about pre { margin-bottom: 1.5em; }
+#about pre { margin-bottom: 0.75em; }
+#about .ghw-cite-actions { margin: 0 0 1.5em 0; }
+#about .ghw-cite-actions .button { margin: 0 0.5em 0.5em 0; color: inherit !important; }
+.ghw-copy-status { font-size: 0.9em; opacity: 0.8; }
 
 /* ---------- Choice of q and m ---------- */
 .ghw-controls {

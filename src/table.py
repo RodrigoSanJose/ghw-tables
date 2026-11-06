@@ -12,7 +12,7 @@ These four are Python dictionaries whose keys are the triples (q, d, m): table.l
 the same as table.lower[(q, d, m)], and as table.lower[code] with code = (q, d, m).  Each value is
 a list indexed by r.
 
-A reason is a small dictionary such as {"rule": "SJ26 Thm 6.7", "n": 24, "set": "-"}: the name of
+A reason is a small dictionary such as {"rule": "SJ26 Thm. 6.7", "n": 24, "set": "-"}: the name of
 the result used, and the data needed to explain it.  The website turns it into a sentence.
 """
 
