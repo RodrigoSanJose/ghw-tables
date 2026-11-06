@@ -46,18 +46,27 @@ OUTPUT = REPOSITORY.joinpath("docs", "data")
 
 MANUAL_COLUMNS = ["q", "d", "m", "r", "lower", "upper", "source", "note"]
 REFERENCES_COLUMNS = ["key", "citation", "link"]
+REFERENCE_METADATA_COLUMNS = ["title", "short_title"]
 
 
 def read_references(path):
-    """The references of data/references.csv, as a dictionary  key -> {"citation": ..., "link": ...}."""
+    """Read citations and links, with optional title and short_title for publication analytics."""
     references = {}
     # "utf-8-sig" also accepts the files saved by Excel, which start with an invisible character.
     with open(path, newline="", encoding="utf-8-sig") as file:
         reader = csv.DictReader(file)
-        if reader.fieldnames != REFERENCES_COLUMNS:
-            sys.exit(f"{path.name}: the first line must be  {','.join(REFERENCES_COLUMNS)}")
+        columns = reader.fieldnames or []
+        if (columns[:3] != REFERENCES_COLUMNS or len(set(columns)) != len(columns)
+                or any(column not in REFERENCE_METADATA_COLUMNS for column in columns[3:])):
+            sys.exit(f"{path.name}: expected {','.join(REFERENCES_COLUMNS)}, optionally followed by "
+                     + ",".join(REFERENCE_METADATA_COLUMNS))
         for row in reader:
-            references[row["key"]] = {"citation": row["citation"], "link": row["link"]}
+            reference = {"citation": row["citation"], "link": row["link"]}
+            for column in REFERENCE_METADATA_COLUMNS:
+                value = (row.get(column) or "").strip()
+                if value:
+                    reference[column] = value
+            references[row["key"]] = reference
     return references
 
 

@@ -52,6 +52,24 @@ function address(q, m, d, r) {             // the link to a table, a code, or an
 	return hash;
 }
 
+function analyticsAttributes(action, q, m, d, r) {
+	// The shared delegated tracker also covers links added by later renders. Keep mathematical
+	// context in metadata, rather than trying to recover it from MathJax's generated elements.
+	const name = "GHW. " + action;
+	const context = Object.entries({q, m, d, r}).filter(([, value]) => value !== undefined);
+	const label = name + ". " + context.map(([key, value]) => key + "=" + value).join(", ");
+	return ' data-analytics-name="' + escapeHTML(name) + '" data-analytics-label="' + escapeHTML(label)
+		+ '" aria-label="' + escapeHTML(label) + '"'
+		+ context.map(([key, value]) => ' data-analytics-' + key + '="' + value + '"').join("");
+}
+
+function referenceTitle(ref) {
+	// Canonical titles come from references.csv. Legacy data keeps the remaining citation after
+	// author initials: bibliographic detail is preferable to cutting off a title containing commas.
+	const title = ref.title || ref.citation.replace(/^(?:(?:[A-Z]\.\s*)+[^,]+,\s*)+/, "") || ref.citation;
+	return title.replace(/[–—]/g, "-");   // match publication names on the personal website
+}
+
 function p(q, j) {                         // p_j = 1 + q + ... + q^j (0 if j < 0)
 	let total = 0;
 	for (let i = 0; i <= j; i++) total += q ** i;
@@ -117,7 +135,8 @@ function inputWeight(q, dd, mm, alpha, value) {
 	if (dd > mm * (q - 1) + 1) {           // the whole space, which is not listed in the tables
 		return math(name + " = " + value) + " (the code is the whole space)";
 	}
-	return '<a href="' + address(q, mm, dd, alpha) + '">' + math(name + " \\ge " + value) + "</a>";
+	return '<a href="' + address(q, mm, dd, alpha) + '"' + analyticsAttributes("Referenced weight", q, mm, dd, alpha)
+		+ '>' + math(name + " \\ge " + value) + "</a>";
 }
 
 function explain(reason, q, d, m, r, value, k) {
@@ -140,7 +159,7 @@ function explain(reason, q, d, m, r, value, k) {
 	case "SJ26 Cor 4.2": {
 		const e = reason.dual_degree;
 		return "Since " + math("(m-1)(q-1) < d < m(q-1)") + ", the dual code is "
-			+ '<a href="' + address(q, m, e) + '">' + math(PRM(q, e, m)) + "</a>"
+			+ '<a href="' + address(q, m, e) + '"' + analyticsAttributes("Referenced code", q, m, e) + '>' + math(PRM(q, e, m)) + "</a>"
 			+ " [Sør91], whose weights are given by [SJ26, Thm 1.1] because " + math(e + " < q")
 			+ ". By Wei duality [Wei91], " + math("d_r") + " is the " + math("r") + "-th integer of "
 			+ math("\\{1,\\dots,p_m\\}") + " that is not of the form " + math("p_m + 1 - d_s(" + PRM(q, e, m) + ")")
@@ -210,7 +229,7 @@ function explain(reason, q, d, m, r, value, k) {
 	case "Wei duality": {
 		const e = reason.dual_degree, w = reason.w, count = reason.count;
 		const N = w - (n - k) + count;
-		const link = '<a href="' + address(q, m, e) + '">' + math(PRM(q, e, m)) + "</a>";
+		const link = '<a href="' + address(q, m, e) + '"' + analyticsAttributes("Referenced code", q, m, e) + '>' + math(PRM(q, e, m)) + "</a>";
 		const dual = reason.plus_ones ? PRM(q, d, m) + "^\\perp" : PRM(q, e, m);
 		let text;
 		if (reason.plus_ones) {
@@ -246,7 +265,7 @@ function explain(reason, q, d, m, r, value, k) {
 
 	case "monotonicity": {
 		const s = reason.from_r, b = reason.from_bound;
-		const link = '<a href="' + address(q, m, d, s) + '">';
+		const link = '<a href="' + address(q, m, d, s) + '"' + analyticsAttributes("Referenced weight", q, m, d, s) + '>';
 		if (s < r) {
 			return "The weights increase strictly [SJ24, Thm 5], so " + math("d_r \\ge d_{" + s + "} + 1")
 				+ ", and " + link + math("d_{" + s + "} \\ge " + b) + "</a>.";
@@ -279,7 +298,8 @@ function showExplanation(q, d, m, r) {
 	}
 	const lower = code.lower[r], upper = code.upper[r];
 	const name = "d_{" + r + "}(" + PRM(q, d, m) + ")";
-	let html = '<a class="ghw-close" href="' + address(q, m) + '" title="Close">&times;</a>';
+	let html = '<a class="ghw-close" href="' + address(q, m) + '" title="Close"'
+		+ analyticsAttributes("Close explanation", q, m, d, r) + '>&times;</a>';
 	if (lower === upper) {
 		html += "<h3>" + math(name + " = " + lower) + "</h3>";
 	} else {
@@ -297,7 +317,8 @@ function showExplanation(q, d, m, r) {
 	if (lower < upper && upperReason.rule === "SJ26 Thm 6.7") {
 		html += "<p>[SJ26, Conj 6.9] predicts that " + math(name + " = " + upper) + ".</p>";
 	}
-	html += '<p class="ghw-permalink">Link to this entry: <a href="' + address(q, m, d, r) + '">'
+	html += '<p class="ghw-permalink">Link to this entry: <a href="' + address(q, m, d, r) + '"'
+		+ analyticsAttributes("Entry permalink", q, m, d, r) + '>'
 		+ escapeHTML(location.origin + location.pathname + address(q, m, d, r)) + "</a></p>";
 	box.innerHTML = html;
 	box.hidden = false;
@@ -327,7 +348,8 @@ function gridHTML(q, m, code) {
 			}
 			const open = code.lower[r] !== code.upper[r] ? " ghw-open" : "";
 			html += '<a class="ghw-cell' + open + '" id="entry-' + code.d + "-" + r + '" href="'
-				+ address(q, m, code.d, r) + '" title="d_' + r + '">' + entryText(code, r) + "</a>";
+				+ address(q, m, code.d, r) + '" title="d_' + r + '"'
+				+ analyticsAttributes("Open explanation", q, m, code.d, r) + '>' + entryText(code, r) + "</a>";
 		}
 	}
 	return '<div class="ghw-grid">' + html + "</div>";
@@ -345,7 +367,8 @@ function codeBlockHTML(q, m, code) {
 	let title = math(PRM(q, code.d, m)) + ": " + code.k + " weights, ";
 	title += complete ? "all known." : exact + " known, " + (code.k - exact) + " only bounded.";
 	const open = isExpanded(code);
-	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '">'
+	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '"'
+		+ analyticsAttributes(open ? "Hide weights" : "Show weights", q, m, code.d) + '>'
 		+ (open ? "Hide" : "Show") + "</a>";
 	return '<div class="ghw-code ' + (complete ? "ghw-complete" : "ghw-partial") + '" id="code-' + code.d + '">'
 		+ '<div class="ghw-code-label"><span class="ghw-degree">' + math("d = " + code.d) + "</span>"
@@ -360,11 +383,13 @@ function drawChoices() {
 		const ms = index.tables.filter(t => t.q === q).map(t => t.m);
 		const m = shown && ms.includes(shown.m) ? shown.m : Math.min(...ms);
 		const current = shown && shown.q === q ? " ghw-current" : "";
-		return '<a class="ghw-choice' + current + '" href="' + address(q, m) + '">' + q + "</a>";
+		return '<a class="ghw-choice' + current + '" href="' + address(q, m) + '"'
+			+ analyticsAttributes("Select field size", q, m) + '>' + q + "</a>";
 	}).join("");
 	document.getElementById("ghw-m-choices").innerHTML = index.tables.filter(t => t.q === shown.q).map(t => {
 		const current = t.m === shown.m ? " ghw-current" : "";
-		return '<a class="ghw-choice' + current + '" href="' + address(t.q, t.m) + '">' + t.m + "</a>";
+		return '<a class="ghw-choice' + current + '" href="' + address(t.q, t.m) + '"'
+			+ analyticsAttributes("Select dimension", t.q, t.m) + '>' + t.m + "</a>";
 	}).join("");
 }
 
@@ -492,10 +517,14 @@ async function follow() {
 
 function drawReferences() {
 	const list = document.getElementById("ghw-references");
+	// Titles and optional concise aliases are exported from the same reference data as citations.
+	// The shared tracker also bounds future titles without aliases, retaining the destination type.
 	list.innerHTML = Object.entries(index.references).map(([key, ref]) => {
 		const link = ref.link ? ' <a href="' + escapeHTML(ref.link) + '" target="_blank" rel="noopener noreferrer">'
 			+ escapeHTML(ref.link.replace("https://doi.org/", "doi:")) + "</a>" : "";
-		return "<li><strong>[" + escapeHTML(key) + "]</strong> " + escapeHTML(ref.citation) + link + "</li>";
+		return '<li data-publication-title="' + escapeHTML(referenceTitle(ref)) + '" data-publication-short="'
+			+ escapeHTML(ref.short_title || referenceTitle(ref)) + '"><strong>['
+			+ escapeHTML(key) + "]</strong> " + escapeHTML(ref.citation) + link + "</li>";
 	}).join("");
 }
 
@@ -519,7 +548,7 @@ async function start() {
 		const toggle = event.target.closest(".ghw-toggle");
 		if (toggle && event.key === " ") {
 			event.preventDefault();
-			toggleCode(Number(toggle.dataset.degree), true);
+			toggle.click();                // use the same activation path as mouse and Enter
 		}
 	});
 	window.addEventListener("hashchange", follow);
