@@ -3,10 +3,10 @@ Tests for src/formulas.py.  Run them from the repository folder with
 
     python3 -m unittest discover -s tests -v
 
-They reproduce the examples and the computational checks of [PRM] (see the docstring of
+They reproduce the examples and the computational checks of [SJ26] (see the docstring of
 src/formulas.py for the references).  The checks over many codes use the parameter range of the
 tables (src/parameters.py) and take a few seconds.  To use instead the range checked in the last
-remark of [PRM] (all prime powers q <= 9 and m <= 5), run
+remark of [SJ26] (all prime powers q <= 9 and m <= 5), run
 
     FULL_CHECK=1 python3 -m unittest discover -s tests -v
 
@@ -15,18 +15,20 @@ which takes about a minute.
 
 import ast
 import os
+import random
 import sys
 import unittest
-from itertools import product
+from itertools import combinations, product
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parent.parent.joinpath("src")
 sys.path.insert(0, str(SRC))
 
-from formulas import (A, B, affine_hierarchy, attaining_set, bdg_hierarchy, binom, digit_sum,  # noqa: E402
-                      dim_PRM, dim_RM, h, high_degree_hierarchy, known_hierarchy,
+from formulas import (A, B, affine_hierarchy, attaining_set, bdg_hierarchy, binom,  # noqa: E402
+                      bounds_after_adding_a_vector, digit_sum,
+                      dim_PRM, dim_RM, dual_degree, h, high_degree_hierarchy, known_hierarchy,
                       large_degree_hierarchy, lifted_weights, macaulay, p, recursive_lower_bound,
-                      sorensen_minimum_distance, upper_bound_hierarchy)
+                      sorensen_minimum_distance, upper_bound_hierarchy, wei_duality_bounds)
 from parameters import codes  # noqa: E402
 
 PAPER_RANGE = {q: 5 for q in (2, 3, 4, 5, 7, 8, 9)}
@@ -36,7 +38,7 @@ CHECKED_CODES = list(codes(PAPER_RANGE) if os.environ.get("FULL_CHECK") else cod
 class TestBasicFunctions(unittest.TestCase):
 
     def test_binom_convention(self):
-        """binom(a, b) = 0 unless 0 <= b <= a, as in [PRM] (Sage gives binomial(-2, 5) = -6)."""
+        """binom(a, b) = 0 unless 0 <= b <= a, as in [SJ26] (Sage gives binomial(-2, 5) = -6)."""
         self.assertEqual(binom(5, 2), 10)
         self.assertEqual(binom(2, 5), 0)
         self.assertEqual(binom(-2, 5), 0)
@@ -51,7 +53,7 @@ class TestBasicFunctions(unittest.TestCase):
             self.assertEqual(p(q, j) * (q - 1), q**(j + 1) - 1)
 
     def test_macaulay(self):
-        """The Macaulay tuple satisfies the defining properties of [PRM], eq. (1.2)."""
+        """The Macaulay tuple satisfies the defining properties of [SJ26], eq. (1.2)."""
         for d in range(1, 7):
             self.assertEqual(macaulay(0, d), (-1,) * d)
             for value in range(400):
@@ -90,7 +92,7 @@ class TestDimensions(unittest.TestCase):
                 self.assertEqual(dim_PRM(q, d, m), binom(m + d, d))
 
     def test_recursions(self):
-        """k_d(m) = A(q^m, d-1) + k_d(m-1)  and  k_d(m) = A(q^m, d) + k_{d-q+1}(m-1)  ([PRM], Section 6)."""
+        """k_d(m) = A(q^m, d-1) + k_d(m-1)  and  k_d(m) = A(q^m, d) + k_{d-q+1}(m-1)  ([SJ26], Section 6)."""
         for q, d, m in codes():
             k = dim_PRM(q, d, m)
             self.assertEqual(k, A(q, q**m, d - 1) + dim_PRM(q, d, m - 1))
@@ -222,7 +224,7 @@ class TestAffine(unittest.TestCase):
             self.assertEqual(affine_hierarchy(q, d, m), expected, (q, d, m))
 
     def test_corollary_5_2(self):
-        """[PRM] Cor 5.2: for d < q, the weights of PRM_q(d, m) are those of RM_q(d-1, m),
+        """[SJ26] Cor 5.2: for d < q, the weights of PRM_q(d, m) are those of RM_q(d-1, m),
         followed by q^m + (the weights of PRM_q(d, m-1))."""
         for q, d, m in codes():
             if d < q:
@@ -290,7 +292,7 @@ class TestRecursiveBound(unittest.TestCase):
 
     def test_tables(self):
         """[SJ24, Tables II, III, IV, V].  The true values are the exact hierarchies for m = 2, and
-        B_r for q = 3, m = 3 (where [PRM] verified Conj. 6.9)."""
+        B_r for q = 3, m = 3 (where [SJ26] verified Conj. 6.9)."""
         for (q, m), ranges in SJ24_TABLE_RANGES.items():
             for d in range(1, m * (q - 1) + 1):
                 true_values = upper_bound_hierarchy(q, d, m)
@@ -306,6 +308,118 @@ class TestRecursiveBound(unittest.TestCase):
                 self.assertTrue(max(r - dim_RM(q, d - 1, m), 0) <= alpha <= min(dim_PRM(q, d, m - 1), r))
                 self.assertTrue(max(r - dim_RM(q, d, m), 0) <= gamma <= min(dim_PRM(q, d - q + 1, m - 1), alpha))
                 self.assertLessEqual(bound, B(q, d, m, r))
+
+
+def binary_span(rows):
+    """All the vectors of the binary code spanned by rows; a vector of F_2^n is written as a number in
+    binary, so that the sum of two vectors is their XOR, a ^ b."""
+    span = {0}
+    for row in rows:
+        span = span | {vector ^ row for vector in span}
+    return span
+
+
+def binary_hierarchy(rows, n):
+    """The weight hierarchy (0, d_1, ..., d_k) of the binary code with basis rows, by brute force: d_r is
+    the smallest support of a subspace spanned by r linearly independent codewords.  The support of
+    the span of some vectors is the union of their supports, that is, the OR (a | b) of the numbers."""
+    words = sorted(binary_span(rows) - {0})
+    hierarchy = [0]
+    for r in range(1, len(rows) + 1):
+        best = n
+        for vectors in combinations(words, r):
+            if len(binary_span(vectors)) == 2**r:                  # linearly independent
+                support = 0
+                for vector in vectors:
+                    support = support | vector
+                best = min(best, bin(support).count("1"))
+        hierarchy.append(best)
+    return hierarchy
+
+
+class TestDuality(unittest.TestCase):
+    """Wei duality applied to bounds ([SJ24, Thm 9 and Section V-C])."""
+
+    def test_dual_degree(self):
+        """For 1 <= d <= m(q-1)-1 the dual is PRM_q(e, m), e = m(q-1)-d, plus the all-ones vector if q-1
+        divides d: the dimensions add up to p_m, or to p_m - 1."""
+        for q, d, m in codes():
+            e = dual_degree(q, d, m)
+            if d >= m * (q - 1):
+                self.assertIsNone(e, (q, d, m))
+                continue
+            self.assertEqual(e, m * (q - 1) - d)
+            self.assertEqual(dual_degree(q, e, m), d)
+            plus_ones = 1 if d % (q - 1) == 0 else 0
+            self.assertEqual(dim_PRM(q, d, m) + dim_PRM(q, e, m) + plus_ones, p(q, m), (q, d, m))
+
+    def test_bounds_after_adding_a_vector(self):
+        """d_{s-1}(D) <= d_s(D + <v>) <= d_s(D), checked by brute force for random binary codes D."""
+        generator = random.Random(2026)
+        n = 6
+        for trial in range(30):
+            rows = []                                   # a basis of D, and then v
+            while len(rows) < generator.randint(2, 4):
+                v = generator.randrange(1, 2**n)        # a vector of F_2^6, written as a number in binary
+                if v not in binary_span(rows):
+                    rows.append(v)
+            D, extended = binary_hierarchy(rows[:-1], n), binary_hierarchy(rows, n)
+            lower, upper = bounds_after_adding_a_vector(n, D, D)
+            for s in range(1, len(rows) + 1):
+                self.assertTrue(lower[s] <= extended[s] <= upper[s], (rows, s))
+
+    def test_exact_dual_gives_exact_hierarchy(self):
+        """If the dual hierarchy is known exactly, so is the hierarchy of the code (Wei duality)."""
+        for q, d, m in codes():
+            e = dual_degree(q, d, m)
+            if e is None or d % (q - 1) == 0:          # we need the dual to be exactly PRM_q(e, m)
+                continue
+            if known_hierarchy(q, d, m)[0] is None or known_hierarchy(q, e, m)[0] is None:
+                continue
+            dual = known_hierarchy(q, e, m)[0]
+            lower, upper = wei_duality_bounds(p(q, m), dim_PRM(q, d, m), dual, dual)
+            expected = list(known_hierarchy(q, d, m)[0][1:])
+            self.assertEqual([lower[r][0] for r in range(1, len(lower))], expected, (q, d, m))
+            self.assertEqual([upper[r][0] for r in range(1, len(upper))], expected, (q, d, m))
+
+    def test_bounds_contain_the_true_values(self):
+        """Random intervals around the true weights of PRM_q(e, m) give intervals around the true weights
+        of PRM_q(d, m), also when the dual is PRM_q(e, m) + <(1, ..., 1)> (here, when d = e = q-1, m = 2)."""
+        generator = random.Random(2026)
+        for q, d, m in codes():
+            e = dual_degree(q, d, m)
+            if e is None or known_hierarchy(q, d, m)[0] is None or known_hierarchy(q, e, m)[0] is None:
+                continue
+            n, true, dual = p(q, m), known_hierarchy(q, d, m)[0], known_hierarchy(q, e, m)[0]
+            for trial in range(5):
+                dual_lower = [0] + [generator.randint(s, dual[s]) for s in range(1, len(dual))]
+                dual_upper = [0] + [generator.randint(dual[s], n) for s in range(1, len(dual))]
+                if d % (q - 1) == 0:
+                    dual_lower, dual_upper = bounds_after_adding_a_vector(n, dual_lower, dual_upper)
+                lower, upper = wei_duality_bounds(n, dim_PRM(q, d, m), dual_lower, dual_upper)
+                for r in range(1, len(true)):
+                    self.assertTrue(lower[r][0] <= true[r] <= upper[r][0], (q, d, m, r, trial))
+
+    def test_SJ24_example_6(self):
+        """[SJ24, Example 6]: for the self-dual code PRM_3(3,3), duality and monotonicity turn the bounds of
+        [SJ24, Table III] (row d = 3) into the exact values of [SJ24, Table VI]."""
+        lower = [0, 9, 12, 13, 18, 21, 22, 24, 25, 26, 27, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40]
+        upper = [0, 9, 12, 17, 18, 21, 23, 24, 25, 26, 27, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40]
+        table_VI = [0, 9, 12, 13, 18, 21, 22, 24, 25, 26, 27, 30, 31, 33, 34, 35, 36, 37, 38, 39, 40]
+        self.assertEqual(dual_degree(3, 3, 3), 3)
+        for step in range(10):
+            new_lower, new_upper = wei_duality_bounds(40, 20, lower, upper)
+            new_lower = [0] + [max(lower[r], new_lower[r][0]) for r in range(1, 21)]
+            new_upper = [0] + [min(upper[r], new_upper[r][0]) for r in range(1, 21)]
+            for r in range(2, 21):                       # monotonicity, [SJ24, Thm 5]
+                new_lower[r] = max(new_lower[r], new_lower[r - 1] + 1)
+            for r in range(19, 0, -1):
+                new_upper[r] = min(new_upper[r], new_upper[r + 1] - 1)
+            if (new_lower, new_upper) == (lower, upper):
+                break
+            lower, upper = new_lower, new_upper
+        self.assertEqual(lower, table_VI)
+        self.assertEqual(upper, table_VI)
 
 
 class TestCodeStyle(unittest.TestCase):

@@ -129,7 +129,7 @@ def all_entries(table):
 
 def check(table):
     """Stop if some lower bound is larger than the corresponding upper bound.  Otherwise return the
-    list of counterexamples to [PRM, Conj. 6.9], i.e. the upper bounds smaller than B_r(q, d, m)."""
+    list of counterexamples to [SJ26, Conj. 6.9], i.e. the upper bounds smaller than B_r(q, d, m)."""
     contradictions = []
     counterexamples = []
     for code, r in all_entries(table):
@@ -178,11 +178,11 @@ def print_report(table, counterexamples):
     if trivial:
         print(f"WARNING: {trivial} weights still have a trivial bound.")
     if counterexamples:
-        print("\nCOUNTEREXAMPLES TO [PRM, Conj. 6.9]:")
+        print("\nCOUNTEREXAMPLES TO [SJ26, Conj. 6.9]:")
         for text in counterexamples:
             print("  " + text)
     else:
-        print("No counterexample to [PRM, Conj. 6.9]: every upper bound is at least B_r(q, d, m).")
+        print("No counterexample to [SJ26, Conj. 6.9]: every upper bound is at least B_r(q, d, m).")
 
 
 def write_json(path, data):

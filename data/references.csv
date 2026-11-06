@@ -1,5 +1,5 @@
 key,citation,link
-PRM,"R. San-José, Common zeros of homogeneous polynomials and the weight hierarchy of projective Reed–Muller codes, preprint (2026).",
+SJ26,"R. San-José, Common zeros of homogeneous polynomials and the weight hierarchy of projective Reed–Muller codes, arXiv:2611.08203 (2026).",https://doi.org/10.48550/arXiv.2611.08203
 SJ24,"R. San-José, A recursive construction for projective Reed–Muller codes, IEEE Trans. Inform. Theory 70(12) (2024), 8511–8523.",https://doi.org/10.1109/TIT.2024.3483998
 GHWs,"R. San-José, An algorithm for computing generalized Hamming weights and the Sage package GHWs, ACM Trans. Math. Softw. 51(4) (2025).",https://doi.org/10.1145/3773284
 BDG22,"P. Beelen, M. Datta, S. R. Ghorpade, A combinatorial approach to the number of solutions of systems of homogeneous polynomial equations over finite fields, Moscow Math. J. 22(4) (2022), 565–593.",https://doi.org/10.17323/1609-4514-2022-22-4-565-593

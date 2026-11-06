@@ -49,7 +49,7 @@ def small_table(manual_text=None, encoding="utf-8"):
 class TestTables(unittest.TestCase):
 
     def test_conjecture_verified_for_q3_m3(self):
-        """[PRM], end of Section 6.3: with d_7(PRM_3(4,3)) = 16, all the weights of PRM_3(d,3) are known,
+        """[SJ26], end of Section 6.3: with d_7(PRM_3(4,3)) = 16, all the weights of PRM_3(d,3) are known,
         and they are the bounds B_r(3, d, 3)."""
         table = small_table()
         for d in range(1, 8):
@@ -57,7 +57,7 @@ class TestTables(unittest.TestCase):
                 self.assertTrue(table.is_exact((3, d, 3), r), (d, r))
                 self.assertEqual(table.lower[3, d, 3][r], B(3, d, 3, r), (d, r))
         self.assertEqual(table.lower_reason[3, 4, 3][7]["rule"], "computed")
-        self.assertEqual(table.upper_reason[3, 4, 3][7]["rule"], "PRM Thm 6.7")
+        self.assertEqual(table.upper_reason[3, 4, 3][7]["rule"], "SJ26 Thm 6.7")
 
     def test_without_the_computed_value(self):
         """Without the computation, [SJ24, Thm 7] and B_r only give 15 <= d_7(PRM_3(4,3)) <= 16."""
@@ -81,6 +81,37 @@ class TestTables(unittest.TestCase):
                 self.assertNotEqual(table.lower_reason[code][r]["rule"], "trivial", (code, r))
                 self.assertNotEqual(table.upper_reason[code][r]["rule"], "trivial", (code, r))
 
+    def test_wei_duality(self):
+        """d_25(PRM_4(4,3)) = 75: the dual PRM_4(5,3) has minimum distance 12, so by Wei duality at most
+        74 - (85 - 35) = 24 weights of PRM_4(4,3) are at most 74."""
+        table = small_table()
+        self.assertEqual((table.lower[4, 4, 3][25], table.upper[4, 4, 3][25]), (75, 75))
+        self.assertEqual(table.lower_reason[4, 4, 3][25]["rule"], "Wei duality")
+
+    def test_wei_duality_when_q_minus_1_divides_d(self):
+        """d_3(PRM_4(6,3)) = 12: since 3 divides 6, the dual is PRM_4(3,3) + <(1,...,1)>, of dimension 21.
+        At most 1 + 11 = 12 of its weights are at most 74 (d_{s-1}(PRM_4(3,3)) <= d_s of the dual), so by
+        Wei duality at most 11 - (85 - 64) + 12 = 2 weights of PRM_4(6,3) are at most 11."""
+        table = small_table()
+        self.assertEqual((table.lower[4, 6, 3][3], table.upper[4, 6, 3][3]), (12, 12))
+        reason = table.lower_reason[4, 6, 3][3]
+        self.assertEqual((reason["rule"], reason["plus_ones"], reason["w"], reason["count"]),
+                         ("Wei duality", True, 11, 12))
+
+    def test_bounds_increase_with_r(self):
+        """After monotonicity ([SJ24, Thm 5]), the lower and the upper bounds increase strictly with r."""
+        table = small_table()
+        for code in table.codes:
+            for r in range(1, len(table.lower[code]) - 1):
+                self.assertLess(table.lower[code][r], table.lower[code][r + 1], (code, r))
+                self.assertLess(table.upper[code][r], table.upper[code][r + 1], (code, r))
+
+    def test_values_that_do_not_increase_stop(self):
+        """d_31 = d_32 is impossible: generate.py must stop instead of reporting a counterexample."""
+        table = small_table(HEADER + "3,6,4,31,45,45,GHWs,test\n" + "3,6,4,32,45,45,GHWs,test\n")
+        with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
+            check(table)
+
     def test_contradiction_stops(self):
         """A computed lower bound above B_r is impossible: generate.py must stop."""
         table = small_table(HEADER + "3,4,3,7,17,,GHWs,a wrong value\n")
@@ -102,7 +133,7 @@ class TestTables(unittest.TestCase):
             rules.RULES[:] = original
 
     def test_counterexample_is_reported(self):
-        """An upper bound below B_r would be a counterexample to [PRM, Conj. 6.9] (this one is invented)."""
+        """An upper bound below B_r would be a counterexample to [SJ26, Conj. 6.9] (this one is invented)."""
         table = small_table(HEADER + "3,4,3,7,,15,GHWs,an invented value\n")
         counterexamples = check(table)
         self.assertEqual(len(counterexamples), 1)

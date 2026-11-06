@@ -102,24 +102,30 @@
 						<h2>Where the bounds come from</h2>
 					</header>
 					<ul>
-						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [PRM, Thm 1.1]
+						<li><strong>Exact values.</strong> The complete hierarchy for <span class="math">\(d &lt; q\)</span> [SJ26, Thm 1.1]
 							(conjectured by Beelen, Datta and Ghorpade [BDG22]),
-							for <span class="math">\((m-1)(q-1) &lt; d &lt; m(q-1)\)</span> [PRM, Cor 4.2], and for <span class="math">\(d \ge m(q-1)\)</span>;
-							the minimum distance [Sør91]; and the first weights for the degrees of [PRM, Prop 6.12].</li>
-						<li><strong>Upper bound.</strong> The bound <span class="math">\(B_r(q,d,m)\)</span> of [PRM, Thm 6.7], valid in every degree.
-							It is sharp for <span class="math">\(d &lt; q\)</span>, and [PRM, Conj 6.9] states that it is always sharp.</li>
+							for <span class="math">\((m-1)(q-1) &lt; d &lt; m(q-1)\)</span> [SJ26, Cor 4.2], and for <span class="math">\(d \ge m(q-1)\)</span>;
+							the minimum distance [Sør91]; and the first weights for the degrees of [SJ26, Prop 6.12].</li>
+						<li><strong>Upper bound.</strong> The bound <span class="math">\(B_r(q,d,m)\)</span> of [SJ26, Thm 6.7], valid in every degree.
+							It is sharp for <span class="math">\(d &lt; q\)</span>, and [SJ26, Conj 6.9] states that it is always sharp.</li>
 						<li><strong>Lower bound.</strong> The recursive bound of [SJ24, Thm 7], applied with the best bounds known for
 							<span class="math">\(\mathrm{PRM}_q(d,m-1)\)</span> and <span class="math">\(\mathrm{PRM}_q(d-q+1,m-1)\)</span>.</li>
+						<li><strong>Duality and monotonicity.</strong> Wei duality [Wei91; SJ24, Thm 9] between <span class="math">\(\mathrm{PRM}_q(d,m)\)</span>
+							and its dual, which is <span class="math">\(\mathrm{PRM}_q(m(q-1)-d,m)\)</span>, plus the all-ones vector when <span class="math">\(q-1\)</span> divides <span class="math">\(d\)</span> [Sør91],
+							and the strict increase <span class="math">\(d_r &lt; d_{r+1}\)</span> [SJ24, Thm 5], as in [SJ24, Section V-C].</li>
 						<li><strong>Computed values.</strong> Values computed with the GHWs package [GHWs], with their source.</li>
 					</ul>
 					<p>
 						All the bounds are applied again and again until none of them improves.
-						The code that computes the tables, and a detailed description, will be available in a public repository.
+						The code that computes the tables, with a detailed description, is at
+						<a href="https://github.com/RodrigoSanJose/ghw-tables" target="_blank" rel="noopener noreferrer">github.com/RodrigoSanJose/ghw-tables</a>.
 					</p>
 
 					<h3 id="cite">How to cite</h3>
 					<p class="ghw-cite-text">
-						If you use these tables, please consider citing them and the paper [PRM] where the bounds are proved.
+						If you use these tables, please consider citing them and the paper [SJ26]
+						(<a href="https://doi.org/10.48550/arXiv.2611.08203" target="_blank" rel="noopener noreferrer">arXiv:2611.08203</a>)
+						where the bounds are proved.
 						The tables will be archived on Zenodo; the DOI below is a placeholder until the first release.
 					</p>
 <pre><code>@Misc{ghwTables,

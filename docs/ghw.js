@@ -124,27 +124,27 @@ function explain(reason, q, d, m, r, value, k) {
 	const n = p(q, m);
 	switch (reason.rule) {
 
-	case "PRM Thm 1.1": {
+	case "SJ26 Thm 1.1": {
 		const mu = reason.mu;              // mu[0] is mu_1, ..., mu[d-1] is mu_d
 		const tuple = d === 1 ? "\\mu_1 = " + mu[0]
 			: "(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu.join(",") + ")";
 		const terms = [p(q, mu[d - 1])];   // p_{mu_d}, then floor(q^mu_i) for i < d
 		for (let i = 0; i < d - 1; i++) terms.push(mu[i] >= 0 ? q ** mu[i] : 0);
-		return "Since " + math("d < q") + ", the weight is given by [PRM, Thm 1.1], conjectured by Beelen, Datta"
+		return "Since " + math("d < q") + ", the weight is given by [SJ26, Thm 1.1], conjectured by Beelen, Datta"
 			+ " and Ghorpade [BDG22]: if " + math("(\\mu_1,\\dots,\\mu_d)") + " is the Macaulay tuple of "
 			+ math("\\binom{m+d}{d} - r = " + (binomial(m + d, d) - r)) + " in degree " + math("d")
 			+ ", then " + math("d_r = p_m - p_{\\mu_d} - \\sum_{i=1}^{d-1} \\lfloor q^{\\mu_i} \\rfloor")
 			+ ". Here " + math(tuple) + ", so " + math("d_r = " + n + " - " + terms.join(" - ") + " = " + value) + ".";
 	}
 
-	case "PRM Cor 4.2": {
+	case "SJ26 Cor 4.2": {
 		const e = reason.dual_degree;
 		return "Since " + math("(m-1)(q-1) < d < m(q-1)") + ", the dual code is "
 			+ '<a href="' + address(q, m, e) + '">' + math(PRM(q, e, m)) + "</a>"
-			+ " [Sør91], whose weights are given by [PRM, Thm 1.1] because " + math(e + " < q")
+			+ " [Sør91], whose weights are given by [SJ26, Thm 1.1] because " + math(e + " < q")
 			+ ". By Wei duality [Wei91], " + math("d_r") + " is the " + math("r") + "-th integer of "
 			+ math("\\{1,\\dots,p_m\\}") + " that is not of the form " + math("p_m + 1 - d_s(" + PRM(q, e, m) + ")")
-			+ " [PRM, Cor 4.2].";
+			+ " [SJ26, Cor 4.2].";
 	}
 
 	case "whole space":
@@ -158,8 +158,8 @@ function explain(reason, q, d, m, r, value, k) {
 	case "Sorensen":
 		return "This is the minimum distance of " + math(PRM(q, d, m)) + ", computed by Sørensen [Sør91].";
 
-	case "PRM Prop 6.12": {
-		let text = "Given by [PRM, Prop 6.12], which determines the first weights when ";
+	case "SJ26 Prop 6.12": {
+		let text = "Given by [SJ26, Prop 6.12], which determines the first weights when ";
 		if ((d - 1) % (q - 1) === 0) {                         // case (a): d = 1 + t(q-1)
 			const t = (d - 1) / (q - 1), h = m - t;
 			text += math("d = 1 + t(q-1)") + ": here " + math("t = " + t) + ", " + math("h = m - t = " + h)
@@ -173,9 +173,9 @@ function explain(reason, q, d, m, r, value, k) {
 		return text;
 	}
 
-	case "PRM Thm 6.7": {
+	case "SJ26 Thm 6.7": {
 		const points = reason.n;
-		let text = "By [PRM, Thm 6.7], " + math("d_r \\le B_r(q,d,m) = p_m - n") + ", where " + math("n = " + points)
+		let text = "By [SJ26, Thm 6.7], " + math("d_r \\le B_r(q,d,m) = p_m - n") + ", where " + math("n = " + points)
 			+ " is the largest integer " + math("0 \\le n \\le p_m") + " with "
 			+ math("h_d(n) \\le k_d(m) - r = " + (k - r)) + ".";
 		if (points === 0) {
@@ -187,7 +187,7 @@ function explain(reason, q, d, m, r, value, k) {
 		else set = math("Z_{" + points + "}^-") + " (or " + math("Z_{" + points + "}^+") + ", which gives the same value)";
 		return text + " The evaluations of the forms of degree " + math("d") + " vanishing on the set " + set
 			+ " of " + math("n") + " points of " + math("\\mathbb{P}^{" + m + "}(\\mathbb{F}_{" + q + "})")
-			+ " (described in [PRM, Section 6.2]) form a subcode of dimension at least " + math("r")
+			+ " (described in [SJ26, Section 6.2]) form a subcode of dimension at least " + math("r")
 			+ ", supported on the remaining " + math("p_m - n = " + value) + " points.";
 	}
 
@@ -205,6 +205,54 @@ function explain(reason, q, d, m, r, value, k) {
 			+ " (Heijnen and Pellikaan [HP98], see [SJ24, Thm 6]), and we use "
 			+ inputWeight(q, d, m - 1, a, reason.PRM_d) + " and "
 			+ inputWeight(q, d - q + 1, m - 1, g, reason.PRM_d_minus_q_plus_1) + ".";
+	}
+
+	case "Wei duality": {
+		const e = reason.dual_degree, w = reason.w, count = reason.count;
+		const N = w - (n - k) + count;
+		const link = '<a href="' + address(q, m, e) + '">' + math(PRM(q, e, m)) + "</a>";
+		const dual = reason.plus_ones ? PRM(q, d, m) + "^\\perp" : PRM(q, e, m);
+		let text;
+		if (reason.plus_ones) {
+			text = "Since " + math("q - 1") + " divides " + math("d") + ", the dual code is "
+				+ math(dual + " = " + PRM(q, e, m) + " + \\langle (1, \\dots, 1) \\rangle") + " [Sør91]. It contains "
+				+ link + " with codimension one, and a subspace of the dual of dimension " + math("s")
+				+ " meets " + math(PRM(q, e, m)) + " in dimension at least " + math("s - 1") + ", so "
+				+ math("d_{s-1}(" + PRM(q, e, m) + ") \\le d_s(" + dual + ") \\le d_s(" + PRM(q, e, m) + ")") + ".";
+		} else {
+			text = "The dual code is " + link + " [Sør91].";
+		}
+		text += " By Wei duality [Wei91; SJ24, Thm 9], the number " + math("N(w)") + " of weights of "
+			+ math(PRM(q, d, m)) + " that are at most " + math("w") + " is "
+			+ math("N(w) = w - (p_m - k) + \\#\\{s : d_s(" + dual + ") \\le p_m - w\\}") + ". Take "
+			+ math("w = " + w) + ", so that " + math("p_m - w = " + (n - w)) + ": ";
+		if (reason.bound === "upper") {
+			text += "the upper bounds of " + link + " show that at least " + math(String(count)) + " of its weights are at most "
+				+ math(String(n - w));
+			if (reason.plus_ones) text += ", and hence so are at least " + math(String(count)) + (count === 1 ? " weight" : " weights") + " of the dual";
+			text += ". So " + math("N(" + w + ") \\ge " + w + " - " + (n - k) + " + " + count + " = " + N
+				+ " \\ge r") + ", that is, " + math("d_r \\le " + w) + ".";
+		} else {
+			const few = c => (c === 0 ? "none" : "at most " + math(String(c)));     // "none" instead of "at most 0"
+			text += "the lower bounds of " + link + " show that " + few(reason.plus_ones ? count - 1 : count)
+				+ " of its weights can be at most " + math(String(n - w));
+			if (reason.plus_ones) text += ", and hence at most " + math(String(count)) + (count === 1 ? " weight" : " weights") + " of the dual";
+			text += ". So " + math("N(" + w + ") \\le " + w + " - " + (n - k) + " + " + count + " = " + N
+				+ " \\le r - 1") + ", that is, " + math("d_r \\ge " + (w + 1)) + ".";
+		}
+		if (!reason.plus_ones) text += " This is how duality improves the tables of the recursive bound in [SJ24, Section V-C].";
+		return text;
+	}
+
+	case "monotonicity": {
+		const s = reason.from_r, b = reason.from_bound;
+		const link = '<a href="' + address(q, m, d, s) + '">';
+		if (s < r) {
+			return "The weights increase strictly [SJ24, Thm 5], so " + math("d_r \\ge d_{" + s + "} + 1")
+				+ ", and " + link + math("d_{" + s + "} \\ge " + b) + "</a>.";
+		}
+		return "The weights increase strictly [SJ24, Thm 5], so " + math("d_r \\le d_{" + s + "} - 1")
+			+ ", and " + link + math("d_{" + s + "} \\le " + b) + "</a>.";
 	}
 
 	case "computed": {
@@ -246,8 +294,8 @@ function showExplanation(q, d, m, r) {
 		html += '<p><span class="ghw-kind">Upper bound ' + upper + ".</span> "
 			+ explain(upperReason, q, d, m, r, upper, code.k) + "</p>";
 	}
-	if (lower < upper && upperReason.rule === "PRM Thm 6.7") {
-		html += "<p>[PRM, Conj 6.9] predicts that " + math(name + " = " + upper) + ".</p>";
+	if (lower < upper && upperReason.rule === "SJ26 Thm 6.7") {
+		html += "<p>[SJ26, Conj 6.9] predicts that " + math(name + " = " + upper) + ".</p>";
 	}
 	html += '<p class="ghw-permalink">Link to this entry: <a href="' + address(q, m, d, r) + '">'
 		+ escapeHTML(location.origin + location.pathname + address(q, m, d, r)) + "</a></p>";

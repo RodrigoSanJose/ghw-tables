@@ -41,18 +41,19 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 
 ## Where the bounds come from
 
-Theorem numbers refer to the current version of [PRM] and to the published version of [SJ24].
+Theorem numbers refer to [SJ26] ([arXiv:2611.08203v1](https://arxiv.org/abs/2611.08203v1)) and to the
+published version of [SJ24].
 
 ### Exact values
 
 | Range | Value | Source |
 |---|---|---|
-| $d < q$ | complete hierarchy | [PRM, Thm 1.1], conjectured by Beelen, Datta and Ghorpade [BDG22] |
-| $(m-1)(q-1) < d < m(q-1)$ | complete hierarchy | [PRM, Cor 4.2]: Wei duality [Wei91] and Sørensen's description of the dual [Sør91] |
+| $d < q$ | complete hierarchy | [SJ26, Thm 1.1], conjectured by Beelen, Datta and Ghorpade [BDG22] |
+| $(m-1)(q-1) < d < m(q-1)$ | complete hierarchy | [SJ26, Cor 4.2]: Wei duality [Wei91] and Sørensen's description of the dual [Sør91] |
 | $d = m(q-1)$ | $d_r = r + 1$ | the dual code is spanned by the all-ones vector [Sør91] |
 | $d > m(q-1)$ | $d_r = r$ | the code is the whole space |
 | $r = 1$ | minimum distance | [Sør91] |
-| $d = 1 + t(q-1)$, or $d = 2 + t(q-1)$ with $q \ge 3$ | the first $m - t + 1$ weights | [PRM, Prop 6.12] |
+| $d = 1 + t(q-1)$, or $d = 2 + t(q-1)$ with $q \ge 3$ | the first $m - t + 1$ weights | [SJ26, Prop 6.12] |
 
 For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the Macaulay tuple of $\binom{m+d}{d} - r$ in degree $d$,
 
@@ -64,7 +65,7 @@ In particular, the complete weight hierarchy is known for $m \le 2$.
 
 ### Upper bound, valid in every degree
 
-By [PRM, Thm 6.7], for $1 \le r \le k_d(m)$,
+By [SJ26, Thm 6.7], for $1 \le r \le k_d(m)$,
 
 ```math
 d_r(\mathrm{PRM}_q(d,m)) \;\le\; B_r(q,d,m) = p_m - \max\{\, 0 \le n \le p_m : h_d(n) \le k_d(m) - r \,\}.
@@ -72,9 +73,9 @@ d_r(\mathrm{PRM}_q(d,m)) \;\le\; B_r(q,d,m) = p_m - \max\{\, 0 \le n \le p_m : h
 
 Here $h_d(n)$ is the smaller of the Hilbert functions in degree $d$ of two explicit sets
 $Z_n^-, Z_n^+ \subseteq \mathbb{P}^m(\mathbb{F}_q)$ with $n$ points, built by filling affine spaces and their
-points at infinity. It is computed with the recursion of [PRM, Prop 6.6]. The bound comes from the
+points at infinity. It is computed with the recursion of [SJ26, Prop 6.6]. The bound comes from the
 subcode of polynomials vanishing on the corresponding set. Equality holds for $d < q$, and
-[PRM, Conj 6.9] states that it always holds.
+[SJ26, Conj 6.9] states that it always holds.
 
 ### Lower bounds
 
@@ -87,6 +88,25 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
 
   The tables use the best bounds available for these smaller codes, so any improvement for them
   propagates to the larger codes.
+* **Duality** [Wei91; SJ24, Thm 9], as in [SJ24, Section V-C]. Let $1 \le d \le m(q-1)-1$ and
+  $e = m(q-1)-d$. The dual of $\mathrm{PRM}_q(d,m)$ is $\mathrm{PRM}_q(e,m)$ if $q-1$ does not divide $d$, and
+  $\mathrm{PRM}_q(e,m) + \langle (1,\dots,1) \rangle$ if it does [Sør91]. In the second case, a subspace of the
+  dual of dimension $s$ meets $\mathrm{PRM}_q(e,m)$ in dimension at least $s-1$, so
+  ```math
+  d_{s-1}(\mathrm{PRM}_q(e,m)) \le d_s(\mathrm{PRM}_q(d,m)^\perp) \le d_s(\mathrm{PRM}_q(e,m)).
+  ```
+  Either way, the bounds for $\mathrm{PRM}_q(e,m)$, which is also in the tables, give bounds for the
+  weights of the dual. Let $N(w)$ be the number of weights of a code $C$ of length $n$ and dimension $k$
+  that are at most $w$. Wei duality gives
+  ```math
+  N(w) = w - (n - k) + \#\{\, s : d_s(C^\perp) \le n - w \,\},
+  ```
+  so the bounds for the weights of the dual give lower and upper bounds for $N(w)$, and hence for the
+  weights of $C$. This applies to all the bounds above, in both directions, and the improved bounds
+  are also used by the recursive bound for the larger codes. ([SJ24, Section V-C] uses the first case;
+  the second one is new here.)
+* **Monotonicity** $d_1 < d_2 < \dots < d_k$ [SJ24, Thm 5]: $d_r$ is at least the lower bound of
+  $d_{r-1}$ plus one, and at most the upper bound of $d_{r+1}$ minus one.
 * **Computed values.** Values computed with the Sage package GHWs [GHWs], and values from the
   literature, listed in [`data/manual.csv`](data/manual.csv) with their source.
 
@@ -101,13 +121,14 @@ Every source above is a *rule*: it looks at one code, proposes bounds, and recor
 A rule can only raise a lower bound or lower an upper bound, and the result of every rule can only
 improve when its inputs improve. Hence the final tables do not depend on the order in which the
 rules are applied, and a new computed value is automatically used by the recursive bound for all
-the larger codes.
+the larger codes, and by duality and monotonicity.
 
 Everything is recomputed from scratch from the formulas and `data/manual.csv`. The generator stops
 if some lower bound is larger than the corresponding upper bound, which would reveal a wrong value
-or a bug. The recursive bound is also computed where the weight is already known, so it checks the
-exact values too. An upper bound below $B_r(q,d,m)$ would be a counterexample to [PRM, Conj 6.9]; the
-generator reports it as such.
+or a bug; thanks to monotonicity, this includes computed values that do not increase with $r$. The
+recursive bound is also computed where the weight is already known, so it checks the exact values too.
+An upper bound below $B_r(q,d,m)$ would be a counterexample to [SJ26, Conj 6.9]; the generator reports it
+as such.
 
 ## Adding a computed value
 
@@ -115,7 +136,7 @@ Add a line to [`data/manual.csv`](data/manual.csv), with the columns
 
 ```
 q,d,m,r,lower,upper,source,note
-3,4,3,7,16,16,GHWs,"Computed with the GHWs package, see [PRM, Section 6.3]."
+3,4,3,7,16,16,GHWs,"Computed with the GHWs package, see [SJ26, Section 6.3]."
 ```
 
 * Leave `lower` (or `upper`) empty if the computation only gives an upper (or a lower) bound.
@@ -125,9 +146,28 @@ q,d,m,r,lower,upper,source,note
 Then run the generator, read its report, and commit the changes. If a line is not valid, the
 generator stops and says which line it is.
 
+### Computing values with GHWs
+
+[`sage/compute.py`](sage/compute.py) computes weights with the GHWs package [GHWs] and prints the lines
+to add to `data/manual.csv`. It is the only file that needs SageMath, and nothing else depends on it.
+With SageMath and GHWs installed, from the repository folder:
+
+```
+sage -python sage/compute.py 4 4 3        # the weights of PRM_4(4,3) that are not known in the tables
+sage -python sage/compute.py 4 4 3 7      # only d_7(PRM_4(4,3))
+sage -python sage/compute.py 3 4 3 all    # all the weights of PRM_3(4,3), to compare them with the tables
+```
+
+When $d_r$ is not known, the tables give $a \le d_r \le b$ with $a < b$ and $b \le B_r(q,d,m)$, and
+[SJ26, Conj 6.9] says that $d_r = B_r(q,d,m)$. So the script first asks `GHW_bound` whether $d_r \ge b$,
+which is usually much faster than computing $d_r$. If the answer is yes, then $d_r = b$, and the line
+for `data/manual.csv` only gives the lower bound $b$ (the upper bound is already in the tables). If the
+answer is no, the script computes $d_r$ with `GHW`, and reports a counterexample to the conjecture.
+
 ## Using the code
 
-Only Python 3.9 or later is needed; there are no other dependencies. From the repository folder:
+Only Python 3.9 or later is needed; there are no other dependencies (SageMath is only needed to
+compute new values, see above). From the repository folder:
 
 ```
 python3 src/generate.py                        # compute the tables (about a minute and a half)
@@ -135,14 +175,17 @@ python3 -m unittest discover -s tests -v       # run the tests (a few seconds)
 FULL_CHECK=1 python3 -m unittest discover -s tests -v
 ```
 
-The tests reproduce the examples and the computational checks of [PRM]:
+The tests reproduce the examples and the computational checks of [SJ26]:
 
 * the formula of Thm 1.1 for $d < q$, Sørensen's minimum distance, Cor 4.2, Prop 6.12, Lemma 6.10 and Cor 5.2;
 * the examples of Section 6, and the remark verifying Conj 6.9 for $q = 3$, $m = 3$.
 
 They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm 7] at every entry of
-[SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$b$. With
-`FULL_CHECK=1`, the checks of [PRM] run for every prime power $q \le 9$ and every $m \le 5$, which takes
+[SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$b$. They reproduce
+[SJ24, Example 6] too: duality and monotonicity turn the row $d = 3$ of [SJ24, Table III] into the exact
+values of [SJ24, Table VI]. They also check by brute force, on random binary codes, the inequalities
+used for duality when $q-1$ divides $d$. With
+`FULL_CHECK=1`, the checks of [SJ26] run for every prime power $q \le 9$ and every $m \le 5$, which takes
 about a minute.
 
 The functions can also be used from Sage. Start Sage in the repository folder and run:
@@ -167,6 +210,7 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 | [`src/generate.py`](src/generate.py) | computes the tables, checks them, writes `docs/data/` |
 | [`src/parameters.py`](src/parameters.py) | the codes in the tables |
 | [`data/manual.csv`](data/manual.csv) | computed values and values from the literature |
+| [`sage/compute.py`](sage/compute.py) | computes weights with GHWs, for `data/manual.csv` (needs SageMath) |
 | [`data/references.csv`](data/references.csv) | the references |
 | [`tests/`](tests) | the tests |
 | [`docs/`](docs) | the website; `docs/data/` is generated, never edit it by hand |
@@ -175,7 +219,7 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 
 ## Citation
 
-If you use these tables, please consider citing them and the paper [PRM] where the bounds are proved.
+If you use these tables, please consider citing them and the paper [SJ26] where the bounds are proved.
 
 > [!NOTE]
 > The tables will be archived on Zenodo with the first release. The DOI below, `10.5281/zenodo.XXXXXXX`,
@@ -199,7 +243,9 @@ If you use these tables, please consider citing them and the paper [PRM] where t
     AUTHOR = {San-Jos\'{e}, Rodrigo},
     TITLE = {Common zeros of homogeneous polynomials and the weight hierarchy of projective {R}eed--{M}uller codes},
     year = "2026",
-    note = "Preprint"
+    eprint = "2611.08203",
+    archivePrefix = "arXiv",
+    doi = "10.48550/arXiv.2611.08203"
 }
 ```
 
@@ -215,8 +261,9 @@ The website uses the style of https://rodrigosanjose.github.io, which is based o
 
 ## References
 
-* **[PRM]** R. San-José, *Common zeros of homogeneous polynomials and the weight hierarchy of
-  projective Reed–Muller codes*, preprint (2026).
+* **[SJ26]** R. San-José, *Common zeros of homogeneous polynomials and the weight hierarchy of
+  projective Reed–Muller codes*, arXiv:2611.08203 (2026).
+  [doi:10.48550/arXiv.2611.08203](https://doi.org/10.48550/arXiv.2611.08203).
 * **[SJ24]** R. San-José, *A recursive construction for projective Reed–Muller codes*,
   IEEE Trans. Inform. Theory 70(12) (2024), 8511–8523.
   [doi:10.1109/TIT.2024.3483998](https://doi.org/10.1109/TIT.2024.3483998).

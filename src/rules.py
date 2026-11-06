@@ -4,31 +4,33 @@ The rules used to fill the table.
 Each rule looks at one code PRM_q(d, m), proposes bounds for its weights together with the reason,
 and returns the number of changes it made to the table.  A rule can only raise a lower bound or lower
 an upper bound (see Table.improve_lower and Table.improve_upper), and the bound proposed by each rule
-can only improve when the bounds it uses improve (only the recursive bound uses other bounds).
+can only improve when the bounds it uses improve (the recursive bound uses the bounds of smaller codes,
+Wei duality those of the dual code, and monotonicity those of the neighbouring weights).
 Hence the order of the rules does not matter for the final table.  It only matters for the credit:
 when two rules give the same bound, the one applied first keeps it.
 
 The list RULES at the end of this file is the list of rules that generate.py uses.
 """
 
-from formulas import (affine_hierarchy, attaining_set, binom, dim_PRM, known_hierarchy, largest_n,
-                      lifted_weights, macaulay, p, recursive_lower_bound, sorensen_minimum_distance)
+from formulas import (affine_hierarchy, attaining_set, binom, bounds_after_adding_a_vector, dim_PRM,
+                      dual_degree, known_hierarchy, largest_n, lifted_weights, macaulay, p,
+                      recursive_lower_bound, sorensen_minimum_distance, wei_duality_bounds)
 
 
 def exact_values(table, q, d, m):
-    """Exact values: the complete hierarchy when it is known ([PRM, Thm 1.1] for d < q, [PRM, Cor. 4.2]
+    """Exact values: the complete hierarchy when it is known ([SJ26, Thm 1.1] for d < q, [SJ26, Cor. 4.2]
     for (m-1)(q-1) < d < m(q-1), and the degrees d >= m(q-1)); the minimum distance (Sorensen);
-    and the first weights given by [PRM, Prop. 6.12]."""
+    and the first weights given by [SJ26, Prop. 6.12]."""
     code = (q, d, m)
     changes = 0
 
-    H, name = known_hierarchy(q, d, m)  # name: "PRM Thm 1.1", "PRM Cor 4.2", "whole space" or "dual is all-ones"
+    H, name = known_hierarchy(q, d, m)  # name: "SJ26 Thm 1.1", "SJ26 Cor 4.2", "whole space" or "dual is all-ones"
     if H is not None:
         for r in range(1, len(H)):
             reason = {"rule": name}
-            if name == "PRM Thm 1.1":
+            if name == "SJ26 Thm 1.1":
                 reason["mu"] = macaulay(binom(m + d, d) - r, d)
-            if name == "PRM Cor 4.2":
+            if name == "SJ26 Cor 4.2":
                 reason["dual_degree"] = m * (q - 1) - d
             changes += table.improve_lower(code, r, H[r], reason)
             changes += table.improve_upper(code, r, H[r], reason)
@@ -38,14 +40,14 @@ def exact_values(table, q, d, m):
     changes += table.improve_upper(code, 1, d1, {"rule": "Sorensen"})
 
     for r, value in lifted_weights(q, d, m).items():
-        reason = {"rule": "PRM Prop 6.12"}
+        reason = {"rule": "SJ26 Prop 6.12"}
         changes += table.improve_lower(code, r, value, reason)
         changes += table.improve_upper(code, r, value, reason)
     return changes
 
 
 def upper_bound(table, q, d, m):
-    """The upper bound B_r(q, d, m) = p_m - n of [PRM, Thm 6.7], where n is the largest integer
+    """The upper bound B_r(q, d, m) = p_m - n of [SJ26, Thm 6.7], where n is the largest integer
     0 <= n <= p_m with h_d(n) <= k_d(m) - r.  The reason records n and which of the sets Z_n^-, Z_n^+
     is used."""
     code = (q, d, m)
@@ -54,7 +56,7 @@ def upper_bound(table, q, d, m):
     changes = 0
     for r in range(1, k + 1):
         n = N[k - r]
-        reason = {"rule": "PRM Thm 6.7", "n": n, "set": attaining_set(q, d, n)}
+        reason = {"rule": "SJ26 Thm 6.7", "n": n, "set": attaining_set(q, d, n)}
         changes += table.improve_upper(code, r, p(q, m) - n, reason)
     return changes
 
@@ -115,5 +117,58 @@ def computed_values(table, q, d, m):
     return changes
 
 
+def wei_duality(table, q, d, m):
+    """Wei duality ([SJ24, Thm 9]): the current bounds for the weights of the dual code give bounds for
+    this code, by the counting argument of wei_duality_bounds in formulas.py.  This is how [SJ24,
+    Section V-C] improves the tables of the recursive bound (Example 6 and Tables VI-VIII there).
+
+    The dual is PRM_q(e, m), with e = m(q-1) - d, if q-1 does not divide d, and PRM_q(e, m) plus the
+    all-ones vector if q-1 divides d (see dual_degree).  In the second case, the bounds for PRM_q(e, m)
+    first give bounds for the dual code, by bounds_after_adding_a_vector.  Since PRM_q(e, m) is also in
+    the tables, the improvements go in both directions, and they also reach the recursive bound for
+    the larger codes.
+    """
+    e = dual_degree(q, d, m)
+    if e is None:
+        return 0
+    code = (q, d, m)
+    n = p(q, m)
+    k = dim_PRM(q, d, m)
+    dual_lower, dual_upper = table.lower[q, e, m], table.upper[q, e, m]
+    plus_ones = d % (q - 1) == 0                 # True if the dual is PRM_q(e, m) + <(1, ..., 1)>
+    if plus_ones:
+        dual_lower, dual_upper = bounds_after_adding_a_vector(n, dual_lower, dual_upper)
+    lower, upper = wei_duality_bounds(n, k, dual_lower, dual_upper)
+    changes = 0
+    for r in range(1, k + 1):
+        bound, w, count = lower[r]
+        reason = {"rule": "Wei duality", "bound": "lower", "dual_degree": e, "plus_ones": plus_ones,
+                  "w": w, "count": count}
+        changes += table.improve_lower(code, r, bound, reason)
+        bound, w, count = upper[r]
+        reason = {"rule": "Wei duality", "bound": "upper", "dual_degree": e, "plus_ones": plus_ones,
+                  "w": w, "count": count}
+        changes += table.improve_upper(code, r, bound, reason)
+    return changes
+
+
+def monotonicity(table, q, d, m):
+    """Monotonicity: d_1 < d_2 < ... < d_k ([SJ24, Thm 5]).  Hence d_r >= (lower bound of d_{r-1}) + 1
+    and d_r <= (upper bound of d_{r+1}) - 1.  Besides improving bounds, this makes generate.py notice
+    computed values that are impossible because they do not increase with r."""
+    code = (q, d, m)
+    k = dim_PRM(q, d, m)
+    changes = 0
+    for r in range(2, k + 1):                    # r = 2, ..., k: lower bounds, upwards
+        previous = table.lower[code][r - 1]
+        reason = {"rule": "monotonicity", "from_r": r - 1, "from_bound": previous}
+        changes += table.improve_lower(code, r, previous + 1, reason)
+    for r in range(k - 1, 0, -1):                # r = k-1, ..., 1: upper bounds, downwards
+        following = table.upper[code][r + 1]
+        reason = {"rule": "monotonicity", "from_r": r + 1, "from_bound": following}
+        changes += table.improve_upper(code, r, following - 1, reason)
+    return changes
+
+
 # The rules used by generate.py, in this order.
-RULES = [exact_values, upper_bound, recursive_bound, computed_values]
+RULES = [exact_values, upper_bound, recursive_bound, computed_values, wei_duality, monotonicity]
