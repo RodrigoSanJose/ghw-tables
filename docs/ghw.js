@@ -19,7 +19,7 @@ const COLUMNS = 10;            // row i and column j of a grid hold d_{i+j}, for
 const EXPANDED_UP_TO = 60;     // codes with at most this many weights are shown expanded
 
 let index = null;              // the contents of data/index.json
-const downloaded = {};         // file name -> contents, for the tables already downloaded
+const downloaded = {};         // file name -> its contents (a promise), for the files already requested
 let shown = null;              // {q, m, data}: the table currently shown
 const expanded = {};           // "d" -> true or false, for the codes expanded or collapsed by hand
 let followCount = 0;           // the number of calls of follow(), to ignore out-of-date ones
@@ -106,12 +106,19 @@ function afterTypesetting(action) {
 	}
 }
 
-async function download(file) {
+function download(file) {                  // the contents of data/file, requested only once
 	if (!(file in downloaded)) {
-		const response = await fetch("data/" + file);
-		downloaded[file] = await response.json();
+		downloaded[file] = fetch("data/" + file).then(response => {
+			if (!response.ok) throw new Error(file + ": " + response.status);
+			return response.json();
+		});
+		downloaded[file].catch(() => { delete downloaded[file]; });    // after an error, try again next time
 	}
 	return downloaded[file];
+}
+
+function plainPRM(q, d, m) {               // PRM_q(d,m) in HTML, for the many labels of the tables:
+	return '<span class="ghw-tex">PRM<sub>' + q + "</sub>(" + d + ", " + m + ")</span>";   // no MathJax needed
 }
 
 function tableInfo(q, m) {                 // the entry of index.json for the table (q, m), if any
@@ -397,15 +404,15 @@ function codeBlockHTML(q, m, code) {
 	let exact = 0;
 	for (let r = 1; r <= code.k; r++) if (code.lower[r] === code.upper[r]) exact += 1;
 	const complete = exact === code.k;
-	let title = math(PRM(q, code.d, m)) + ": " + code.k + " weights, ";
+	let title = plainPRM(q, code.d, m) + ": " + code.k + " weights, ";
 	title += complete ? "all known." : exact + " known, " + (code.k - exact) + " only bounded.";
 	const open = isExpanded(code);
 	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '"'
 		+ analyticsAttributes(open ? "Hide weights" : "Show weights", q, m, code.d) + '>'
 		+ (open ? "Hide" : "Show") + "</a>";
 	return '<div class="ghw-code ' + (complete ? "ghw-complete" : "ghw-partial") + '" id="code-' + code.d + '">'
-		+ '<div class="ghw-code-label"><span class="ghw-degree">' + math("d = " + code.d) + "</span>"
-		+ '<span class="ghw-dimension">' + math("k = " + code.k) + "</span></div>"
+		+ '<div class="ghw-code-label"><span class="ghw-degree ghw-tex"><i>d</i> = ' + code.d + "</span>"
+		+ '<span class="ghw-dimension ghw-tex"><i>k</i> = ' + code.k + "</span></div>"
 		+ '<div class="ghw-code-content"><div class="ghw-code-title">' + title + "</div>"
 		+ '<div class="ghw-grid-wrapper">' + (open ? gridHTML(q, m, code) : "") + "</div></div></div>";
 }
@@ -430,17 +437,14 @@ function drawTable() {
 	const {q, m, data} = shown;
 	const info = tableInfo(q, m);
 	const summary = document.getElementById("ghw-summary");
-	summary.innerHTML = "Length " + math("p_" + m + " = " + data.n) + ". Codes " + math(PRM(q, "d", m))
-		+ " with " + math("1 \\le d \\le " + Math.max(...info.degrees)) + ": " + info.weights + " weights, "
-		+ info.exact + " known exactly"
+	// Plain HTML, like the labels of the codes, so that the line appears together with the tables.
+	summary.innerHTML = 'Length <span class="ghw-tex"><i>p</i><sub>' + m + "</sub> = " + data.n + "</span>. Codes "
+		+ plainPRM(q, "<i>d</i>", m) + ' with <span class="ghw-tex">1 ≤ <i>d</i> ≤ ' + Math.max(...info.degrees)
+		+ "</span>: " + info.weights + " weights, " + info.exact + " known exactly"
 		+ (info.exact < info.weights ? ", " + (info.weights - info.exact) + " only bounded." : ".")
-		+ (q === 2 ? " For " + math("q = 2") + ", PRM codes are shortened Reed–Muller codes: " + math(PRM(2, "d", m))
-			+ " is " + math(RM(2, "d", m + 1)) + " shortened at the origin, and its dual is the punctured code "
-			+ math(RM(2, m + "-d", m + 1) + "^*") + "." : "");
+		+ (q === 2 ? ' Note: for <span class="ghw-tex"><i>q</i> = 2</span> PRM codes are shortened RM codes at the origin.' : "");
 	const container = document.getElementById("ghw-codes");
-	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");
-	typeset(summary);
-	typeset(container);
+	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");   // no MathJax inside
 }
 
 function highlightSelected() {             // mark the entry selected in the address, if it is drawn
@@ -456,7 +460,6 @@ function toggleCode(degree, keepFocus) {
 	expanded[degree] = !isExpanded(code);
 	const block = document.getElementById("code-" + degree);
 	block.outerHTML = codeBlockHTML(shown.q, shown.m, code);
-	typeset(document.getElementById("code-" + degree));
 	highlightSelected();
 	if (keepFocus) document.querySelector("#code-" + degree + " .ghw-toggle").focus();
 }
@@ -564,17 +567,20 @@ function drawReferences() {
 	}).join("");
 }
 
-// The citation.  The button copies exactly the BibTeX entry shown on the page; the download is the
-// file sanjoseGHWTables.bib, which the tests check against the page and the README.
+// The citation.  The button in the corner of the box copies exactly the BibTeX entry shown on the page.
 function setUpCitation() {
 	const button = document.getElementById("ghw-copy-bibtex");
 	const status = document.getElementById("ghw-copy-status");
 	const entry = document.querySelector("#ghw-bibtex code");
 	if (!button || !status || !entry) return;
+	const icon = button.querySelector("i");
+	let timer = null;
 	button.addEventListener("click", async () => {
+		clearTimeout(timer);
 		try {
 			await navigator.clipboard.writeText(entry.textContent);
 			status.textContent = "Copied.";
+			if (icon) icon.className = "fa-solid fa-check";
 		} catch (error) {
 			// Without access to the clipboard, select the entry so that it can be copied by hand.
 			const range = document.createRange();
@@ -584,10 +590,18 @@ function setUpCitation() {
 			selection.addRange(range);
 			status.textContent = "The entry is selected: press Ctrl+C (⌘+C on a Mac) to copy it.";
 		}
+		timer = setTimeout(() => {                 // back to the copy icon after a moment
+			status.textContent = "";
+			if (icon) icon.className = "fa-regular fa-copy";
+		}, status.textContent === "Copied." ? 2000 : 8000);
 	});
 }
 
 async function start() {
+	// The table of the address is requested at the same time as index.json, which lists the tables:
+	// its file name is known (q{q}_m{m}.json), so the two downloads need not wait for each other.
+	const params = new URLSearchParams(location.hash.slice(1));
+	download("q" + Number(params.get("q") || 3) + "_m" + Number(params.get("m") || 3) + ".json").catch(() => {});
 	try {
 		index = await download("index.json");
 	} catch (error) {

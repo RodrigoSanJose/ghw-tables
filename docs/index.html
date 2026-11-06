@@ -17,6 +17,8 @@
 		<meta name="description" content="Bounds and exact values for the generalized Hamming weights of projective Reed–Muller codes, with a justification for every value." />
 		<link rel="stylesheet" href="/assets/css/main.css" />
 		<link rel="stylesheet" href="ghw.css" />
+		<!-- ghw.js needs this list of the tables: start downloading it now. -->
+		<link rel="preload" href="data/index.json" as="fetch" crossorigin="anonymous" />
 
 		<!-- MathJax, as on the main page: math in <span class="math"> stays hidden until it is typeset. -->
 		<style>html.mj-loading .math { visibility: hidden; }</style>
@@ -50,10 +52,16 @@
 		<!-- Header (as on the main page) -->
 			<header id="header">
 				<div class="inner">
-					<a href="/" class="image avatar" title="Main page" aria-label="Main page" data-analytics-label="Main page"><img src="/images/Rodrigo.JPG" alt="" /></a>
-					<h1 style="margin-bottom: 1rem;"><strong><a href="/" class="name-link" data-analytics-label="Main page">Rodrigo San-José</a></strong><br /> </h1>
+					<a class="image avatar"><img src="/images/Rodrigo.JPG" alt="" /></a>
+					<h1 style="margin-bottom: 1rem;"><strong>Rodrigo San-José</strong><br /> </h1>
 					<a href="https://www.vt.edu/" target="_blank" rel="noopener noreferrer">Virginia Tech</a> <br />
 					<a href="https://math.vt.edu/" target="_blank" rel="noopener noreferrer">Department of Mathematics</a> <br />
+					<!-- The pages of the site, as on the main page (the style is .site-nav in the main page's main.css). -->
+					<nav class="site-nav" aria-label="Pages">
+						<a href="/">Home</a><span class="site-nav-separator" aria-hidden="true"> · </span>
+						<span aria-current="page">GHW tables</span><span class="site-nav-separator" aria-hidden="true"> · </span>
+						<a href="/books.html">Tier lists</a>
+					</nav>
 				</div>
 				<div class="inner">
 					<ul class="icons">
@@ -75,19 +83,21 @@
 						<h2>Generalized Hamming weights of projective Reed–Muller codes</h2>
 					</header>
 					<p>
+						<!-- The formulas of this paragraph and of the tables are plain HTML in a math-like font (class
+						     ghw-tex), so that they appear at once, without waiting for MathJax. -->
 						Bounds and exact values for the generalized Hamming weights
-						<span class="math">\(d_r(\mathrm{PRM}_q(d,m))\)</span> of projective Reed–Muller codes.
-						Choose <span class="math">\(q\)</span> and <span class="math">\(m\)</span>: each block below is a code
-						<span class="math">\(\mathrm{PRM}_q(d,m)\)</span>, and the entry in row <span class="math">\(i\)</span> and
-						column <span class="math">\(j\)</span> is the weight <span class="math">\(d_{i+j}\)</span>.
+						<span class="ghw-tex"><i>d</i><sub><i>r</i></sub>(PRM<sub><i>q</i></sub>(<i>d</i>, <i>m</i>))</span> of projective Reed–Muller codes.
+						Choose <span class="ghw-tex"><i>q</i></span> and <span class="ghw-tex"><i>m</i></span>: each block below is a code
+						<span class="ghw-tex">PRM<sub><i>q</i></sub>(<i>d</i>, <i>m</i>)</span>, and the entry in row <span class="ghw-tex"><i>i</i></span> and
+						column <span class="ghw-tex"><i>j</i></span> is the weight <span class="ghw-tex"><i>d</i><sub><i>i</i>+<i>j</i></sub></span>.
 						A single number is the exact value, and <span class="ghw-open-sample">a–b</span>
-						means <span class="math">\(a \le d_r \le b\)</span>.
+						means <span class="ghw-tex"><i>a</i> ≤ <i>d</i><sub><i>r</i></sub> ≤ <i>b</i></span>.
 						<strong>Click on any entry</strong> to see where its bounds come from.
 					</p>
 
 					<div class="ghw-controls" data-analytics-section="GHW tables / Controls">
-						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="math">\(q\)</span></span> <span id="ghw-q-choices"></span></div>
-						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="math">\(m\)</span></span> <span id="ghw-m-choices"></span></div>
+						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="ghw-tex"><i>q</i></span></span> <span id="ghw-q-choices"></span></div>
+						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="ghw-tex"><i>m</i></span></span> <span id="ghw-m-choices"></span></div>
 					</div>
 					<p id="ghw-notice" hidden></p>
 					<p id="ghw-summary"></p>
@@ -132,14 +142,13 @@
 					<h3 id="cite">How to cite</h3>
 					<div id="ghw-citation" data-analytics-section="GHW tables / Citation">
 					<p class="ghw-cite-text">
-						If you use these tables, please consider citing them and the paper [SJ26]
-						(<a href="https://doi.org/10.48550/arXiv.2611.08203" target="_blank" rel="noopener noreferrer" data-publication-title="Common zeros of homogeneous polynomials and the weight hierarchy of projective Reed-Muller codes" data-publication-short="Common zeros and PRM weights">arXiv:2611.08203</a>)
-						where the bounds are proved.
+						If you use these tables, please consider citing them and the paper [SJ24,SJ26] where the main bounds are proved.
 						The tables are archived on Zenodo with the DOI
 						<a href="https://doi.org/10.5281/zenodo.24020768" target="_blank" rel="noopener noreferrer" data-publication-title="Tables of generalized Hamming weights of projective Reed-Muller codes" data-publication-short="GHW tables" data-link-type="Zenodo archive">10.5281/zenodo.24020768</a>,
 						which always points to the latest version.
 					</p>
-<!-- The same BibTeX entry is in README.md and in sanjoseGHWTables.bib (the download below); the tests check that they agree. -->
+					<div class="ghw-bibtex-box">
+<!-- The same BibTeX entry is in README.md; the tests check that they agree. -->
 <pre id="ghw-bibtex"><code>@misc{sanjoseGHWTables,
   author       = {San-Jos{\'e}, Rodrigo},
   title        = {Tables of generalized {H}amming weights of
@@ -151,11 +160,9 @@
                   Permanent DOI:
                   \url{https://doi.org/10.5281/zenodo.24020768}}
 }</code></pre>
-					<p class="ghw-cite-actions">
-						<button type="button" id="ghw-copy-bibtex" class="button small" data-analytics-label="GHW tables. Copy BibTeX">Copy BibTeX</button>
-						<a id="ghw-download-bibtex" class="button small" href="sanjoseGHWTables.bib" download="sanjoseGHWTables.bib" data-analytics-label="GHW tables. Download BibTeX">Download .bib</a>
-						<span id="ghw-copy-status" class="ghw-copy-status" role="status" aria-live="polite"></span>
-					</p>
+						<button type="button" id="ghw-copy-bibtex" class="ghw-copy-button" title="Copy BibTeX" aria-label="Copy BibTeX" data-analytics-label="GHW tables. Copy BibTeX"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>
+					</div>
+					<p id="ghw-copy-status" class="ghw-copy-status" role="status" aria-live="polite"></p>
 					</div>
 
 					<h3 id="references">References</h3>

@@ -18,7 +18,7 @@ SRC = Path(__file__).resolve().parent.parent.joinpath("src")
 sys.path.insert(0, str(SRC))
 
 import rules  # noqa: E402
-from formulas import B, dim_PRM  # noqa: E402
+from formulas import B, dim_PRM, upper_bound_hierarchy  # noqa: E402
 from generate import (MANUAL, REFERENCES, check, fill, read_computed_values,  # noqa: E402
                       read_references, write_website_data)
 from parameters import codes  # noqa: E402
@@ -139,6 +139,31 @@ class TestTables(unittest.TestCase):
         counterexamples = check(table)
         self.assertEqual(len(counterexamples), 1)
         self.assertIn("d_7(PRM_3(4,3))", counterexamples[0])
+
+    def test_conjecture_is_consistent_with_all_the_rules(self):
+        """[SJ26, Conj. 6.9] says that d_r = B_r for every code.  If it were true, the table with
+        lower = upper = B_r for every code of the tables (the whole range, not only SMALL) would be
+        correct, and no rule could change it, since every rule is a theorem.  Apply every rule once to
+        that table: a bound that changes would prove that the conjecture fails for some code (maybe
+        another one, for instance a smaller code whose weights the recursive bound uses).  This takes
+        about a minute, mostly for the recursive bound."""
+        table = Table(codes())
+        assumption = {"rule": "Conj. 6.9"}
+        for q, d, m in table.codes:
+            H = upper_bound_hierarchy(q, d, m)
+            table.lower[q, d, m] = list(H)
+            table.upper[q, d, m] = list(H)
+            table.lower_reason[q, d, m] = [None] + [assumption] * (len(H) - 1)
+            table.upper_reason[q, d, m] = [None] + [assumption] * (len(H) - 1)
+        read_computed_values(table, MANUAL, read_references(REFERENCES))
+        for q, d, m in table.codes:
+            for rule in rules.RULES:
+                rule(table, q, d, m)
+        changed = [(code, r, table.lower[code][r], table.upper[code][r],
+                    table.lower_reason[code][r], table.upper_reason[code][r])
+                   for code in table.codes for r in range(1, len(table.lower[code]))
+                   if not table.lower[code][r] == B(*code, r) == table.upper[code][r]]
+        self.assertEqual(changed, [])
 
     def test_invalid_lines(self):
         """generate.py stops with a message when a line of data/manual.csv is not valid."""

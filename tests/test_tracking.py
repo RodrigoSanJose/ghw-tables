@@ -240,9 +240,6 @@ class TrackingTests(unittest.TestCase):
         self.assert_event("Google Scholar", "Google Scholar",
                           "https://scholar.google.com/citations?user=F5GiN1MAAAAJ", "Header")
         self.reset_events()
-        self.page.locator('#header a[title="Main page"] img').dispatch_event("click", {"button": 0})
-        self.assert_event("Main page", "Main page", ORIGIN + "/", "Header")
-        self.reset_events()
         first_reference = self.page.locator("#ghw-references a").first
         first_reference.dispatch_event("click", {"button": 0})
         event = self.events()[0]
@@ -274,7 +271,7 @@ class TrackingTests(unittest.TestCase):
                                   PAGE + href, "GHW tables / Explanation", **target_context)
         self.assertEqual(seen, {"GHW. Referenced code", "GHW. Referenced weight"})
 
-    def test_citation_copy_and_download_match_the_displayed_entry_and_are_tracked(self):
+    def test_citation_copy_matches_the_displayed_entry_and_is_tracked(self):
         displayed = self.page.locator("#ghw-bibtex code").text_content()
         self.assertTrue(displayed.startswith("@misc{sanjoseGHWTables,"))
         self.context.grant_permissions(["clipboard-read", "clipboard-write"], origin=ORIGIN)
@@ -285,26 +282,14 @@ class TrackingTests(unittest.TestCase):
                 self.reset_events()
                 button = self.page.locator("#ghw-copy-bibtex")
                 if method == "click":
-                    button.click()
+                    button.locator("i").click()          # the icon inside the button
                 else:
                     button.focus()
                     button.press(method)
                 self.page.wait_for_function("document.getElementById('ghw-copy-status').textContent === 'Copied.'")
                 self.assertEqual(self.page.evaluate("navigator.clipboard.readText()"), displayed)
                 self.assert_event("GHW tables. Copy BibTeX", "GHW tables. Copy BibTeX", PAGE, section)
-                self.page.evaluate("document.getElementById('ghw-copy-status').textContent = ''")
-        self.reset_events()
-        with self.page.expect_download() as download_info:
-            self.page.locator("#ghw-download-bibtex").click()
-        self.assertEqual(download_info.value.suggested_filename, "sanjoseGHWTables.bib")
-        # The download request bypasses the local test routes, and the test origin does not exist, so
-        # the browser cancels it: read the file at the same address through the routes instead.
-        downloaded = self.page.evaluate(
-            "fetch(document.getElementById('ghw-download-bibtex').href).then(response => response.text())")
-        self.assertEqual(downloaded, displayed + "\n")
-        self.assertEqual(self.page.url, PAGE)
-        self.assert_event("GHW tables. Download BibTeX", "GHW tables. Download BibTeX",
-                          PAGE + "sanjoseGHWTables.bib", section)
+        self.assertEqual(self.page.locator('a[download], a[href$=".bib"]').count(), 0)
         self.reset_events()
         self.stop_navigation()
         self.page.locator('#ghw-citation a[href="https://doi.org/10.5281/zenodo.24020768"]').dispatch_event(
@@ -313,6 +298,18 @@ class TrackingTests(unittest.TestCase):
                           "Tables of generalized Hamming weights of projective Reed-Muller codes. Zenodo archive",
                           "https://doi.org/10.5281/zenodo.24020768", section)
         self.assertEqual(self.errors, [])
+
+    def test_site_navigation_links_have_one_event_and_the_current_page_is_not_a_link(self):
+        self.stop_navigation()
+        nav = self.page.locator("#header nav.site-nav")
+        self.assertEqual(nav.locator('[aria-current="page"]').text_content(), "GHW tables")
+        self.assertEqual(nav.locator('a[href="/ghw-tables/"]').count(), 0)
+        for href, name in (("/", "Home"), ("/books.html", "Tier lists")):
+            with self.subTest(link=name):
+                self.reset_events()
+                nav.locator(f'a[href="{href}"]').dispatch_event("click", {"button": 0})
+                self.assert_event(name, name, ORIGIN + href, "Navigation")
+        self.assertEqual(self.page.locator("#header .avatar[href], #header h1 a").count(), 0)
 
     def test_all_current_links_and_new_large_table_cells_are_covered(self):
         results = self.page.evaluate(r"""() => {

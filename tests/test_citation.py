@@ -1,4 +1,4 @@
-"""The citation of the tables is the same everywhere: README.md, the website and the .bib download.
+"""The citation of the tables is the same everywhere: README.md and the website.
 
 The website test in test_tracking.py checks that the copy button copies the same text.
 Run with:  python -B -m unittest tests/test_citation.py
@@ -42,16 +42,13 @@ class TestCitation(unittest.TestCase):
         self.assertIsNotNone(block)
         self.assertEqual(block.group(1), BIBTEX)   # the entry has no characters that HTML would change
 
-    def test_download_is_the_bibtex_entry(self):
-        self.assertEqual(read("docs/sanjoseGHWTables.bib"), BIBTEX + "\n")
-
     def test_citation_cff_keeps_the_doi_field(self):
         cff = read("CITATION.cff")
         self.assertRegex(cff, r"(?m)^doi: " + re.escape(CONCEPT_DOI) + "$")
         self.assertRegex(cff, r"(?m)^url: 'https://rodrigosanjose\.github\.io/ghw-tables/'$")
 
     def test_only_the_concept_doi_is_used(self):
-        for name in ("README.md", "CITATION.cff", "docs/index.html", "docs/sanjoseGHWTables.bib"):
+        for name in ("README.md", "CITATION.cff", "docs/index.html"):
             text = read(name)
             with self.subTest(file=name):
                 self.assertNotIn(VERSION_DOI, text)
