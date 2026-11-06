@@ -129,7 +129,10 @@ def dim_PRM(q, d, m):
     """k_d(m) = dim PRM_q(d, m) = dim RM_q(d-1, 0) + dim RM_q(d-1, 1) + ... + dim RM_q(d-1, m).
 
     This is [SJ24, Cor. 1] applied m times (also in [PRM], Section 6.2, with A(q^j, d-1) =
-    dim RM_q(d-1, j)).  As in [SJ24], PRM_q(d, m) = {0} for d <= 0.
+    dim RM_q(d-1, j)).  At the levels j with d > j(q-1), where Cor. 1 is not stated, both codes are
+    whole spaces and the identity is p_j = q^j + p_{j-1}; the last term is dim RM_q(d-1, 0) = 1 =
+    dim PRM_q(d, 0), since P^0 is a single point.  The result agrees with the closed formula of
+    [SJ24, Thm 1].  As in [SJ24], PRM_q(d, m) = {0} for d <= 0.
     """
     if d <= 0:
         return 0
@@ -253,7 +256,9 @@ def high_degree_hierarchy(q, d, m):
     """(0, d_1, ..., d_k) for PRM_q(d, m) with (m-1)(q-1) < d < m(q-1)  ([PRM], Cor. 4.2).
 
     The dual is PRM_q(e, m) with e = m(q-1) - d < q-1 (Sorensen; [SJ24, Thm 2]), whose
-    weights are given by Thm 1.1, and we apply Wei duality.
+    weights are given by Thm 1.1, and we apply Wei duality.  In this range d lies strictly between
+    the multiples (m-1)(q-1) and m(q-1) of q-1, so d is not a multiple of q-1, and by [SJ24, Thm 2]
+    the dual is exactly PRM_q(e, m), with no all-ones vector added.
     """
     e = m * (q - 1) - d
     return wei_dual(bdg_hierarchy(q, e, m), p(q, m))
@@ -273,9 +278,12 @@ def large_degree_hierarchy(q, d, m):
 
 
 def known_hierarchy(q, d, m):
-    """The complete hierarchy (0, d_1, ..., d_k) of PRM_q(d, m) when one of the results above gives it
-    (d < q, or d > (m-1)(q-1)), together with the name of the result.  Otherwise (None, None).
+    """For d >= 1: the complete hierarchy (0, d_1, ..., d_k) of PRM_q(d, m) when one of the results
+    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result.
+    Otherwise, and also for d <= 0, it returns (None, None).
     """
+    if d <= 0:
+        return None, None
     if d < q:
         return bdg_hierarchy(q, d, m), "PRM Thm 1.1"
     if (m - 1) * (q - 1) < d < m * (q - 1):
@@ -296,6 +304,8 @@ def lifted_weights(q, d, m):
     for t in range(m):
         hh = m - t
         if d == 1 + t * (q - 1):
+            # q^h + ... + q^(h-r+1) = p_h - p_(h-r), as in the proof of [PRM, Prop. 6.12]
+            # (for r = h+1 this is p_h, because p_(-1) = 0).
             return {r: p(q, hh) - p(q, hh - r) for r in range(1, hh + 2)}
         if q >= 3 and d == 2 + t * (q - 1):
             weights = {r: q**hh - q**(hh - r) for r in range(1, hh + 1)}

@@ -138,7 +138,8 @@ The tests reproduce the examples and the computational checks of [PRM]:
 * the formula of Thm 1.1 for $d < q$, Sørensen's minimum distance, Cor 4.2, Prop 6.12, Lemma 6.10 and Cor 5.2;
 * the examples of Section 6, and the remark verifying Conj 6.9 for $q = 3$, $m = 3$.
 
-They also reproduce the examples of [SJ24, Section V] and every entry of [SJ24, Tables II–V]. With
+They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm 7] at every entry of
+[SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$b$. With
 `FULL_CHECK=1`, the checks of [PRM] run for every prime power $q \le 9$ and every $m \le 5$, which takes
 about a minute.
 

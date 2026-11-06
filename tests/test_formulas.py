@@ -191,7 +191,7 @@ class TestUpperBound(unittest.TestCase):
 
 
 class TestAffine(unittest.TestCase):
-    """The Heijnen-Pellikaan weights of the affine codes RM_q(d, m) ([SJ24, Thm 5.4])."""
+    """The weights of the affine codes RM_q(d, m): Heijnen-Pellikaan [HP98, Thm 5.10], in the form of [SJ24, Thm 6]."""
 
     AFFINE = [(q, d, m) for q, top in ((2, 9), (3, 6), (4, 4), (5, 4), (7, 3), (8, 3), (9, 3))
               for m in range(1, top + 1) for d in range(0, m * (q - 1) + 1)]
@@ -237,6 +237,8 @@ class TestHelpers(unittest.TestCase):
                 self.assertIsNotNone(H, (q, d, m))
             if H is not None:
                 self.assertEqual(H, upper_bound_hierarchy(q, d, m), (q, d, m))
+        for d in (0, -1, -5):
+            self.assertEqual(known_hierarchy(3, d, 2), (None, None))
 
     def test_attaining_set(self):
         """Example 6.4 (q=4): Z_6^+ gives h_2(6), Z_15^- gives h_4(15); Z_9^- = Z_9^+ (q=4, d=2)."""
@@ -245,8 +247,11 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(attaining_set(4, 2, 9), "-+")
 
 
-# Entries "a-b" of [SJ24, Tables II-V]: a is the value of [SJ24, Thm 7], which is below the true value
-# there.  At all the other entries with r >= 2, the paper states that Thm 7 gives the true value.
+# Entries "a-b" of [SJ24, Tables II-V]: a is the value of [SJ24, Thm 7], and b is the best upper bound
+# used in [SJ24] (Lemma 1 and monotonicity).  [SJ24] writes a range when Thm 7 is not sharp OR when the
+# true value was not known (see the text after the tables), so a may be the true value: for instance
+# d_2(PRM_3(3,2)) = 4 [SJ24, p. 8522] and d_3(PRM_3(3,3)) = 13 [SJ24, Example 6].  At all the other
+# entries with r >= 2, the paper states that Thm 7 gives the true value.  Only a is tested here.
 # Keys: (q, m) -> {(d, r): a}.
 SJ24_TABLE_RANGES = {
     (3, 2): {(3, 2): 4},                                                              # Table II
