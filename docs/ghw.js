@@ -447,7 +447,12 @@ function drawTable() {
 		+ " with " + math("1 \\le d \\le " + Math.max(...info.degrees)) + ": " + info.weights + " weights, "
 		+ info.exact + " known exactly"
 		+ (info.exact < info.weights ? ", " + (info.weights - info.exact) + " only bounded." : ".")
-		+ (q === 2 ? " Note: for " + math("q=2") + " PRM codes are shortened RM codes at the origin." : "");
+		+ (q === 2 ? " Note: for " + math("q=2") + " PRM codes are shortened RM codes at the origin." : "")
+		+ ' <span class="ghw-all-toggles" data-analytics-section="GHW tables / Controls">'
+		+ '<button type="button" class="ghw-all-toggle" data-show="true"' + analyticsAttributes("Show all weights", q, m)
+		+ ">Show all</button> · "
+		+ '<button type="button" class="ghw-all-toggle" data-show="false"' + analyticsAttributes("Hide all weights", q, m)
+		+ ">Hide all</button></span>";
 	const container = document.getElementById("ghw-codes");
 	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");
 	typeset(summary);
@@ -470,6 +475,14 @@ function toggleCode(degree, keepFocus) {
 	typeset(document.getElementById("code-" + degree));
 	highlightSelected();
 	if (keepFocus) document.querySelector("#code-" + degree + " .ghw-toggle").focus();
+}
+
+function showAll(show) {                   // the buttons "Show all" and "Hide all" of the summary
+	for (const code of shown.data.codes) expanded[code.d] = show;
+	const container = document.getElementById("ghw-codes");    // the summary, with the buttons, stays
+	container.innerHTML = shown.data.codes.map(code => codeBlockHTML(shown.q, shown.m, code)).join("");
+	highlightSelected();
+	typeset(container);
 }
 
 function showCode(d) {                     // expand the block of PRM_q(d,m) and scroll to it
@@ -631,6 +644,10 @@ async function start() {
 			event.preventDefault();
 			toggle.click();                // use the same activation path as mouse and Enter
 		}
+	});
+	document.getElementById("ghw-summary").addEventListener("click", event => {
+		const button = event.target.closest(".ghw-all-toggle");     // native buttons: Enter and Space too
+		if (button && shown) showAll(button.dataset.show === "true");
 	});
 	window.addEventListener("hashchange", follow);
 	await follow();

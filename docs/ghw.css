@@ -128,6 +128,18 @@
 	font-size: 0.9em;
 	cursor: pointer;
 }
+/* "Show all · Hide all" at the end of the summary: buttons that look like the links Show/Hide. */
+.ghw-all-toggles { margin-left: 0.5em; white-space: nowrap; font-size: 0.9em; }
+.ghw-all-toggle {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #49bf9d;
+	font: inherit;
+	cursor: pointer;
+}
+.ghw-all-toggle:hover,
+.ghw-all-toggle:focus-visible { text-decoration: underline; }
 .ghw-grid-wrapper { overflow-x: auto; }
 
 /* The grid: row i and column j hold d_{i+j}.

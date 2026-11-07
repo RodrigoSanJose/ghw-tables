@@ -335,6 +335,29 @@ class TrackingTests(unittest.TestCase):
                 self.assertEqual(set(self.page.locator(selector).evaluate_all(visibility)), {"visible"})
         self.assertEqual(self.errors, [])
 
+    def test_show_all_and_hide_all_redraw_every_code_and_emit_one_event_each(self):
+        self.page.evaluate("location.hash = '#q=2&m=7'")
+        self.page.wait_for_selector('#ghw-q-choices a.ghw-current[href="#q=2&m=7"]')
+        codes = self.page.evaluate("shown.data.codes.length")
+        weights = self.page.evaluate("shown.data.codes.reduce((total, code) => total + code.k, 0)")
+        self.assertGreater(self.page.locator('#ghw-codes .ghw-toggle:text-is("Show")').count(), 0)
+        for method, show in (("click", True), ("Enter", False), ("Space", True)):
+            with self.subTest(method=method, show=show):
+                self.reset_events()
+                button = self.page.locator(f'#ghw-summary .ghw-all-toggle[data-show="{str(show).lower()}"]')
+                if method == "click":
+                    button.click()
+                else:
+                    button.focus()
+                    button.press(method)
+                action = "GHW. Show all weights" if show else "GHW. Hide all weights"
+                self.assert_event(action, self.table_action(action, 2, 7), PAGE + "#q=2&m=7",
+                                  "GHW tables / Controls", q=2, m=7)
+                self.assertEqual(self.page.locator('#ghw-codes [id^="entry-"]').count(), weights if show else 0)
+                toggle = "Hide" if show else "Show"           # every code now offers the opposite action
+                self.assertEqual(self.page.locator(f'#ghw-codes .ghw-toggle:text-is("{toggle}")').count(), codes)
+        self.assertEqual(self.errors, [])
+
     def test_all_current_links_and_new_large_table_cells_are_covered(self):
         results = self.page.evaluate(r"""() => {
             const selector = 'a[href], area[href], button, input[type="button"], ' +
@@ -357,11 +380,11 @@ class TrackingTests(unittest.TestCase):
                     control.querySelector('img[alt]')?.getAttribute('alt')]
                     .find(value => value && value.trim());
                 const href = control.matches('a[href], area[href]') ? control.href : location.href;
-                const keyboardCovered = control.matches('.ghw-toggle');
+                const keyboardCovered = control.matches('.ghw-toggle, .ghw-all-toggle');
                 const nativeUmami = Boolean(control.closest('[data-umami-event]'));
                 const before = __analyticsEvents.length;
-                // Show/Hide replaces its entire block; exercise those separately
-                // with real mouse/Enter/Space activations rather than stale nodes.
+                // Show/Hide replaces its entire block, and Show all/Hide all every block;
+                // exercise those separately with real mouse/Enter/Space activations.
                 if (!keyboardCovered) control.dispatchEvent(new MouseEvent('click', {
                     bubbles: true, cancelable: true, button: 0
                 }));
