@@ -232,7 +232,7 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 | [`sage/compute.py`](sage/compute.py) | computes weights with GHWs, for `data/manual.csv` (needs SageMath) |
 | [`data/references.csv`](data/references.csv) | the references |
 | [`tests/`](tests) | the tests |
-| [`docs/`](docs) | the website; `docs/data/` is generated, never edit it by hand |
+| [`docs/`](docs) | the website; `docs/data/` is generated |
 | [`CITATION.cff`](CITATION.cff) | how to cite the tables (used by GitHub and Zenodo) |
 | [`LICENSE`](LICENSE), [`LICENSE-CC-BY-4.0.txt`](LICENSE-CC-BY-4.0.txt) | the licenses (see below) |
 
