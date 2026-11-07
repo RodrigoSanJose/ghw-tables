@@ -1,5 +1,5 @@
 """
-Compute generalized Hamming weights of projective Reed-Muller codes with the package GHWs [GHWs] for
+Compute generalized Hamming weights of projective Reed-Muller codes with the package GHWs [SJ25] for
 SageMath, and print the results as lines for data/manual.csv.
 
 This is the only file of the repository that uses SageMath, and nothing else depends on it.  It needs
@@ -75,9 +75,9 @@ def read_table(q, d, m):
 
 
 def csv_line(q, d, m, r, lower, upper, note):
-    """A line of data/manual.csv with the source GHWs (an empty lower or upper means no bound)."""
+    """A line of data/manual.csv with the source SJ25, the paper of GHWs (an empty lower or upper means no bound)."""
     text = io.StringIO()
-    csv.writer(text, lineterminator="").writerow([q, d, m, r, lower, upper, "GHWs", note])
+    csv.writer(text, lineterminator="").writerow([q, d, m, r, lower, upper, "SJ25", note])
     return text.getvalue()
 
 

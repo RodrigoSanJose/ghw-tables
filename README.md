@@ -143,7 +143,7 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
   on $n$, $k$ and $r$. For these codes, neither the sphere-packing bound nor the Griesmer bound improves
   any upper bound of the tables, and since the upper bounds can only decrease, they never will, so they
   are not used.
-* **Computed values.** Values computed with the Sage package GHWs [GHWs], and values from the
+* **Computed values.** Values computed with the Sage package GHWs [SJ25], and values from the
   literature, listed in [`data/manual.csv`](data/manual.csv) with their source.
 
 ## How the tables are computed
@@ -173,7 +173,7 @@ Add a line to [`data/manual.csv`](data/manual.csv), with the columns
 
 ```
 q,d,m,r,lower,upper,source,note
-3,4,3,7,16,16,GHWs,"Computed with the GHWs package, see [SJ26, Section 6.3]."
+3,4,3,7,16,16,SJ25,"Also given in [SJ26, Section 6.3]."
 ```
 
 * Leave `lower` (or `upper`) empty if the computation only gives an upper (or a lower) bound.
@@ -185,7 +185,7 @@ generator stops and says which line it is.
 
 ### Computing values with GHWs
 
-[`sage/compute.py`](sage/compute.py) computes weights with the GHWs package [GHWs] and prints the lines
+[`sage/compute.py`](sage/compute.py) computes weights with the GHWs package [SJ25] and prints the lines
 to add to `data/manual.csv`. It is the only file that needs SageMath, and nothing else depends on it.
 With SageMath and GHWs installed, from the repository folder:
 
@@ -306,7 +306,7 @@ The website uses the style of https://rodrigosanjose.github.io, which is based o
 * **[SJ24]** R. San-José, *A recursive construction for projective Reed–Muller codes*,
   IEEE Trans. Inform. Theory 70(12) (2024), 8511–8523.
   [doi:10.1109/TIT.2024.3483998](https://doi.org/10.1109/TIT.2024.3483998).
-* **[GHWs]** R. San-José, *An algorithm for computing generalized Hamming weights and the Sage package GHWs*,
+* **[SJ25]** R. San-José, *An algorithm for computing generalized Hamming weights and the Sage package GHWs*,
   ACM Trans. Math. Softw. 51(4) (2025). [doi:10.1145/3773284](https://doi.org/10.1145/3773284),
   [github.com/RodrigoSanJose/GHWs](https://github.com/RodrigoSanJose/GHWs).
 * **[BDG22]** P. Beelen, M. Datta, S. R. Ghorpade, *A combinatorial approach to the number of solutions of

@@ -321,7 +321,9 @@ function explain(reason, q, d, m, r, value, k) {
 	}
 
 	case "computed": {
-		let text = "Source: [" + escapeHTML(reason.source) + "].";
+		// The source is a key of the references below: SJ25 is the paper of the Sage package GHWs.
+		let text = reason.source === "SJ25" ? "Computed with the Sage package GHWs [SJ25]."
+			: "Source: [" + escapeHTML(reason.source) + "].";
 		if (reason.note) text += " " + escapeHTML(reason.note);
 		return text;
 	}

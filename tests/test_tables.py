@@ -109,13 +109,13 @@ class TestTables(unittest.TestCase):
 
     def test_values_that_do_not_increase_stop(self):
         """d_31 = d_32 is impossible: generate.py must stop instead of reporting a counterexample."""
-        table = small_table(HEADER + "3,6,4,31,45,45,GHWs,test\n" + "3,6,4,32,45,45,GHWs,test\n")
+        table = small_table(HEADER + "3,6,4,31,45,45,SJ25,test\n" + "3,6,4,32,45,45,SJ25,test\n")
         with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
             check(table)
 
     def test_contradiction_stops(self):
         """A computed lower bound above B_r is impossible: generate.py must stop."""
-        table = small_table(HEADER + "3,4,3,7,17,,GHWs,a wrong value\n")
+        table = small_table(HEADER + "3,4,3,7,17,,SJ25,a wrong value\n")
         with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
             check(table)
 
@@ -127,7 +127,7 @@ class TestTables(unittest.TestCase):
             for order in [original, [rules.exact_values, rules.computed_values, rules.upper_bound,
                                      rules.recursive_bound]]:
                 rules.RULES[:] = order        # generate.py uses this same list
-                table = small_table(HEADER + "3,4,3,7,14,14,GHWs,a wrong value\n")
+                table = small_table(HEADER + "3,4,3,7,14,14,SJ25,a wrong value\n")
                 with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
                     check(table)
         finally:
@@ -135,7 +135,7 @@ class TestTables(unittest.TestCase):
 
     def test_counterexample_is_reported(self):
         """An upper bound below B_r would be a counterexample to [SJ26, Conj. 6.9] (this one is invented)."""
-        table = small_table(HEADER + "3,4,3,7,,15,GHWs,an invented value\n")
+        table = small_table(HEADER + "3,4,3,7,,15,SJ25,an invented value\n")
         counterexamples = check(table)
         self.assertEqual(len(counterexamples), 1)
         self.assertIn("d_7(PRM_3(4,3))", counterexamples[0])
@@ -167,27 +167,27 @@ class TestTables(unittest.TestCase):
 
     def test_invalid_lines(self):
         """generate.py stops with a message when a line of data/manual.csv is not valid."""
-        for line in ["5,4,3,7,16,16,GHWs,x",       # PRM_5(4,3) is not among the codes of SMALL
-                     "3,4,3,30,16,16,GHWs,x",      # r = 30 > k_4(3) = 29
-                     "3,4,3,7,,,GHWs,x",           # no bound at all
-                     "3,4,3,7,17,16,GHWs,x",       # lower > upper
+        for line in ["5,4,3,7,16,16,SJ25,x",       # PRM_5(4,3) is not among the codes of SMALL
+                     "3,4,3,30,16,16,SJ25,x",      # r = 30 > k_4(3) = 29
+                     "3,4,3,7,,,SJ25,x",           # no bound at all
+                     "3,4,3,7,17,16,SJ25,x",       # lower > upper
                      "3,4,3,7,16,16,Nobody,x",     # unknown source
-                     "3,4,3,7,16,16,GHWs,a, b",    # a comma in a note without double quotes
-                     "3,4,3,7,16.0,16,GHWs,x",     # not a whole number
+                     "3,4,3,7,16,16,SJ25,a, b",    # a comma in a note without double quotes
+                     "3,4,3,7,16.0,16,SJ25,x",     # not a whole number
                      "3,4,3,7,16"]:                # missing columns
             with self.assertRaises(SystemExit):
                 small_table(HEADER + line + "\n")
 
     def test_error_names_the_line(self):
         """The message gives the line of the file, also after a blank line."""
-        text = HEADER + "\n" + "3,4,3,7,16,16,GHWs,valid\n" + "3,4,3,30,16,16,GHWs,r too large\n"
+        text = HEADER + "\n" + "3,4,3,7,16,16,SJ25,valid\n" + "3,4,3,30,16,16,SJ25,r too large\n"
         with self.assertRaises(SystemExit) as stop:
             small_table(text)
         self.assertIn("line 4", str(stop.exception))
 
     def test_excel_file_is_accepted(self):
         """A file saved by Excel (with an invisible first character) and a quoted note with commas work."""
-        table = small_table(HEADER + '3,4,3,7,16,16,GHWs,"a note, with commas"\n', encoding="utf-8-sig")
+        table = small_table(HEADER + '3,4,3,7,16,16,SJ25,"a note, with commas"\n', encoding="utf-8-sig")
         self.assertEqual(table.lower[3, 4, 3][7], 16)
         self.assertEqual(table.lower_reason[3, 4, 3][7]["note"], "a note, with commas")
 
