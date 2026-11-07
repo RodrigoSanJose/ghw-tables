@@ -16,9 +16,9 @@ The $r$-th generalized Hamming weight $d_r(C)$ of a linear code $C$ is the small
 $r$-dimensional subcode of $C$, and $d_1(C) < d_2(C) < \dots < d_k(C)$ is its weight hierarchy.
 For each code in the range below, the tables give, for every $1 \le r \le k_d(m)$, an interval
 
-```math
+$$
 \text{lower} \;\le\; d_r(\mathrm{PRM}_q(d,m)) \;\le\; \text{upper},
-```
+$$
 
 which is a single number when the value is known. Each end of the interval comes with the result
 (or computation) it follows from.
@@ -37,9 +37,8 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 | 8 | 1, 2, 3 | 585 |
 | 9 | 1, 2, 3 | 820 |
 
-For $q = 2$ every weight is known exactly. In that case PRM codes are shortened Reed–Muller codes: since
-$x^2 = x$ on $\mathbb{F}_2$, $\mathrm{PRM}_2(d,m)$ is $\mathrm{RM}_2(d,m+1)$ shortened at the origin, and
-its dual is the punctured code $\mathrm{RM}_2(m-d,m+1)^*$.
+For $q = 2$ every weight is known exactly. In that case $\mathrm{PRM}_2(d,m)$ is
+$\mathrm{RM}_2(d,m+1)$ shortened at the origin.
 
 ## Where the bounds come from
 
@@ -59,9 +58,9 @@ published version of [SJ24].
 
 For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the Macaulay tuple of $\binom{m+d}{d} - r$ in degree $d$,
 
-```math
+$$
 d_r(\mathrm{PRM}_q(d,m)) = p_m - p_{\mu_d} - \sum_{i=1}^{d-1} \lfloor q^{\mu_i} \rfloor .
-```
+$$
 
 In particular, the complete weight hierarchy is known for $m \le 2$.
 
@@ -69,9 +68,9 @@ In particular, the complete weight hierarchy is known for $m \le 2$.
 
 By [SJ26, Thm. 6.7], for $1 \le r \le k_d(m)$,
 
-```math
+$$
 d_r(\mathrm{PRM}_q(d,m)) \;\le\; B_r(q,d,m) = p_m - \max\{\, 0 \le n \le p_m : h_d(n) \le k_d(m) - r \,\}.
-```
+$$
 
 Here $h_d(n)$ is the smaller of the Hilbert functions in degree $d$ of two explicit sets
 $Z_n^-, Z_n^+ \subseteq \mathbb{P}^m(\mathbb{F}_q)$ with $n$ points, built by filling affine spaces and their
@@ -94,53 +93,51 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
   $e = m(q-1)-d$. The dual of $\mathrm{PRM}_q(d,m)$ is $\mathrm{PRM}_q(e,m)$ if $q-1$ does not divide $d$, and
   $\mathrm{PRM}_q(e,m) + \langle (1,\dots,1) \rangle$ if it does [Sør91]. In the second case, a subspace of the
   dual of dimension $s$ meets $\mathrm{PRM}_q(e,m)$ in dimension at least $s-1$, so
-  ```math
+
+  $$
   d_{s-1}(\mathrm{PRM}_q(e,m)) \le d_s(\mathrm{PRM}_q(d,m)^\perp) \le d_s(\mathrm{PRM}_q(e,m)).
-  ```
+  $$
+
   Either way, the bounds for $\mathrm{PRM}_q(e,m)$, which is also in the tables, give bounds for the
   weights of the dual. Let $N(w)$ be the number of weights of a code $C$ of length $n$ and dimension $k$
   that are at most $w$. Wei duality gives
-  ```math
+
+  $$
   N(w) = w - (n - k) + \#\{\, s : d_s(C^\perp) \le n - w \,\},
-  ```
+  $$
+
   so the bounds for the weights of the dual give lower and upper bounds for $N(w)$, and hence for the
   weights of $C$. This applies to all the bounds above, in both directions, and the improved bounds
   are also used by the recursive bound for the larger codes. ([SJ24, Section V-C] uses the first case;
   the second one is new here.)
 * **Classical bounds**, valid for every linear code of length $n$ (here $n = p_m$) and dimension $k$
   over $\mathbb{F}_q$, each one used in both directions:
-  * the *fundamental relation*, the case $s = r - 1$ of [HKLY95, Thm. 1] ([HKY92, Thm. 1] for $q = 2$),
-    ```math
+  * the case $s = r - 1$ of [HKLY95, Thm. 1] ([HKY92, Thm. 1] for $q = 2$),
+
+    $$
     (q^r - q)\, d_r \ge (q^r - 1)\, d_{r-1}, \qquad 2 \le r \le k,
-    ```
+    $$
+
     which gives lower bounds for $d_r$ from those of $d_{r-1}$, and upper bounds for $d_{r-1}$ from
     those of $d_r$;
-  * the *residual code bound* (from the proof of [HKLY95, Thm. 4])
-    ```math
+  * the bound (from the proof of [HKLY95, Thm. 4])
+
+    $$
     n - d_r \ge \sum_{i=0}^{k-r-1} \left\lceil \frac{d_{r+1} - d_r}{q^i} \right\rceil, \qquad 0 \le r \le k-1.
-    ```
-    Deleting the support of an $r$-dimensional subcode with $d_r$ coordinates in its support gives a
-    code of length $n - d_r$, dimension $k - r$ and minimum distance at least $d_{r+1} - d_r$, and this is
-    the Griesmer bound for it. It gives upper bounds for $d_{r+1}$ from those of $d_r$ (for $r = 0$,
-    with $d_0 = 0$, it is the Griesmer bound for $d_1$), and lower bounds for $d_r$ from those of $d_{r+1}$.
+    $$
 
   These two contain the other bounds of [Wei91], [HKY92] and [HKLY95] that can be evaluated from
   bounds for the weights, so these are not applied separately:
   * the strict increase $d_{r-1} < d_r$ [Wei91, Thm. 1; SJ24, Thm. 5], since $(q^r - 1)/(q^r - q) > 1$;
   * the other cases of [HKLY95, Thm. 1], [HKLY95, Cor. 1], and the Griesmer-type lower bound
     $d_r \ge \sum_{i=0}^{r-1} \lceil d_1/q^i \rceil$ ([Wei91, Thm. 4 and Lemma 1], there for $q = 2$), which
-    follow by iterating the fundamental relation upwards;
+    follow by iterating the bound of [HKLY95, Thm. 1] upwards;
   * the generalized Singleton bound $d_r \le n - k + r$ [Wei91, Cor. 1], the Plotkin-type bound
     [HKLY95, Thm. 2] and the generalized Griesmer bound [HKLY95, Thm. 4] ([HKY92, Thm. 5] for $q = 2$),
-    which follow by iterating it downwards from $d_k \le n$;
-  * [HKY92, Thm. 9], whose proof works over every field, and whose form over $\mathbb{F}_q$ is the
-    residual code bound without the ceilings.
+    which follow by iterating the bound of [HKLY95, Thm. 1] downwards from $d_k \le n$;
+  * [HKY92, Thm. 9], whose proof works over every field, and whose form over $\mathbb{F}_q$ is the bound
+    from the proof of [HKLY95, Thm. 4] with the ceilings omitted.
 
-  [HKY92, Lemma 5] gives a code over $\mathbb{F}_{q^r}$ with minimum distance $d_r$, so every bound for
-  the minimum distance, such as the sphere-packing bound, gives an upper bound for $d_r$ that depends only
-  on $n$, $k$ and $r$. For these codes, neither the sphere-packing bound nor the Griesmer bound improves
-  any upper bound of the tables, and since the upper bounds can only decrease, they never will, so they
-  are not used.
 * **Computed values.** Values computed with the Sage package GHWs [SJ25], and values from the
   literature, listed in [`data/manual.csv`](data/manual.csv) with their source.
 
@@ -159,9 +156,9 @@ the larger codes, and by duality and the classical bounds.
 
 Everything is recomputed from scratch from the formulas and `data/manual.csv`. The generator stops
 if some lower bound is larger than the corresponding upper bound, which would reveal a wrong value
-or a bug; since the fundamental relation contains the strict increase of the weights, this includes
-computed values that do not increase with $r$. The recursive bound is also computed where the weight
-is already known, so it checks the exact values too.
+or a bug; since the bound of [HKLY95, Thm. 1] implies the strict monotonicity of the weights, this
+includes computed values that do not increase with $r$. The recursive bound is also computed where
+the weight is already known, so it checks the exact values too.
 An upper bound below $B_r(q,d,m)$ would be a counterexample to [SJ26, Conj. 6.9]; the generator reports it
 as such.
 
@@ -274,27 +271,12 @@ The tables are archived on Zenodo with the DOI
 }
 ```
 
-### Citation for the paper
-```
-@Misc{sanjoseCommonZeros,
-    AUTHOR = {San-Jos\'{e}, Rodrigo},
-    TITLE = {Common zeros of homogeneous polynomials and the weight hierarchy of projective {R}eed--{M}uller codes},
-    year = "2026",
-    eprint = "2611.08203",
-    archivePrefix = "arXiv",
-    doi = "10.48550/arXiv.2611.08203"
-}
-```
-
 ## License
 
 * The code (the folders `src/` and `tests/`, and the files `docs/ghw.js`, `docs/ghw.css` and `docs/index.html`)
   is released under the [MIT license](LICENSE).
 * The tables (`docs/data/`), the data (`data/`) and the documentation (this README and the texts of the website)
   are released under the [Creative Commons Attribution 4.0 International license](LICENSE-CC-BY-4.0.txt) (CC BY 4.0).
-
-The website uses the style of https://rodrigosanjose.github.io, which is based on
-[Strata](https://html5up.net/strata) by HTML5 UP.
 
 ## References
 
