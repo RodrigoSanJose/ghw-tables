@@ -3,7 +3,7 @@
 Bounds and exact values for the generalized Hamming weights of projective Reed–Muller codes,
 with a justification for every value, in the spirit of [codetables.de](https://www.codetables.de).
 
-The tables are available at https://rodrigosanjose.github.io/ghw-tables/, and every release is archived on Zenodo, [doi:10.5281/zenodo.24020768](https://doi.org/10.5281/zenodo.24020768) (see [Citation](#citation)).
+**The tables are available at [https://rodrigosanjose.github.io/ghw-tables/](https://rodrigosanjose.github.io/ghw-tables/)**, and every release is archived on Zenodo, [doi:10.5281/zenodo.24020768](https://doi.org/10.5281/zenodo.24020768) (see [Citation](#citation)).
 
 ## The codes
 

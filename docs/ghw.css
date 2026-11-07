@@ -9,8 +9,7 @@
 	The paragraphs of this page that come after other elements need their own margins. */
 #ghw-summary,
 #ghw-loading,
-#ghw-notice,
-#about ul + p {
+#ghw-notice {
 	margin: 0 0 1.25em 0;
 }
 #ghw-notice { font-weight: bold; }
@@ -20,6 +19,7 @@
 /* While the tables load, keep the text below them out of sight, so that it does not jump. */
 #ghw-codes:has(#ghw-loading) { min-height: 100vh; }
 #about .ghw-cite-text { margin: 0 0 1em 0; }
+#about > header.major > h2 { margin-bottom: 0.35em; }
 
 /* ---------- The BibTeX entry, with a copy button in its top right corner (as on GitHub) ---------- */
 .ghw-bibtex-box { position: relative; margin-bottom: 1.5em; }

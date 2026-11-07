@@ -132,18 +132,13 @@
 							and its dual, which is <span class="math">\(\mathrm{PRM}_q(m(q-1)-d,m)\)</span>, plus the all-ones vector when <span class="math">\(q-1\)</span> divides <span class="math">\(d\)</span> [Sør91],
 							as in [SJ24, Section V-C].</li>
 						<li><strong>Classical bounds.</strong> Two bounds valid for every linear code, used in both directions:
-							the fundamental relation <span class="math">\((q^r-q)\,d_r \ge (q^r-1)\,d_{r-1}\)</span> [HKLY95, Thm. 1] ([HKY92, Thm. 1] for <span class="math">\(q = 2\)</span>),
-							which contains the strict increase <span class="math">\(d_{r-1} &lt; d_r\)</span> [Wei91, Thm. 1; SJ24, Thm. 5],
-							and the residual code bound <span class="math">\(n - d_r \ge \sum_{i=0}^{k-r-1} \lceil (d_{r+1}-d_r)/q^i \rceil\)</span> [HKLY95, proof of Thm. 4],
+							the bound <span class="math">\((q^r-q)\,d_r \ge (q^r-1)\,d_{r-1}\)</span> [HKLY95, Thm. 1] ([HKY92, Thm. 1] for <span class="math">\(q = 2\)</span>),
+							which implies the strict monotonicity <span class="math">\(d_{r-1} &lt; d_r\)</span> [Wei91, Thm. 1; SJ24, Thm. 5],
+							and the bound <span class="math">\(n - d_r \ge \sum_{i=0}^{k-r-1} \lceil (d_{r+1}-d_r)/q^i \rceil\)</span> [HKLY95, proof of Thm. 4],
 							which contains the Griesmer bound. Together they contain the other bounds of [Wei91], [HKY92] and [HKLY95]
 							that can be evaluated from bounds for the weights, such as the generalized Singleton, Plotkin-type and Griesmer-type bounds.</li>
 						<li><strong>Computed values.</strong> Values computed with the Sage package GHWs [SJ25], with their source.</li>
 					</ul>
-					<p>
-						All the bounds are applied again and again until none of them improves.
-						The code that computes the tables, with a detailed description, is at
-						<a href="https://github.com/RodrigoSanJose/ghw-tables" target="_blank" rel="noopener noreferrer" data-analytics-label="GHW tables. Code">github.com/RodrigoSanJose/ghw-tables</a>.
-					</p>
 
 					<h3 id="cite">How to cite</h3>
 					<div id="ghw-citation" data-analytics-section="GHW tables / Citation">
