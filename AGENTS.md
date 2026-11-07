@@ -81,3 +81,11 @@ package; they are not needed for analytics-only changes.
 Preserve the existing README and its content. Before any README edit, explicitly
 tell the user that `README.md` will change and describe the intended changes.
 Never silently add analytics, maintenance, testing, or other documentation to it.
+
+## References
+
+Keep the references in alphabetical order of the surnames of their authors, then by year (as in the
+amsalpha style): in `data/references.csv`, whose order the website follows, and in the reference
+list at the end of `README.md`. When adding a reference, insert it at its place in both (the README
+rule above applies) and give it an author-year key, such as `HKY92`. `tests/test_citation.py`
+checks the order.

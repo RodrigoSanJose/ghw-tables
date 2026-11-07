@@ -300,25 +300,25 @@ The website uses the style of https://rodrigosanjose.github.io, which is based o
 
 ## References
 
-* **[SJ26]** R. San-José, *Common zeros of homogeneous polynomials and the weight hierarchy of
-  projective Reed–Muller codes*, arXiv:2611.08203 (2026).
-  [doi:10.48550/arXiv.2611.08203](https://doi.org/10.48550/arXiv.2611.08203).
+* **[BDG22]** P. Beelen, M. Datta, S. R. Ghorpade, *A combinatorial approach to the number of solutions of
+  systems of homogeneous polynomial equations over finite fields*, Moscow Math. J. 22(4) (2022), 565–593.
+  [doi:10.17323/1609-4514-2022-22-4-565-593](https://doi.org/10.17323/1609-4514-2022-22-4-565-593).
+* **[HP98]** P. Heijnen, R. Pellikaan, *Generalized Hamming weights of q-ary Reed–Muller codes*,
+  IEEE Trans. Inform. Theory 44(1) (1998), 181–196. [doi:10.1109/18.651015](https://doi.org/10.1109/18.651015).
+* **[HKLY95]** T. Helleseth, T. Kløve, V. I. Levenshtein, Ø. Ytrehus, *Bounds on the minimum support weights*,
+  IEEE Trans. Inform. Theory 41(2) (1995), 432–440. [doi:10.1109/18.370144](https://doi.org/10.1109/18.370144).
+* **[HKY92]** T. Helleseth, T. Kløve, Ø. Ytrehus, *Generalized Hamming weights of linear codes*,
+  IEEE Trans. Inform. Theory 38(3) (1992), 1133–1140. [doi:10.1109/18.135655](https://doi.org/10.1109/18.135655).
 * **[SJ24]** R. San-José, *A recursive construction for projective Reed–Muller codes*,
   IEEE Trans. Inform. Theory 70(12) (2024), 8511–8523.
   [doi:10.1109/TIT.2024.3483998](https://doi.org/10.1109/TIT.2024.3483998).
 * **[SJ25]** R. San-José, *An algorithm for computing generalized Hamming weights and the Sage package GHWs*,
   ACM Trans. Math. Softw. 51(4) (2025). [doi:10.1145/3773284](https://doi.org/10.1145/3773284),
   [github.com/RodrigoSanJose/GHWs](https://github.com/RodrigoSanJose/GHWs).
-* **[BDG22]** P. Beelen, M. Datta, S. R. Ghorpade, *A combinatorial approach to the number of solutions of
-  systems of homogeneous polynomial equations over finite fields*, Moscow Math. J. 22(4) (2022), 565–593.
-  [doi:10.17323/1609-4514-2022-22-4-565-593](https://doi.org/10.17323/1609-4514-2022-22-4-565-593).
-* **[HP98]** P. Heijnen, R. Pellikaan, *Generalized Hamming weights of q-ary Reed–Muller codes*,
-  IEEE Trans. Inform. Theory 44(1) (1998), 181–196. [doi:10.1109/18.651015](https://doi.org/10.1109/18.651015).
+* **[SJ26]** R. San-José, *Common zeros of homogeneous polynomials and the weight hierarchy of
+  projective Reed–Muller codes*, arXiv:2611.08203 (2026).
+  [doi:10.48550/arXiv.2611.08203](https://doi.org/10.48550/arXiv.2611.08203).
 * **[Sør91]** A. B. Sørensen, *Projective Reed–Muller codes*, IEEE Trans. Inform. Theory 37(6) (1991), 1567–1576.
   [doi:10.1109/18.104317](https://doi.org/10.1109/18.104317).
 * **[Wei91]** V. K. Wei, *Generalized Hamming weights for linear codes*,
   IEEE Trans. Inform. Theory 37(5) (1991), 1412–1418. [doi:10.1109/18.133259](https://doi.org/10.1109/18.133259).
-* **[HKY92]** T. Helleseth, T. Kløve, Ø. Ytrehus, *Generalized Hamming weights of linear codes*,
-  IEEE Trans. Inform. Theory 38(3) (1992), 1133–1140. [doi:10.1109/18.135655](https://doi.org/10.1109/18.135655).
-* **[HKLY95]** T. Helleseth, T. Kløve, V. I. Levenshtein, Ø. Ytrehus, *Bounds on the minimum support weights*,
-  IEEE Trans. Inform. Theory 41(2) (1995), 432–440. [doi:10.1109/18.370144](https://doi.org/10.1109/18.370144).

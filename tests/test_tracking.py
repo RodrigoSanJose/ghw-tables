@@ -240,8 +240,8 @@ class TrackingTests(unittest.TestCase):
         self.assert_event("Google Scholar", "Google Scholar",
                           "https://scholar.google.com/citations?user=F5GiN1MAAAAJ", "Header")
         self.reset_events()
-        first_reference = self.page.locator("#ghw-references a").first
-        first_reference.dispatch_event("click", {"button": 0})
+        reference = self.page.locator('#ghw-references a[href="https://doi.org/10.48550/arXiv.2611.08203"]')
+        reference.dispatch_event("click", {"button": 0})
         event = self.events()[0]
         self.assertEqual(len(self.events()), 1)
         self.assertIn("Common zeros", event["data"]["label"])
