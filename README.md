@@ -31,11 +31,13 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 |---|---|---|
 | 2 | 1, …, 8 | 511 |
 | 3 | 1, …, 6 | 1093 |
-| 4 | 1, …, 4 | 341 |
+| 4 | 1, …, 5 | 1365 |
 | 5 | 1, …, 4 | 781 |
 | 7 | 1, 2, 3 | 400 |
 | 8 | 1, 2, 3 | 585 |
 | 9 | 1, 2, 3 | 820 |
+| 11 | 1, 2, 3 | 1464 |
+| 13 | 1, 2, 3 | 2380 |
 
 For $q = 2$ every weight is known exactly. In that case $\mathrm{PRM}_2(d,m)$ is
 $\mathrm{RM}_2(d,m+1)$ shortened at the origin.
@@ -189,7 +191,7 @@ Only Python 3.9 or later is needed; there are no other dependencies (SageMath is
 compute new values, see above). From the repository folder:
 
 ```
-python3 src/generate.py                        # compute the tables (about a minute and a half)
+python3 src/generate.py                        # compute the tables (about three minutes)
 python3 -m unittest discover -s tests -v       # run the tests (a few seconds)
 FULL_CHECK=1 python3 -m unittest discover -s tests -v
 ```

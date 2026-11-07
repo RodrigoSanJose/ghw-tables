@@ -144,6 +144,7 @@ def A(q, t, D):
     return sum(dim_RM(q, D - c, s) for c in range(a)) + A(q, b, D - a)
 
 
+@cache
 def dim_PRM(q, d, m):
     """k_d(m) = dim PRM_q(d, m) = dim RM_q(d-1, 0) + dim RM_q(d-1, 1) + ... + dim RM_q(d-1, m).
 
@@ -214,6 +215,7 @@ def largest_n(q, d, m):
     return tuple(N)
 
 
+@cache
 def upper_bound_hierarchy(q, d, m):
     """(0, B_1, ..., B_k), where k = k_d(m) and   ([SJ26], Thm. 6.7)
 
