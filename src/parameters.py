@@ -1,7 +1,7 @@
 """The codes PRM_q(d, m) included in the tables."""
 
 # For each field size q, the largest m included (lengths p_m up to about 1100).
-MAX_M = {2: 9, 3: 6, 4: 4, 5: 4, 7: 3, 8: 3, 9: 3}
+MAX_M = {2: 8, 3: 6, 4: 4, 5: 4, 7: 3, 8: 3, 9: 3}
 
 
 def codes(max_m=MAX_M):

@@ -31,7 +31,7 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 
 | $q$ | $m$ | largest length $p_m$ |
 |---|---|---|
-| 2 | 1, …, 9 | 1023 |
+| 2 | 1, …, 8 | 511 |
 | 3 | 1, …, 6 | 1093 |
 | 4 | 1, …, 4 | 341 |
 | 5 | 1, …, 4 | 781 |
