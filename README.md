@@ -16,9 +16,9 @@ The $r$-th generalized Hamming weight $d_r(C)$ of a linear code $C$ is the small
 $r$-dimensional subcode of $C$, and $d_1(C) < d_2(C) < \dots < d_k(C)$ is its weight hierarchy.
 For each code in the range below, the tables give, for every $1 \le r \le k_d(m)$, an interval
 
-$$
+```math
 \text{lower} \;\le\; d_r(\mathrm{PRM}_q(d,m)) \;\le\; \text{upper},
-$$
+```
 
 which is a single number when the value is known. Each end of the interval comes with the result
 (or computation) it follows from.
@@ -60,9 +60,9 @@ published version of [SJ24].
 
 For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the Macaulay tuple of $\binom{m+d}{d} - r$ in degree $d$,
 
-$$
+```math
 d_r(\mathrm{PRM}_q(d,m)) = p_m - p_{\mu_d} - \sum_{i=1}^{d-1} \lfloor q^{\mu_i} \rfloor .
-$$
+```
 
 In particular, the complete weight hierarchy is known for $m \le 2$.
 
@@ -70,9 +70,9 @@ In particular, the complete weight hierarchy is known for $m \le 2$.
 
 By [SJ26, Thm. 6.7], for $1 \le r \le k_d(m)$,
 
-$$
+```math
 d_r(\mathrm{PRM}_q(d,m)) \;\le\; B_r(q,d,m) = p_m - \max\{\, 0 \le n \le p_m : h_d(n) \le k_d(m) - r \,\}.
-$$
+```
 
 Here $h_d(n)$ is the smaller of the Hilbert functions in degree $d$ of two explicit sets
 $Z_n^-, Z_n^+ \subseteq \mathbb{P}^m(\mathbb{F}_q)$ with $n$ points, built by filling affine spaces and their
@@ -96,17 +96,13 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
   $\mathrm{PRM}_q(e,m) + \langle (1,\dots,1) \rangle$ if it does [Sør91]. In the second case, a subspace of the
   dual of dimension $s$ meets $\mathrm{PRM}_q(e,m)$ in dimension at least $s-1$, so
 
-  $$
-  d_{s-1}(\mathrm{PRM}_q(e,m)) \le d_s(\mathrm{PRM}_q(d,m)^\perp) \le d_s(\mathrm{PRM}_q(e,m)).
-  $$
+  $`\displaystyle d_{s-1}(\mathrm{PRM}_q(e,m)) \le d_s(\mathrm{PRM}_q(d,m)^\perp) \le d_s(\mathrm{PRM}_q(e,m)).`$
 
   Either way, the bounds for $\mathrm{PRM}_q(e,m)$, which is also in the tables, give bounds for the
   weights of the dual. Let $N(w)$ be the number of weights of a code $C$ of length $n$ and dimension $k$
   that are at most $w$. Wei duality gives
 
-  $$
-  N(w) = w - (n - k) + \#\{\, s : d_s(C^\perp) \le n - w \,\},
-  $$
+  $`\displaystyle N(w) = w - (n - k) + \#\{\, s : d_s(C^\perp) \le n - w \,\},`$
 
   so the bounds for the weights of the dual give lower and upper bounds for $N(w)$, and hence for the
   weights of $C$. This applies to all the bounds above, in both directions, and the improved bounds
@@ -116,17 +112,13 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
   over $\mathbb{F}_q$, each one used in both directions:
   * the case $s = r - 1$ of [HKLY95, Thm. 1] ([HKY92, Thm. 1] for $q = 2$),
 
-    $$
-    (q^r - q)\, d_r \ge (q^r - 1)\, d_{r-1}, \qquad 2 \le r \le k,
-    $$
+    $`\displaystyle (q^r - q)\, d_r \ge (q^r - 1)\, d_{r-1}, \qquad 2 \le r \le k,`$
 
     which gives lower bounds for $d_r$ from those of $d_{r-1}$, and upper bounds for $d_{r-1}$ from
     those of $d_r$;
   * the bound (from the proof of [HKLY95, Thm. 4])
 
-    $$
-    n - d_r \ge \sum_{i=0}^{k-r-1} \left\lceil \frac{d_{r+1} - d_r}{q^i} \right\rceil, \qquad 0 \le r \le k-1.
-    $$
+    $`\displaystyle n - d_r \ge \sum_{i=0}^{k-r-1} \left\lceil \frac{d_{r+1} - d_r}{q^i} \right\rceil, \qquad 0 \le r \le k-1.`$
 
   These two contain the other bounds of [Wei91], [HKY92] and [HKLY95] that can be evaluated from
   bounds for the weights, so these are not applied separately:
