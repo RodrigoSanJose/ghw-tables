@@ -149,19 +149,6 @@ Every source above is a *rule*: it looks at one code, proposes bounds, and recor
 2. applies all the rules to all the codes, by increasing $m$;
 3. repeats step 2 until a full pass changes nothing.
 
-A rule can only raise a lower bound or lower an upper bound, and the result of every rule can only
-improve when its inputs improve. Hence the final tables do not depend on the order in which the
-rules are applied, and a new computed value is automatically used by the recursive bound for all
-the larger codes, and by duality and the classical bounds.
-
-Everything is recomputed from scratch from the formulas and `data/manual.csv`. The generator stops
-if some lower bound is larger than the corresponding upper bound, which would reveal a wrong value
-or a bug; since the bound of [HKLY95, Thm. 1] implies the strict monotonicity of the weights, this
-includes computed values that do not increase with $r$. The recursive bound is also computed where
-the weight is already known, so it checks the exact values too.
-An upper bound below $B_r(q,d,m)$ would be a counterexample to [SJ26, Conj. 6.9]; the generator reports it
-as such.
-
 ## Adding a computed value
 
 Add a line to [`data/manual.csv`](data/manual.csv), with the columns
