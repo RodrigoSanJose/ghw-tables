@@ -13,19 +13,6 @@ It does the following:
 
 Everything is computed from scratch every time, so never edit the files in docs/data/ by hand.
 
-Python details used in this file:
-  * f"d_{r}(PRM_{q}({d},{m}))" is a text in which each {x} is replaced by the value of x,
-    for instance "d_7(PRM_3(4,3))".
-  * "with open(path) as file:" opens the file, and closes it at the end of the block.
-  * csv.DictReader reads a CSV file line by line: each line becomes a dictionary row, and row["q"]
-    is the text in the column q.
-  * "try: ... except ValueError: ..." runs the second block if the first one fails because a text
-    is not a number.
-  * sys.exit(message) stops the program and prints the message.
-  * Counter() is a dictionary of counters that start at 0.
-  * REPOSITORY is the folder that contains src/ (this file is src/generate.py).
-  * The last two lines run main() only when this file is run as a program, and not when the tests
-    import it.
 """
 
 import csv
