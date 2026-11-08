@@ -3,7 +3,8 @@ Tests for the table, the rules and generate.py.  Run them with the other tests:
 
     python3 -m unittest discover -s tests -v
 
-They use a small range of codes, so that they take a few seconds.
+Most checks use a small range of codes. The consistency check against all the rules uses the full
+configured range of tables.
 """
 
 import io
@@ -145,8 +146,8 @@ class TestTables(unittest.TestCase):
         lower = upper = B_r for every code of the tables (the whole range, not only SMALL) would be
         correct, and no rule could change it, since every rule is a theorem.  Apply every rule once to
         that table: a bound that changes would prove that the conjecture fails for some code (maybe
-        another one, for instance a smaller code whose weights the recursive bound uses).  This takes
-        about a minute, mostly for the recursive bound."""
+        another one, for instance a smaller code whose weights the recursive bound uses).  This includes
+        the recursive bound over the full configured range."""
         table = Table(codes())
         assumption = {"rule": "Conj. 6.9"}
         for q, d, m in table.codes:

@@ -33,11 +33,12 @@ All degrees $1 \le d \le m(q-1)+1$ (for $d > m(q-1)$ the code is the whole space
 | 3 | 1, …, 6 | 1093 |
 | 4 | 1, …, 5 | 1365 |
 | 5 | 1, …, 4 | 781 |
-| 7 | 1, 2, 3 | 400 |
+| 7 | 1, …, 4 | 2801 |
 | 8 | 1, 2, 3 | 585 |
 | 9 | 1, 2, 3 | 820 |
 | 11 | 1, 2, 3 | 1464 |
 | 13 | 1, 2, 3 | 2380 |
+| 16 | 1, 2, 3 | 4369 |
 
 For $q = 2$ every weight is known exactly. In that case $\mathrm{PRM}_2(d,m)$ is
 $\mathrm{RM}_2(d,m+1)$ shortened at the origin.
@@ -183,8 +184,8 @@ Only Python 3.9 or later is needed; there are no other dependencies (SageMath is
 compute new values, see above). From the repository folder:
 
 ```
-python3 src/generate.py                        # compute the tables (about three minutes)
-python3 -m unittest discover -s tests -v       # run the tests (a few seconds)
+python3 src/generate.py                        # compute the tables (about 23 minutes, depending on the machine)
+python3 -m unittest discover -s tests -v       # run the tests, including the full-range consistency check
 FULL_CHECK=1 python3 -m unittest discover -s tests -v
 ```
 
@@ -198,8 +199,8 @@ They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm. 7] at
 [SJ24, Example 6] too: duality and monotonicity turn the row $d = 3$ of [SJ24, Table III] into the exact
 values of [SJ24, Table VI]. They also check by brute force, on random binary codes, the inequalities
 used for duality when $q-1$ divides $d$. With
-`FULL_CHECK=1`, the checks of [SJ26] run for every prime power $q \le 9$ and every $m \le 5$, which takes
-about a minute.
+`FULL_CHECK=1`, the checks of [SJ26] run for every prime power $q \le 9$ and every $m \le 5$.
+The consistency check against all the rules also runs over the full configured range of tables.
 
 The functions can also be used from Sage. Start Sage in the repository folder and run:
 

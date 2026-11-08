@@ -5,12 +5,12 @@ Tests for src/formulas.py.  Run them from the repository folder with
 
 They reproduce the examples and the computational checks of [SJ26] (see the docstring of
 src/formulas.py for the references).  The checks over many codes use the parameter range of the
-tables (src/parameters.py) and take a few seconds.  To use instead the range checked in the last
+tables (src/parameters.py).  To use instead the range checked in the last
 remark of [SJ26] (all prime powers q <= 9 and m <= 5), run
 
     FULL_CHECK=1 python3 -m unittest discover -s tests -v
 
-which takes about a minute.
+The full-range consistency check in test_tables.py still uses the configured tables.
 """
 
 import ast
@@ -30,7 +30,7 @@ from formulas import (A, B, affine_hierarchy, attaining_set, bdg_hierarchy, bino
                       high_degree_hierarchy, known_hierarchy, large_degree_hierarchy, lifted_weights,
                       macaulay, p, recursive_lower_bound, residual_length, residual_lower, residual_upper,
                       sorensen_minimum_distance, upper_bound_hierarchy, wei_duality_bounds)
-from parameters import codes  # noqa: E402
+from parameters import MAX_M, codes  # noqa: E402
 
 PAPER_RANGE = {q: 5 for q in (2, 3, 4, 5, 7, 8, 9)}
 CHECKED_CODES = list(codes(PAPER_RANGE) if os.environ.get("FULL_CHECK") else codes())
@@ -196,7 +196,7 @@ class TestUpperBound(unittest.TestCase):
 class TestAffine(unittest.TestCase):
     """The weights of the affine codes RM_q(d, m): Heijnen-Pellikaan [HP98, Thm. 5.10], in the form of [SJ24, Thm. 6]."""
 
-    AFFINE = [(q, d, m) for q, top in ((2, 9), (3, 6), (4, 4), (5, 4), (7, 3), (8, 3), (9, 3))
+    AFFINE = [(q, d, m) for q, top in MAX_M.items()
               for m in range(1, top + 1) for d in range(0, m * (q - 1) + 1)]
 
     def test_length_is_dimension(self):

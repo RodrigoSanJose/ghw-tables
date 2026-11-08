@@ -61,7 +61,36 @@ apply them before navigation, inspect source or use a protected local browser.
 Never clear the agent browser's opt-out or add an unconditional production
 opt-out that would disable real visitors' analytics.
 
-Run the protected tests from the repository root:
+## Table regeneration and validation
+
+Full generation of the current ranges has been measured at about 23 minutes.
+The formula caches are in memory only; starting another generator process repeats
+the computation. Treat `docs/data/` as committed computation results.
+
+Run `python -B src/generate.py` when parameter coverage, mathematical formulas or
+rules, numerical inputs, or computation logic change the numerical tables, or when
+the user explicitly requests regeneration. Documentation, styles, navigation, and
+analytics-only changes should reuse the committed JSON. Do not automatically
+regenerate tables for routine website work.
+
+Reuse a successful generation and its validation when the relevant inputs have
+not changed. Do not repeat expensive work merely for a later documentation edit,
+review, commit, or push. Reference-only changes may refresh the affected metadata
+without recomputing bounds; preserve and verify all numerical parameters,
+dimensions, bounds, and values.
+
+Choose focused tests for the change, run from the repository root. For example:
+
+```sh
+python -B -m unittest discover -s tests -p test_tracking.py -v
+python -B -m unittest discover -s tests -p test_citation.py -v
+python -B -m unittest discover -s tests -p test_reference_metadata.py -v
+```
+
+Full discovery includes `test_conjecture_is_consistent_with_all_the_rules`, which
+repeats the recursive computation over the entire configured range and can take
+as long as generation. Reserve the full suite for mathematical or range changes,
+related regressions, or explicitly requested full validation:
 
 ```sh
 python -B -m unittest discover -s tests -v
