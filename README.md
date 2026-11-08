@@ -97,8 +97,9 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
   $\mathrm{PRM}_q(e,m) + \langle (1,\dots,1) \rangle$ if it does [Sør91]. In the second case, a subspace of the
   dual of dimension $s$ meets $\mathrm{PRM}_q(e,m)$ in dimension at least $s-1$, so
 
-  $`\displaystyle d_{s-1}(\mathrm{PRM}_q(e,m)) \le d_s(\mathrm{PRM}_q(d,m)^\perp) \le d_s(\mathrm{PRM}_q(e,m)).`$
+  $`\displaystyle d_{s-1}(\mathrm{PRM}_q(e,m)) \le d_s(\mathrm{PRM}_q(d,m)^\perp) \le d_s(\mathrm{PRM}_q(e,m))`$
 
+  for $1 \le s \le k_e(m)$ (with $d_0 = 0$), and the last weight of the dual is $p_m$.
   Either way, the bounds for $\mathrm{PRM}_q(e,m)$, which is also in the tables, give bounds for the
   weights of the dual. Let $N(w)$ be the number of weights of a code $C$ of length $n$ and dimension $k$
   that are at most $w$. Wei duality gives

@@ -110,14 +110,19 @@ def ghws_version():
 
 
 USAGE = "usage: sage -python sage/compute.py q d m [r | all]   (see the beginning of this file)"
-if len(sys.argv) not in (4, 5) or not all(argument.isdigit() for argument in sys.argv[1:4]):
+if len(sys.argv) not in (4, 5) or not all(argument.isdecimal() for argument in sys.argv[1:4]):
     sys.exit(USAGE)
 q, d, m = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 which = sys.argv[4] if len(sys.argv) > 4 else "open"
 n, table = read_table(q, d, m)
 k = table["k"]
-if which not in ("open", "all") and not (which.isdigit() and 1 <= int(which) <= k):
+if which not in ("open", "all") and not (which.isdecimal() and 1 <= int(which) <= k):
     sys.exit(f"r must be a whole number between 1 and k = {k}, or all.\n{USAGE}")
+if which == "open" and all(table["lower"][r] == table["upper"][r] for r in range(1, k + 1)):
+    # Nothing to compute: do not build the code, which can take minutes (80 million entries for PRM_16(46,3)).
+    print(f"All the weights of PRM_{q}({d},{m}) are known in the tables, so there is nothing to compute "
+          f"(give r or all to compute some of them again).")
+    sys.exit(0)
 C = prm_code(q, d, m)
 if C.length() != n or C.dimension() != k:
     sys.exit(f"The code has length {C.length()} and dimension {C.dimension()}, but the tables say "

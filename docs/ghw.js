@@ -23,6 +23,7 @@ const downloaded = {};         // file name -> its contents (a promise), for the
 let shown = null;              // {q, m, data}: the table currently shown
 const expanded = {};           // "d" -> true or false, for the codes expanded or collapsed by hand
 let followCount = 0;           // the number of calls of follow(), to ignore out-of-date ones
+let selectedEntry = null;      // {d, r}: the entry of the address that select() explained, if any
 
 
 // ---------------------------------------------------------------------------------------------
@@ -117,10 +118,12 @@ function afterTypesetting(action) {
 	// Run action once MathJax has typeset everything: typesetting changes the height of the text,
 	// and so the place of the cells.  Before the page has finished loading, MathJax may not have
 	// started yet, so we wait for the "load" event; if MathJax could not be loaded, we do not wait.
+	// If the address changes meanwhile, the action is dropped: it belongs to an older navigation.
+	const call = followCount;
 	if (window.MathJax && MathJax.startup && MathJax.startup.promise) {
-		MathJax.startup.promise.finally(action);
+		MathJax.startup.promise.finally(() => { if (call === followCount) action(); });
 	} else if (document.readyState !== "complete") {
-		window.addEventListener("load", () => afterTypesetting(action), {once: true});
+		window.addEventListener("load", () => { if (call === followCount) afterTypesetting(action); }, {once: true});
 	} else {
 		action();
 	}
@@ -261,7 +264,9 @@ function explain(reason, q, d, m, r, value, k) {
 				+ math(dual + " = " + PRM(q, e, m) + " + \\langle (1, \\dots, 1) \\rangle") + " [Sør91]. It contains "
 				+ link + " with codimension one, and a subspace of the dual of dimension " + math("s")
 				+ " meets " + math(PRM(q, e, m)) + " in dimension at least " + math("s - 1") + ", so "
-				+ math("d_{s-1}(" + PRM(q, e, m) + ") \\le d_s(" + dual + ") \\le d_s(" + PRM(q, e, m) + ")") + ".";
+				+ math("d_{s-1}(" + PRM(q, e, m) + ") \\le d_s(" + dual + ") \\le d_s(" + PRM(q, e, m) + ")")
+				+ " for " + math("1 \\le s \\le " + (n - k - 1)) + " (with " + math("d_0 = 0") + "), and the last weight of the dual is "
+				+ math("d_{" + (n - k) + "}(" + dual + ") = p_m") + ".";
 		} else {
 			text = "The dual code is " + link + " [Sør91].";
 		}
@@ -427,13 +432,14 @@ function codeBlockHTML(q, m, code) {
 	title += complete ? "all known." : exact + " known, " + (code.k - exact) + " only bounded.";
 	const open = isExpanded(code);
 	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '"'
+		+ ' aria-expanded="' + open + '" aria-controls="weights-' + code.d + '"'
 		+ labelledAnalyticsAttributes(open ? "Hide weights" : "Show weights", q, m, code.d) + '>'
 		+ (open ? "Hide" : "Show") + "</a>";
 	return '<div class="ghw-code ' + (complete ? "ghw-complete" : "ghw-partial") + '" id="code-' + code.d + '">'
 		+ '<div class="ghw-code-label"><span class="ghw-degree">' + math("d = " + code.d) + "</span>"
 		+ '<span class="ghw-dimension">' + math("k = " + code.k) + "</span></div>"
 		+ '<div class="ghw-code-content"><div class="ghw-code-title">' + title + "</div>"
-		+ '<div class="ghw-grid-wrapper">' + (open ? gridHTML(q, m, code) : "") + "</div></div></div>";
+		+ '<div class="ghw-grid-wrapper" id="weights-' + code.d + '">' + (open ? gridHTML(q, m, code) : "") + "</div></div></div>";
 }
 
 function drawChoices() {
@@ -441,15 +447,16 @@ function drawChoices() {
 	document.getElementById("ghw-q-choices").innerHTML = qs.map(q => {
 		const ms = index.tables.filter(t => t.q === q).map(t => t.m);
 		const m = shown && ms.includes(shown.m) ? shown.m : Math.min(...ms);
-		const current = shown && shown.q === q ? " ghw-current" : "";
-		return '<a class="ghw-choice' + current + '" href="' + address(q, m) + '"'
-			+ labelledAnalyticsAttributes("Select field size", q, m) + '>' + q + "</a>";
+		return choiceLink(shown && shown.q === q, address(q, m), labelledAnalyticsAttributes("Select field size", q, m), q);
 	}).join("");
-	document.getElementById("ghw-m-choices").innerHTML = index.tables.filter(t => t.q === shown.q).map(t => {
-		const current = t.m === shown.m ? " ghw-current" : "";
-		return '<a class="ghw-choice' + current + '" href="' + address(t.q, t.m) + '"'
-			+ labelledAnalyticsAttributes("Select dimension", t.q, t.m) + '>' + t.m + "</a>";
-	}).join("");
+	document.getElementById("ghw-m-choices").innerHTML = index.tables.filter(t => t.q === shown.q).map(t =>
+		choiceLink(t.m === shown.m, address(t.q, t.m), labelledAnalyticsAttributes("Select dimension", t.q, t.m), t.m)
+	).join("");
+}
+
+function choiceLink(current, href, attributes, text) {   // a choice of q or m; the current one is marked
+	return '<a class="ghw-choice' + (current ? " ghw-current" : "") + '"' + (current ? ' aria-current="true"' : "")
+		+ ' href="' + href + '"' + attributes + ">" + text + "</a>";
 }
 
 function drawTable() {
@@ -473,12 +480,10 @@ function drawTable() {
 	typeset(container);
 }
 
-function highlightSelected() {             // mark the entry selected in the address, if it is drawn
-	const params = new URLSearchParams(location.hash.slice(1));
-	if (params.has("d") && params.has("r")) {
-		const cell = document.getElementById("entry-" + Number(params.get("d")) + "-" + Number(params.get("r")));
-		if (cell) cell.classList.add("ghw-selected");
-	}
+function highlightSelected() {             // after a redraw, mark the selected entry again, if it is drawn
+	if (!selectedEntry) return;            // (not the address: it may name an entry of a missing table)
+	const cell = document.getElementById("entry-" + selectedEntry.d + "-" + selectedEntry.r);
+	if (cell) cell.classList.add("ghw-selected");
 }
 
 function toggleCode(degree, keepFocus) {
@@ -503,7 +508,10 @@ function showCode(d) {                     // expand the block of PRM_q(d,m) and
 	const code = codeOf(shown.q, d, shown.m);
 	if (!code) return;
 	if (!isExpanded(code)) toggleCode(d);
-	afterTypesetting(() => document.getElementById("code-" + d).scrollIntoView({behavior: "smooth"}));
+	afterTypesetting(() => {
+		const block = document.getElementById("code-" + d);   // looked up when the action runs
+		if (block) block.scrollIntoView({behavior: "smooth"});
+	});
 }
 
 function showSelectedCell() {
@@ -527,12 +535,14 @@ function showSelectedCell() {
 
 function select(d, r) {
 	document.querySelectorAll(".ghw-selected").forEach(cell => cell.classList.remove("ghw-selected"));
+	selectedEntry = null;
 	const box = document.getElementById("ghw-explanation");
 	const code = d === null ? null : codeOf(shown.q, d, shown.m);
 	if (!code || !Number.isInteger(r) || r < 1 || r > code.k) {    // nothing selected, or no such entry (such as r=x)
 		box.hidden = true;
 		return;
 	}
+	selectedEntry = {d, r};
 	if (!isExpanded(code)) toggleCode(d);
 	showExplanation(shown.q, d, shown.m, r);
 	const cell = document.getElementById("entry-" + d + "-" + r);
@@ -567,7 +577,13 @@ async function follow() {
 		m = 3;
 	}
 	if (!shown || shown.q !== q || shown.m !== m) {
-		const data = await download(tableInfo(q, m).file);
+		let data;
+		try {
+			data = await download(tableInfo(q, m).file);
+		} catch (error) {                                        // for instance, the connection was lost
+			if (call === followCount) tableNotLoaded(q, m);      // unless the address changed meanwhile
+			return;
+		}
 		if (call !== followCount) return;                        // the address changed meanwhile
 		shown = {q, m, data};
 		for (const key in expanded) delete expanded[key];
@@ -587,6 +603,21 @@ async function follow() {
 	} else {
 		select(null, null);
 	}
+}
+
+function tableNotLoaded(q, m) {            // the file of the table (q, m) could not be downloaded
+	const problem = "The table for q = " + q + " and m = " + m + " could not be loaded";
+	if (!shown) {                          // nothing is drawn yet, so there are no choices to click
+		document.getElementById("ghw-notice").hidden = true;   // it may say that this table is shown
+		const loading = document.getElementById("ghw-loading");
+		if (loading) loading.textContent = problem + ". Please reload the page.";
+		return;
+	}
+	select(null, null);                    // the entry of the address is not in the table shown
+	const notice = document.getElementById("ghw-notice");
+	notice.textContent = problem + ", so the table for q = " + shown.q + " and m = " + shown.m
+		+ " is still shown. Please reload the page to try again.";
+	notice.hidden = false;
 }
 
 function drawReferences() {

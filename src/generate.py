@@ -7,8 +7,8 @@ It does the following:
   1. start with the trivial bounds  r <= d_r <= p_m  for every code of src/parameters.py;
   2. read the computed values of data/manual.csv;
   3. apply all the rules of src/rules.py to all the codes, again and again, until a full pass
-     changes nothing;
-  4. check that every lower bound is at most the corresponding upper bound;
+     changes nothing, and stop as soon as a lower bound becomes larger than the upper bound;
+  4. check again that every lower bound is at most the corresponding upper bound;
   5. print a summary, and write the tables for the website in docs/data/.
 
 Everything is computed from scratch every time, so never edit the files in docs/data/ by hand.
@@ -106,7 +106,8 @@ def read_computed_values(table, path, references):
                 sys.exit(f"{where}: the lower bound is larger than the upper bound.")
             if row["source"] not in references:
                 sys.exit(f"{where}: the source '{row['source']}' is not a key of {REFERENCES.name}.")
-            entry = {"r": r, "lower": lower, "upper": upper, "source": row["source"], "note": row["note"]}
+            entry = {"r": r, "lower": lower, "upper": upper, "source": row["source"], "note": row["note"],
+                     "where": where}
             if (q, d, m) not in table.computed:
                 table.computed[q, d, m] = []
             table.computed[q, d, m].append(entry)
@@ -114,17 +115,55 @@ def read_computed_values(table, path, references):
 
 def fill(table):
     """Apply all the rules to all the codes, again and again, until a full pass changes nothing.
-    Returns the number of passes."""
+    Returns the number of passes.  Stops at the first contradiction (see stop_at_contradiction)."""
     passes = 0
     while True:
         passes += 1
         changes = 0
         for q, d, m in table.codes:             # by q, then m, then d (see table.py)
             for rule in RULES:
-                changes += rule(table, q, d, m)
+                changed = rule(table, q, d, m)
+                if changed:
+                    stop_at_contradiction(table, (q, d, m))
+                changes += changed
         print(f"Pass {passes}: {changes} changes.")
         if changes == 0:
             return passes
+
+
+def reason_text(table, code, r, kind):
+    """The reason of the lower (kind = "lower") or the upper bound for d_r, as a text for the messages.
+    For a value of data/manual.csv, it also gives the line."""
+    if kind == "lower":
+        bound, reason = table.lower[code][r], table.lower_reason[code][r]
+    else:
+        bound, reason = table.upper[code][r], table.upper_reason[code][r]
+    text = str(reason)
+    if reason["rule"] == "computed":
+        lines = [entry["where"] for entry in table.computed[code] if entry["r"] == r and entry[kind] == bound]
+        text += " (" + "; ".join(lines) + ")"
+    return text
+
+
+def stop_at_contradiction(table, code):
+    """Stop if some lower bound of the code (q, d, m) is larger than its upper bound, with both reasons.
+
+    Checking at the end is not enough: a wrong value can make the other rules raise the lower bounds
+    beyond the length p_m pass after pass, so that fill() never finishes (or Wei duality fails).  Each
+    rule only changes the code it is applied to, so fill() checks that code after each change."""
+    q, d, m = code
+    for r in range(1, len(table.lower[code])):
+        if table.lower[code][r] > table.upper[code][r]:
+            message = (f"CONTRADICTION (a computed value or a formula must be wrong): d_{r}(PRM_{q}({d},{m})) has "
+                       f"the lower bound {table.lower[code][r]}, by {reason_text(table, code, r, 'lower')}, "
+                       f"and the upper bound {table.upper[code][r]}, by {reason_text(table, code, r, 'upper')}.")
+            if "computed" not in (table.lower_reason[code][r]["rule"], table.upper_reason[code][r]["rule"]):
+                # A wrong value can show up first in another code (through Wei duality, for instance), but
+                # always one with the same q: the rules only relate codes with the same q.
+                lines = [entry["where"] for other in table.computed if other[0] == q for entry in table.computed[other]]
+                if lines:
+                    message += f" The computed values for q = {q} are at: " + "; ".join(lines) + "."
+            sys.exit(message)
 
 
 def all_entries(table):
@@ -138,7 +177,8 @@ def all_entries(table):
 
 def check(table):
     """Stop if some lower bound is larger than the corresponding upper bound.  Otherwise return the
-    list of counterexamples to [SJ26, Conj. 6.9], i.e. the upper bounds smaller than B_r(q, d, m)."""
+    list of counterexamples to [SJ26, Conj. 6.9], i.e. the upper bounds smaller than B_r(q, d, m).
+    (After fill(), which already stops at the first contradiction, the first part is a safety net.)"""
     contradictions = []
     counterexamples = []
     for code, r in all_entries(table):
@@ -146,8 +186,8 @@ def check(table):
         name = f"d_{r}(PRM_{q}({d},{m}))"
         lower, upper = table.lower[code][r], table.upper[code][r]
         if lower > upper:
-            contradictions.append(f"{name}: lower bound {lower} {table.lower_reason[code][r]} is larger "
-                                  f"than the upper bound {upper} {table.upper_reason[code][r]}")
+            contradictions.append(f"{name}: lower bound {lower} {reason_text(table, code, r, 'lower')} is larger "
+                                  f"than the upper bound {upper} {reason_text(table, code, r, 'upper')}")
         bound = B(q, d, m, r)
         if upper < bound:
             counterexamples.append(f"{name} <= {upper} < B_r = {bound}, by {table.upper_reason[code][r]}")

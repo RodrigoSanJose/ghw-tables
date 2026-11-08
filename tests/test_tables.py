@@ -110,15 +110,51 @@ class TestTables(unittest.TestCase):
 
     def test_values_that_do_not_increase_stop(self):
         """d_31 = d_32 is impossible: generate.py must stop instead of reporting a counterexample."""
-        table = small_table(HEADER + "3,6,4,31,45,45,SJ25,test\n" + "3,6,4,32,45,45,SJ25,test\n")
-        with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
-            check(table)
+        with self.assertRaises(SystemExit) as stop:
+            small_table(HEADER + "3,6,4,31,45,45,SJ25,test\n" + "3,6,4,32,45,45,SJ25,test\n")
+        self.assertIn("PRM_3(6,4)", str(stop.exception))
+        self.assertIn("fundamental relation", str(stop.exception))
+        self.assertIn("manual.csv, line", str(stop.exception))
 
     def test_contradiction_stops(self):
-        """A computed lower bound above B_r is impossible: generate.py must stop."""
-        table = small_table(HEADER + "3,4,3,7,17,,SJ25,a wrong value\n")
-        with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
+        """A computed lower bound above B_r is impossible: generate.py must stop, with both reasons."""
+        with self.assertRaises(SystemExit) as stop:
+            small_table(HEADER + "3,4,3,7,17,,SJ25,a wrong value\n")
+        self.assertIn("d_7(PRM_3(4,3))", str(stop.exception))
+        self.assertIn("SJ26 Thm. 6.7", str(stop.exception))
+        self.assertIn("manual.csv, line 2", str(stop.exception))
+
+    def test_bounds_beyond_the_length_stop_at_once(self):
+        """A wrong lower bound for a known weight is pushed beyond the length p_m by the classical bounds,
+        pass after pass (or makes Wei duality fail): generate.py must stop at once, naming the line."""
+        with self.assertRaises(SystemExit) as stop:
+            small_table(HEADER + "2,1,1,1,3,,SJ25,a wrong value\n")    # d_1(PRM_2(1,1)) = 2
+        self.assertIn("d_1(PRM_2(1,1))", str(stop.exception))
+        self.assertIn("manual.csv, line 2", str(stop.exception))
+
+    def test_contradiction_in_another_code_names_the_line(self):
+        """A wrong upper bound for d_25(PRM_4(4,3)), whose value 75 is only found in the second pass, first
+        contradicts the dual code PRM_4(5,3) through Wei duality: the message still names the line."""
+        with self.assertRaises(SystemExit) as stop:
+            small_table(HEADER + "4,4,3,25,,74,SJ25,a wrong value\n")
+        self.assertIn("PRM_4(5,3)", str(stop.exception))
+        self.assertIn("manual.csv, line 2", str(stop.exception))
+
+    def test_check_names_the_line(self):
+        """check(), the safety net after fill(), also stops at a contradiction and names the line."""
+        table = Table(codes(SMALL))
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder).joinpath("manual.csv")
+            path.write_text(HEADER + "3,4,3,7,17,,SJ25,a wrong value\n", encoding="utf-8")
+            read_computed_values(table, path, read_references(REFERENCES))
+        for code in table.codes:
+            rules.upper_bound(table, *code)
+            rules.computed_values(table, *code)
+        output = io.StringIO()
+        with redirect_stdout(output), self.assertRaises(SystemExit):
             check(table)
+        self.assertIn("d_7(PRM_3(4,3))", output.getvalue())
+        self.assertIn("manual.csv, line 2", output.getvalue())
 
     def test_wrong_value_caught_in_any_rule_order(self):
         """A computed value below the bound of [SJ24, Thm. 7] (here d_7(PRM_3(4,3)) >= 15) is impossible,
@@ -128,9 +164,8 @@ class TestTables(unittest.TestCase):
             for order in [original, [rules.exact_values, rules.computed_values, rules.upper_bound,
                                      rules.recursive_bound]]:
                 rules.RULES[:] = order        # generate.py uses this same list
-                table = small_table(HEADER + "3,4,3,7,14,14,SJ25,a wrong value\n")
-                with redirect_stdout(io.StringIO()), self.assertRaises(SystemExit):
-                    check(table)
+                with self.assertRaises(SystemExit):
+                    small_table(HEADER + "3,4,3,7,14,14,SJ25,a wrong value\n")
         finally:
             rules.RULES[:] = original
 

@@ -1,6 +1,6 @@
 """Browser checks for GHW analytics; all requests are fulfilled locally.
 
-Install Python Playwright and Chromium, then run:
+Install Python Playwright and Chromium (at /usr/bin/chromium, or set CHROMIUM_PATH), then run:
     python -B -m unittest discover -s tests -p test_tracking.py -v
 The shared website scripts are read from the sibling RodrigoSanJose.github.io
 checkout, or from PERSONAL_SITE_ROOT. Nothing is sent to production analytics.
@@ -535,6 +535,109 @@ class TrackingTests(unittest.TestCase):
                          self.table_action("GHW. Close explanation", d=4, r=7))
         self.assertEqual(self.page.locator("#code-4 .ghw-toggle").get_attribute("aria-label"),
                          self.table_action("GHW. Hide weights", d=4))
+
+    def test_tables_that_cannot_be_downloaded_give_a_message(self):
+        """A table that cannot be downloaded gives a message, without errors: in the notice when another
+        table is shown (the choice is still tracked once), and instead of "Loading the tables…" when it is
+        the first table of the visit (there are no choices yet)."""
+        self.page.route("**/ghw-tables/data/q4_m3.json", lambda route: route.abort())
+        self.page.locator('#ghw-q-choices a[href="#q=4&m=3"]').click()
+        self.page.wait_for_selector("#ghw-notice:not([hidden])")
+        notice = self.page.locator("#ghw-notice").text_content()
+        self.assertIn("q = 4 and m = 3 could not be loaded", notice)
+        self.assertIn("q = 3 and m = 3 is still shown", notice)
+        self.assertEqual(self.page.evaluate("[shown.q, shown.m]"), [3, 3])
+        self.assert_event("GHW. Select field size", self.table_action("GHW. Select field size", 4, 3),
+                          PAGE + "#q=4&m=3", "GHW tables / Controls", q=4, m=3)
+        page = self.context.new_page()
+        page.on("pageerror", lambda error: self.errors.append(str(error)))
+        page.route("**/ghw-tables/data/q3_m3.json", lambda route: route.abort())
+        page.goto(PAGE, wait_until="load")
+        page.wait_for_function("document.getElementById('ghw-loading').textContent.includes('could not be loaded')")
+        self.assertIn("Please reload the page", page.locator("#ghw-loading").text_content())
+        # A missing table, whose replacement cannot be loaded either: only the failure is reported.
+        page.goto(PAGE + "#q=99&m=1", wait_until="load")
+        page.wait_for_function("document.getElementById('ghw-loading').textContent.includes('could not be loaded')")
+        self.assertTrue(page.locator("#ghw-notice").is_hidden())
+        page.close()
+        self.assertEqual(self.errors, [])
+
+    def test_scrolls_of_an_older_address_are_dropped(self):
+        """A scroll to a code waits until MathJax has typeset the table. If the visitor has moved on by then,
+        it must neither fail (the new table has no such code) nor scroll the new table (it has one)."""
+        for newer in ("#q=2&m=1", "#q=3&m=3"):                    # without, and with, a code d = 7
+            with self.subTest(newer=newer):
+                self.page.evaluate("""() => {     // a MathJax that finishes only when the test releases it
+                    window.__gate = new Promise(resolve => { window.__release = resolve; });
+                    MathJax.typesetPromise = () => window.__gate;
+                }""")
+                self.page.evaluate("location.hash = '#q=4&m=3&d=7'")
+                self.page.wait_for_selector('#ghw-q-choices a.ghw-current[href="#q=4&m=3"]')
+                self.page.evaluate("address => { location.hash = address; }", newer)
+                self.page.wait_for_selector(f'#ghw-m-choices a.ghw-current[href="{newer}"]')
+                self.page.evaluate("window.__release()")
+                self.page.wait_for_function("!document.querySelector('.mj-pending')")
+                self.page.wait_for_timeout(800)                   # a smooth scroll would have moved by now
+                self.assertEqual(self.page.evaluate("scrollY"), 0)
+        self.assertEqual(self.errors, [])
+
+    def test_blocked_site_data_keeps_the_dark_mode_toggle_working(self):
+        """When the visitor blocks site data, localStorage throws: the page still starts in dark mode, and
+        the toggle still switches the theme, its icon and its pressed state (only for this page)."""
+        context = self.browser.new_context(viewport={"width": 1400, "height": 1000})
+        # The opt-out comes first, in the same script: separate init scripts have no guaranteed order.
+        context.add_init_script(INIT + """
+Object.defineProperty(window, 'localStorage', {configurable: true, get() {
+    throw new DOMException('Access is denied for this document.', 'SecurityError');
+}});
+""")
+        context.route("**/*", self.route)
+        try:
+            page = context.new_page()
+            errors = []
+            page.on("pageerror", lambda error: errors.append(str(error)))
+            page.goto(PAGE, wait_until="load")
+            page.wait_for_selector("#entry-1-1", state="attached")
+            toggle = page.locator("#dark-mode-toggle")
+            self.assertTrue(page.evaluate("document.documentElement.classList.contains('dark-mode')"))
+            self.assertEqual(toggle.get_attribute("aria-pressed"), "true")
+            toggle.click()
+            self.assertFalse(page.evaluate("document.documentElement.classList.contains('dark-mode')"))
+            self.assertEqual(toggle.get_attribute("aria-pressed"), "false")
+            self.assertEqual(toggle.locator("i").get_attribute("class"), "fas fa-moon")
+            events = page.evaluate("window.__analyticsEvents.filter(e => !e.name.startsWith('Page visible. '))")
+            self.assertEqual([event["name"] for event in events], ["Toggle dark mode"])
+            self.assertEqual(errors, [])
+        finally:
+            context.close()
+
+    def test_language_states_and_live_regions_for_assistive_technology(self):
+        """The page declares its language and exposes the current choices, the state of the Show/Hide and
+        dark-mode toggles, and live regions for its messages. An address naming an entry of a table that
+        does not exist selects nothing, also after a redraw."""
+        self.assertEqual(self.page.evaluate("document.documentElement.lang"), "en")
+        for group in ("#ghw-q-choices", "#ghw-m-choices"):
+            current = self.page.locator(group + ' a[aria-current="true"]')
+            self.assertEqual(current.count(), 1)
+            self.assertIn("ghw-current", current.get_attribute("class"))
+        self.assertEqual(self.page.locator(".ghw-choice[aria-current]:not(.ghw-current)").count(), 0)
+        toggle = self.page.locator("#code-1 .ghw-toggle")
+        self.assertEqual((toggle.get_attribute("aria-expanded"), toggle.get_attribute("aria-controls")),
+                         ("true", "weights-1"))
+        self.assertEqual(self.page.locator("#weights-1 #entry-1-1").count(), 1)
+        toggle.click()
+        self.assertEqual(self.page.locator("#code-1 .ghw-toggle").get_attribute("aria-expanded"), "false")
+        self.assertEqual(self.page.locator("#weights-1").count(), 1)
+        self.assertEqual(self.page.locator("#dark-mode-toggle").get_attribute("aria-pressed"), "true")
+        self.assertEqual(self.page.locator("#ghw-notice").evaluate("e => e.parentElement.getAttribute('role')"),
+                         "status")
+        self.assertEqual(self.page.locator("#ghw-loading").count(), 0)    # replaced by the table
+        self.assertIn('<p id="ghw-loading" role="status">', (DOCS / "index.html").read_text(encoding="utf-8"))
+        self.page.evaluate("location.hash = '#q=99&m=1&d=4&r=7'")
+        self.page.wait_for_selector("#ghw-notice:not([hidden])")
+        self.page.locator('.ghw-all-toggle[data-show="true"]').click()
+        self.assertEqual(self.page.locator(".ghw-selected").count(), 0)
+        self.assertEqual(self.errors, [])
 
     def test_shared_visible_timer_pauses_resumes_keeps_hash_visit_and_handles_back_forward(self):
         self.page.clock.install(time=INITIAL_TIME)

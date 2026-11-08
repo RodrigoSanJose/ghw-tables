@@ -5,7 +5,7 @@
 	the files under /assets and /images are those of the personal webpage.
 	The tables are computed by src/generate.py and read from data/ by ghw.js.
 -->
-<html>
+<html lang="en">
 	<head>
 		<script defer src="/assets/js/link-tracking.js"></script>
 		<script defer src="/assets/js/page-visibility.js"></script>
@@ -44,7 +44,8 @@
 		<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
 		<script>
 			(function() {
-				const saved = localStorage.getItem('darkMode');
+				let saved = null;
+				try { saved = localStorage.getItem('darkMode'); } catch (error) {}   // blocked site data: dark by default
 				if (saved === null || saved === 'true') {
 					document.documentElement.classList.add('dark-mode');
 				}
@@ -105,13 +106,14 @@
 						<div class="ghw-control"><span class="ghw-control-label">Field size <span class="math">\(q\)</span></span> <span id="ghw-q-choices"></span></div>
 						<div class="ghw-control"><span class="ghw-control-label">Dimension <span class="math">\(m\)</span></span> <span id="ghw-m-choices"></span></div>
 					</div>
-					<p id="ghw-notice" hidden></p>
+					<!-- Live regions: screen readers announce a notice or an error when its text appears. -->
+					<div role="status"><p id="ghw-notice" hidden></p></div>
 					<p id="ghw-summary"></p>
 
 					<div id="ghw-explanation" class="ghw-explanation" data-analytics-section="GHW tables / Explanation" hidden></div>
 
 					<div id="ghw-codes" data-analytics-section="GHW tables / Codes">
-						<p id="ghw-loading">Loading the tables…</p>
+						<p id="ghw-loading" role="status">Loading the tables…</p>
 					</div>
 				</section>
 
@@ -129,7 +131,7 @@
 						<li><strong>Lower bound.</strong> The recursive bound of [SJ24, Thm. 7], applied with the best bounds known for
 							<span class="math">\(\mathrm{PRM}_q(d,m-1)\)</span> and <span class="math">\(\mathrm{PRM}_q(d-q+1,m-1)\)</span>.</li>
 						<li><strong>Duality.</strong> Wei duality [Wei91; SJ24, Thm. 9] between <span class="math">\(\mathrm{PRM}_q(d,m)\)</span>
-							and its dual, which is <span class="math">\(\mathrm{PRM}_q(m(q-1)-d,m)\)</span>, plus the all-ones vector when <span class="math">\(q-1\)</span> divides <span class="math">\(d\)</span> [Sør91],
+							and its dual, which for <span class="math">\(1 \le d \le m(q-1)-1\)</span> is <span class="math">\(\mathrm{PRM}_q(m(q-1)-d,m)\)</span>, plus the all-ones vector when <span class="math">\(q-1\)</span> divides <span class="math">\(d\)</span> [Sør91],
 							as in [SJ24, Section V-C].</li>
 						<li><strong>Classical bounds.</strong> Two bounds valid for every linear code, used in both directions:
 							the bound <span class="math">\((q^r-q)\,d_r \ge (q^r-1)\,d_{r-1}\)</span> [HKLY95, Thm. 1] ([HKY92, Thm. 1] for <span class="math">\(q = 2\)</span>),
@@ -192,8 +194,10 @@
 		<script> // Dark/light mode, as on the main page
 			const toggle = document.getElementById('dark-mode-toggle');
 			const icon = toggle.querySelector('i');
-			const savedMode = localStorage.getItem('darkMode');
+			let savedMode = null;
+			try { savedMode = localStorage.getItem('darkMode'); } catch (error) {}   // blocked site data: dark by default
 			const isDark = savedMode === null ? true : savedMode === 'true';
+			toggle.setAttribute('aria-pressed', isDark);
 			if (isDark) {
 				document.body.classList.add('dark-mode');
 				document.documentElement.classList.add('dark-mode');
@@ -205,7 +209,8 @@
 				document.body.classList.toggle('dark-mode');
 				document.documentElement.classList.toggle('dark-mode');
 				const nowDark = document.body.classList.contains('dark-mode');
-				localStorage.setItem('darkMode', nowDark);
+				try { localStorage.setItem('darkMode', nowDark); } catch (error) {}   // then the choice lasts for this page only
+				toggle.setAttribute('aria-pressed', nowDark);
 				if (nowDark) {
 					icon.classList.replace('fa-moon', 'fa-sun');
 				} else {

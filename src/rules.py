@@ -64,8 +64,10 @@ def upper_bound(table, q, d, m):
 
 def recursive_bound(table, q, d, m):
     """The lower bound of [SJ24, Thm. 7], using the current lower bounds for the codes PRM_q(d, m-1)
-    and PRM_q(d-q+1, m-1).  Since the codes are treated by increasing m, these bounds are final when
-    this rule reaches PRM_q(d, m), and a new value for a smaller code is automatically used here.
+    and PRM_q(d-q+1, m-1).  The codes are treated by increasing m, so these are the bounds reached so far
+    in this pass, which are not always final: for instance, d_25(PRM_4(4,3)) >= 75 is only found in the
+    second pass, by Wei duality with PRM_4(5,3), which comes later in each pass.  So this rule uses 74 for
+    PRM_4(4,4) in the first pass, and 75 in the second.
 
     The bound is computed for every r, also where the weight is already known: there it cannot
     improve anything, but generate.py then checks that it agrees with the known value.
