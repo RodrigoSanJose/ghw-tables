@@ -109,18 +109,21 @@ def ghws_version():
         return "(unknown version)"
 
 
+USAGE = "usage: sage -python sage/compute.py q d m [r | all]   (see the beginning of this file)"
+if len(sys.argv) not in (4, 5) or not all(argument.isdigit() for argument in sys.argv[1:4]):
+    sys.exit(USAGE)
 q, d, m = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])
 which = sys.argv[4] if len(sys.argv) > 4 else "open"
 n, table = read_table(q, d, m)
 k = table["k"]
+if which not in ("open", "all") and not (which.isdigit() and 1 <= int(which) <= k):
+    sys.exit(f"r must be a whole number between 1 and k = {k}, or all.\n{USAGE}")
 C = prm_code(q, d, m)
 if C.length() != n or C.dimension() != k:
     sys.exit(f"The code has length {C.length()} and dimension {C.dimension()}, but the tables say "
              f"n = {n} and k = {k}. Please report this.")
 software = f"GHWs {ghws_version()}, SageMath {sage_version}"
 print(f"PRM_{q}({d},{m}): length {C.length()}, dimension {k}.", flush=True)
-
-
 
 # Each result is printed as soon as it is computed, so a long run can be stopped without losing them.
 new_lines = []

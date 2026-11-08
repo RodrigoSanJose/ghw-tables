@@ -52,15 +52,25 @@ function address(q, m, d, r) {             // the link to a table, a code, or an
 	return hash;
 }
 
+function analyticsLabel(action, q, m, d, r) {   // for instance "GHW. Open explanation. q=3, m=3, d=4, r=7"
+	const context = Object.entries({q, m, d, r}).filter(([, value]) => value !== undefined);
+	return "GHW. " + action + ". " + context.map(([key, value]) => key + "=" + value).join(", ");
+}
+
 function analyticsAttributes(action, q, m, d, r) {
 	// The shared delegated tracker also covers links added by later renders. Keep mathematical
 	// context in metadata, rather than trying to recover it from MathJax's generated elements.
-	const name = "GHW. " + action;
+	// The visible content (a value, a formula, an address) remains the accessible name.
 	const context = Object.entries({q, m, d, r}).filter(([, value]) => value !== undefined);
-	const label = name + ". " + context.map(([key, value]) => key + "=" + value).join(", ");
-	return ' data-analytics-name="' + escapeHTML(name) + '" data-analytics-label="' + escapeHTML(label)
-		+ '" aria-label="' + escapeHTML(label) + '"'
+	return ' data-analytics-name="' + escapeHTML("GHW. " + action) + '" data-analytics-label="'
+		+ escapeHTML(analyticsLabel(action, q, m, d, r)) + '"'
 		+ context.map(([key, value]) => ' data-analytics-' + key + '="' + value + '"').join("");
+}
+
+function labelledAnalyticsAttributes(action, q, m, d, r) {
+	// For the controls whose visible text needs context (a number, "Show", "×"): the same metadata,
+	// and the label is also their accessible name.
+	return analyticsAttributes(action, q, m, d, r) + ' aria-label="' + escapeHTML(analyticsLabel(action, q, m, d, r)) + '"';
 }
 
 function referenceTitle(ref) {
@@ -159,7 +169,7 @@ function explain(reason, q, d, m, r, value, k) {
 	case "SJ26 Thm. 1.1": {
 		const mu = reason.mu;              // mu[0] is mu_1, ..., mu[d-1] is mu_d
 		const tuple = d === 1 ? "\\mu_1 = " + mu[0]
-			: "(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu.join(",") + ")";
+			: (d === 2 ? "(\\mu_1,\\mu_2)" : "(\\mu_1,\\dots,\\mu_" + d + ")") + " = (" + mu.join(",") + ")";
 		const terms = [p(q, mu[d - 1])];   // p_{mu_d}, then floor(q^mu_i) for i < d
 		for (let i = 0; i < d - 1; i++) terms.push(mu[i] >= 0 ? q ** mu[i] : 0);
 		return "Since " + math("d < q") + ", the weight is given by [SJ26, Thm. 1.1], conjectured by Beelen, Datta"
@@ -225,6 +235,9 @@ function explain(reason, q, d, m, r, value, k) {
 
 	case "SJ24 Thm. 7": {
 		const a = reason.alpha, g = reason.gamma;
+		const inputs = a === 0 && g === 0 ? math("d_0 = 0") + " for both smaller codes"
+			: inputWeight(q, d, m - 1, a, reason.PRM_d) + " and "
+				+ inputWeight(q, d - q + 1, m - 1, g, reason.PRM_d_minus_q_plus_1);
 		return "By the recursive bound [SJ24, Thm. 7], " + math("d_r \\ge \\min_{(\\alpha,\\gamma) \\in Y} B_{\\alpha,\\gamma}")
 			+ ", where " + math("B_{\\alpha,\\gamma} = \\max\\{d_{r-\\gamma}(\\mathrm{RM}_q(d,m)),\\, d_{r-\\alpha}(\\mathrm{RM}_q(d-1,m))\\}"
 				+ " + \\max\\{d_\\alpha(\\mathrm{PRM}_q(d,m-1)),\\, d_\\gamma(\\mathrm{PRM}_q(d-q+1,m-1))\\}")
@@ -234,9 +247,7 @@ function explain(reason, q, d, m, r, value, k) {
 				+ reason.PRM_d + "," + reason.PRM_d_minus_q_plus_1 + "\\} = " + value)
 			+ ". Here " + math("d_{" + (r - g) + "}(" + RM(q, d, m) + ") = " + reason.RM_d)
 			+ " and " + math("d_{" + (r - a) + "}(" + RM(q, d - 1, m) + ") = " + reason.RM_d_minus_1)
-			+ " (Heijnen and Pellikaan [HP98], see [SJ24, Thm. 6]), and we use "
-			+ inputWeight(q, d, m - 1, a, reason.PRM_d) + " and "
-			+ inputWeight(q, d - q + 1, m - 1, g, reason.PRM_d_minus_q_plus_1) + ".";
+			+ " (Heijnen and Pellikaan [HP98], see [SJ24, Thm. 6]), and we use " + inputs + ".";
 	}
 
 	case "Wei duality": {
@@ -340,14 +351,14 @@ function sameReason(a, b) {
 function showExplanation(q, d, m, r) {
 	const box = document.getElementById("ghw-explanation");
 	const code = codeOf(q, d, m);
-	if (!code || r < 1 || r > code.k) {
+	if (!code || !Number.isInteger(r) || r < 1 || r > code.k) {
 		box.hidden = true;
 		return;
 	}
 	const lower = code.lower[r], upper = code.upper[r];
 	const name = "d_{" + r + "}(" + PRM(q, d, m) + ")";
 	let html = '<a class="ghw-close" href="' + address(q, m) + '" title="Close"'
-		+ analyticsAttributes("Close explanation", q, m, d, r) + '>&times;</a>';
+		+ labelledAnalyticsAttributes("Close explanation", q, m, d, r) + '>&times;</a>';
 	if (lower === upper) {
 		html += "<h3>" + math(name + " = " + lower) + "</h3>";
 	} else {
@@ -416,7 +427,7 @@ function codeBlockHTML(q, m, code) {
 	title += complete ? "all known." : exact + " known, " + (code.k - exact) + " only bounded.";
 	const open = isExpanded(code);
 	title += ' <a class="ghw-toggle" href="#" role="button" data-degree="' + code.d + '"'
-		+ analyticsAttributes(open ? "Hide weights" : "Show weights", q, m, code.d) + '>'
+		+ labelledAnalyticsAttributes(open ? "Hide weights" : "Show weights", q, m, code.d) + '>'
 		+ (open ? "Hide" : "Show") + "</a>";
 	return '<div class="ghw-code ' + (complete ? "ghw-complete" : "ghw-partial") + '" id="code-' + code.d + '">'
 		+ '<div class="ghw-code-label"><span class="ghw-degree">' + math("d = " + code.d) + "</span>"
@@ -432,12 +443,12 @@ function drawChoices() {
 		const m = shown && ms.includes(shown.m) ? shown.m : Math.min(...ms);
 		const current = shown && shown.q === q ? " ghw-current" : "";
 		return '<a class="ghw-choice' + current + '" href="' + address(q, m) + '"'
-			+ analyticsAttributes("Select field size", q, m) + '>' + q + "</a>";
+			+ labelledAnalyticsAttributes("Select field size", q, m) + '>' + q + "</a>";
 	}).join("");
 	document.getElementById("ghw-m-choices").innerHTML = index.tables.filter(t => t.q === shown.q).map(t => {
 		const current = t.m === shown.m ? " ghw-current" : "";
 		return '<a class="ghw-choice' + current + '" href="' + address(t.q, t.m) + '"'
-			+ analyticsAttributes("Select dimension", t.q, t.m) + '>' + t.m + "</a>";
+			+ labelledAnalyticsAttributes("Select dimension", t.q, t.m) + '>' + t.m + "</a>";
 	}).join("");
 }
 
@@ -449,11 +460,12 @@ function drawTable() {
 		+ " with " + math("1 \\le d \\le " + Math.max(...info.degrees)) + ": " + info.weights + " weights, "
 		+ info.exact + " known exactly"
 		+ (info.exact < info.weights ? ", " + (info.weights - info.exact) + " only bounded." : ".")
-		+ (q === 2 ? " Note: for " + math("q=2") + " PRM codes are shortened RM codes at the origin." : "")
+		+ (q === 2 ? " Note: for " + math("q = 2") + ", " + math(PRM(2, "d", m)) + " is " + math(RM(2, "d", m + 1))
+			+ " shortened at the origin." : "")
 		+ ' <span class="ghw-all-toggles" data-analytics-section="GHW tables / Controls">'
-		+ '<button type="button" class="ghw-all-toggle" data-show="true"' + analyticsAttributes("Show all weights", q, m)
+		+ '<button type="button" class="ghw-all-toggle" data-show="true"' + labelledAnalyticsAttributes("Show all weights", q, m)
 		+ ">Show all</button> · "
-		+ '<button type="button" class="ghw-all-toggle" data-show="false"' + analyticsAttributes("Hide all weights", q, m)
+		+ '<button type="button" class="ghw-all-toggle" data-show="false"' + labelledAnalyticsAttributes("Hide all weights", q, m)
 		+ ">Hide all</button></span>";
 	const container = document.getElementById("ghw-codes");
 	container.innerHTML = data.codes.map(code => codeBlockHTML(q, m, code)).join("");
@@ -517,7 +529,7 @@ function select(d, r) {
 	document.querySelectorAll(".ghw-selected").forEach(cell => cell.classList.remove("ghw-selected"));
 	const box = document.getElementById("ghw-explanation");
 	const code = d === null ? null : codeOf(shown.q, d, shown.m);
-	if (!code || r < 1 || r > code.k) {    // nothing selected, or an entry that does not exist
+	if (!code || !Number.isInteger(r) || r < 1 || r > code.k) {    // nothing selected, or no such entry (such as r=x)
 		box.hidden = true;
 		return;
 	}

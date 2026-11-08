@@ -12,8 +12,8 @@ is obtained by evaluating the homogeneous polynomials of degree $d$ in $\mathbb{
 at fixed representatives of the points of $\mathbb{P}^m(\mathbb{F}_q)$. Its length is
 $p_m = 1 + q + \dots + q^m$ and we denote its dimension by $k_d(m)$.
 
-The $r$-th generalized Hamming weight $d_r(C)$ of a linear code $C$ is the smallest support of an
-$r$-dimensional subcode of $C$, and $d_1(C) < d_2(C) < \dots < d_k(C)$ is its weight hierarchy.
+The $r$-th generalized Hamming weight $d_r(C)$ of a linear code $C$ is the smallest size of the support
+of an $r$-dimensional subcode of $C$, and $d_1(C) < d_2(C) < \dots < d_k(C)$ is its weight hierarchy.
 For each code in the range below, the tables give, for every $1 \le r \le k_d(m)$, an interval
 
 ```math
@@ -181,12 +181,13 @@ answer is no, the script computes $d_r$ with `GHW`, and reports a counterexample
 ## Using the code
 
 Only Python 3.9 or later is needed; there are no other dependencies (SageMath is only needed to
-compute new values, see above). From the repository folder:
+compute new values, see above, and Playwright only for the browser tests of the website, see
+[`tests/test_tracking.py`](tests/test_tracking.py)). From the repository folder:
 
 ```
 python3 src/generate.py                        # compute the tables (about 23 minutes, depending on the machine)
 python3 -m unittest discover -s tests -v       # run the tests, including the full-range consistency check
-FULL_CHECK=1 python3 -m unittest discover -s tests -v
+FULL_CHECK=1 python3 -m unittest discover -s tests -v    # also check the range of the last remark of [SJ26]
 ```
 
 The tests reproduce the examples and the computational checks of [SJ26]:
@@ -197,9 +198,9 @@ The tests reproduce the examples and the computational checks of [SJ26]:
 They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm. 7] at every entry of
 [SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$b$. They reproduce
 [SJ24, Example 6] too: duality and monotonicity turn the row $d = 3$ of [SJ24, Table III] into the exact
-values of [SJ24, Table VI]. They also check by brute force, on random binary codes, the inequalities
-used for duality when $q-1$ divides $d$. With
-`FULL_CHECK=1`, the checks of [SJ26] run for every prime power $q \le 9$ and every $m \le 5$.
+values of [SJ24, Table VI]. They also check by brute force, on random codes over $\mathbb{F}_2$ and
+$\mathbb{F}_3$, the inequalities used for duality when $q-1$ divides $d$. With
+`FULL_CHECK=1`, the checks of [SJ26] also run for every prime power $q \le 9$ and every $m \le 5$.
 The consistency check against all the rules also runs over the full configured range of tables.
 
 The functions can also be used from Sage. Start Sage in the repository folder and run:
@@ -233,7 +234,7 @@ A weight hierarchy is always stored as $(0, d_1, \dots, d_k)$, so that position 
 
 ## Citation
 
-If you use these tables, please consider citing them and the papers [SJ24,SJ26] where the main bounds are proved.
+If you use these tables, please consider citing them and the papers [SJ24, SJ26] where the main bounds are proved.
 
 The tables are archived on Zenodo with the DOI
 [10.5281/zenodo.24020768](https://doi.org/10.5281/zenodo.24020768), which always points to the latest version.
@@ -255,7 +256,7 @@ The tables are archived on Zenodo with the DOI
 
 ## License
 
-* The code (the folders `src/` and `tests/`, and the files `docs/ghw.js`, `docs/ghw.css` and `docs/index.html`)
+* The code (the folders `src/`, `sage/` and `tests/`, and the files `docs/ghw.js`, `docs/ghw.css` and `docs/index.html`)
   is released under the [MIT license](LICENSE).
 * The tables (`docs/data/`), the data (`data/`) and the documentation (this README and the texts of the website)
   are released under the [Creative Commons Attribution 4.0 International license](LICENSE-CC-BY-4.0.txt) (CC BY 4.0).

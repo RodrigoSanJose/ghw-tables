@@ -516,6 +516,26 @@ class TrackingTests(unittest.TestCase):
                           PAGE + "#q=3&m=3&d=1&r=1", "GHW tables / Codes", q=3, m=3, d=1, r=1)
         self.assertEqual(self.errors, [])
 
+    def test_missing_entries_close_the_explanation_and_values_stay_accessible_names(self):
+        """An address with an entry that does not exist (r=x, r=1.5, r=99) closes the explanation without
+        errors.  The analytics label does not replace the accessible name of a cell (its value) or of a
+        permalink; only the controls whose text needs context (×, Show/Hide, the choices) use it."""
+        for address in ("#q=3&m=3&d=4&r=x", "#q=3&m=3&d=4&r=1.5", "#q=3&m=3&d=4&r=99"):
+            with self.subTest(address=address):
+                self.page.evaluate("location.hash = '#q=3&m=3&d=4&r=7'")
+                self.page.wait_for_selector("#ghw-explanation:not([hidden])")
+                self.page.evaluate("address => { location.hash = address; }", address)
+                self.page.wait_for_selector("#ghw-explanation[hidden]", state="attached")
+        self.assertEqual(self.errors, [])
+        self.page.evaluate("location.hash = '#q=3&m=3&d=4&r=7'")
+        self.page.wait_for_selector("#ghw-explanation:not([hidden])")
+        self.assertEqual(self.page.locator("#entry-4-7").aria_snapshot().splitlines()[0], '- link "16":')
+        self.assertEqual(self.page.locator(".ghw-cell[aria-label], .ghw-permalink a[aria-label]").count(), 0)
+        self.assertEqual(self.page.locator(".ghw-close").get_attribute("aria-label"),
+                         self.table_action("GHW. Close explanation", d=4, r=7))
+        self.assertEqual(self.page.locator("#code-4 .ghw-toggle").get_attribute("aria-label"),
+                         self.table_action("GHW. Hide weights", d=4))
+
     def test_shared_visible_timer_pauses_resumes_keeps_hash_visit_and_handles_back_forward(self):
         self.page.clock.install(time=INITIAL_TIME)
         self.page.clock.pause_at(INITIAL_TIME)

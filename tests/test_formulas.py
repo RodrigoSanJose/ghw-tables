@@ -5,8 +5,8 @@ Tests for src/formulas.py.  Run them from the repository folder with
 
 They reproduce the examples and the computational checks of [SJ26] (see the docstring of
 src/formulas.py for the references).  The checks over many codes use the parameter range of the
-tables (src/parameters.py).  To use instead the range checked in the last
-remark of [SJ26] (all prime powers q <= 9 and m <= 5), run
+tables (src/parameters.py).  To also check the range of the last remark of [SJ26] (all prime
+powers q <= 9 and m <= 5), run
 
     FULL_CHECK=1 python3 -m unittest discover -s tests -v
 
@@ -33,7 +33,11 @@ from formulas import (A, B, affine_hierarchy, attaining_set, bdg_hierarchy, bino
 from parameters import MAX_M, codes  # noqa: E402
 
 PAPER_RANGE = {q: 5 for q in (2, 3, 4, 5, 7, 8, 9)}
-CHECKED_CODES = list(codes(PAPER_RANGE) if os.environ.get("FULL_CHECK") else codes())
+# The codes of the tables, followed with FULL_CHECK=1 by the other codes of PAPER_RANGE (which does
+# not contain all the tables: for instance q = 11, or q = 2 and m = 8).
+CHECKED_CODES = codes()
+if os.environ.get("FULL_CHECK"):
+    CHECKED_CODES += sorted(set(codes(PAPER_RANGE)) - set(CHECKED_CODES))
 
 
 class TestBasicFunctions(unittest.TestCase):
