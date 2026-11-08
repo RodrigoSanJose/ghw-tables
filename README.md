@@ -118,7 +118,7 @@ subcode of polynomials vanishing on the corresponding set. Equality holds for $d
     those of $d_r$;
   * the bound (from the proof of [HKLY95, Thm. 4])
 
-    $`\displaystyle n - d_r \ge \sum_{i=0}^{k-r-1} \left\lceil \frac{d_{r+1} - d_r}{q^i} \right\rceil, \qquad 0 \le r \le k-1.`$
+    $`n - d_r \ge \sum_{i=0}^{k-r-1} \left\lceil \frac{d_{r+1} - d_r}{q^i} \right\rceil, \qquad 0 \le r \le k-1.`$
 
   These two contain the other bounds of [Wei91], [HKY92] and [HKLY95] that can be evaluated from
   bounds for the weights, so these are not applied separately:
