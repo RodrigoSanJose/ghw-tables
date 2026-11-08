@@ -8,35 +8,13 @@ Each function implements one formula, with the notation of the papers:
   [SJ24]  R. San-Jose, A recursive construction for projective Reed-Muller codes,
           IEEE Trans. Inform. Theory 70(12) (2024), 8511-8523.
 
-How to read this file:
 
-  * A weight hierarchy is stored as a tuple H = (0, d_1, d_2, ..., d_k), so that H[r] is d_r.
-    Position 0 holds d_0 = 0, the convention of [SJ24].  Hence len(H) = k + 1.
-  * All numbers are Python integers, which are exact and have no size limit.
-  * We never use "/" (in Python it produces decimal numbers) nor "^" (in Python it is not a
-    power).  We write q**j for q^j, and a // b and a % b for the quotient and the remainder of
-    the division of a by b.  The tests check that "/" and "^" do not appear.
-  * The field size q always comes first: for instance B(q, d, m, r) is B_r(q, d, m) of [SJ26].
+A weight hierarchy is stored as a tuple H = (0, d_1, d_2, ..., d_k), so that H[r] is d_r. 
+Position 0 holds d_0 = 0, the convention of [SJ24].  Hence len(H) = k + 1.
 
-Python notation used below:
-
-  * range(a, b) is the list of integers a, a+1, ..., b-1 (b is NOT included), and range(b) is
-    range(0, b), that is 0, 1, ..., b-1.  Both are empty if b <= a (resp. b <= 0).
-    range(a, b, -1) counts down: a, a-1, ..., b+1.
-  * sum(f(i) for i in range(a, b)) is the sum of f(i) for a <= i < b (an empty sum is 0), and
-    tuple(f(i) for i in range(a, b)) is the tuple (f(a), f(a+1), ..., f(b-1)).  Adding
-    "if condition" at the end keeps only the i satisfying the condition.
-  * (0,) is the tuple with the single entry 0 (the comma is needed), and + joins two tuples:
-    (0,) + (5, 7) = (0, 5, 7).  H[1:] is H without its first entry H[0].
-  * A function can return several values ("return a, s, b"), and "a, s, b = leading_term(q, n)"
-    gives a name to each of them.
-  * {f(w) for w in S} is a set, and {r: f(r) for r in S} is a dictionary, in which weights[r] is f(r).
-  * @cache, written above a function, makes Python remember its results, so that each value is
-    computed only once.  It does not change the results.
-  * None means "no value", and "x is None" tests it.
 
 To use these functions in Sage, start Sage in the repository folder and type
-load("src/formulas.py").  Sage reads .py files without modifying them.
+load("src/formulas.py"). 
 """
 
 from functools import cache
@@ -119,7 +97,6 @@ def dim_RM(q, d, m):
     """dim RM_q(d, m) = the number of tuples u in {0, ..., q-1}^m with u_1 + ... + u_m <= d.
 
     We count according to the last coordinate c = u_m, which leaves u_1 + ... + u_(m-1) <= d - c.
-    (@cache makes Python remember the results, because this function is called very often.)
     """
     if d < 0:
         return 0
