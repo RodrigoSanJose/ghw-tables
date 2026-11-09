@@ -59,7 +59,7 @@ published version of [SJ24].
 | $r = 1$ | minimum distance | [Sør91] |
 | $d = 1 + t(q-1)$, or $d = 2 + t(q-1)$ with $q \ge 3$ | the first $m - t + 1$ weights | [SJ26, Prop. 6.12] |
 
-For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the degree-$d$ Macaulay tuple of $\binom{m+d}{d} - r$,
+For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the degree-$`d`$ Macaulay tuple of $\binom{m+d}{d} - r$,
 
 ```math
 d_r(\mathrm{PRM}_q(d,m)) = p_m - p_{\mu_d} - \sum_{i=1}^{d-1} \lfloor q^{\mu_i} \rfloor .
@@ -195,7 +195,7 @@ The tests reproduce the examples and the computational checks of [SJ26]:
 * the examples of Section 6, and the remark verifying Conj. 6.9 for $q = 3$, $m = 3$.
 
 They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm. 7] at every entry of
-[SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$b$. They reproduce
+[SJ24, Tables II–V]: the exact value, or the lower end $a$ of the entries $a$–$`b`$. They reproduce
 [SJ24, Example 6] too: duality and monotonicity turn the row $d = 3$ of [SJ24, Table III] into the exact
 values of [SJ24, Table VI]. They also check by brute force, on random binary codes, the inequalities
 used for duality when $q-1$ divides $d$. With
