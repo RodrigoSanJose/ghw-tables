@@ -290,13 +290,21 @@ class TrackingTests(unittest.TestCase):
                 self.assertEqual(self.page.evaluate("navigator.clipboard.readText()"), displayed)
                 self.assert_event("GHW tables. Copy BibTeX", "GHW tables. Copy BibTeX", PAGE, section)
         self.assertEqual(self.page.locator('a[download], a[href$=".bib"]').count(), 0)
-        self.reset_events()
         self.stop_navigation()
-        self.page.locator('#ghw-citation a[href="https://doi.org/10.5281/zenodo.24020768"]').dispatch_event(
-            "click", {"button": 0})
-        self.assert_event("GHW tables. Zenodo archive",
-                          "Tables of generalized Hamming weights of projective Reed-Muller codes. Zenodo archive",
-                          "https://doi.org/10.5281/zenodo.24020768", section)
+        title = "Tables of generalized Hamming weights of projective Reed-Muller codes"
+        for href, link_type in (("https://doi.org/10.5281/zenodo.24020768", "Zenodo archive"),
+                                ("https://github.com/RodrigoSanJose/ghw-tables", "Code")):
+            link = self.page.locator(f'#ghw-citation a[href="{href}"]')
+            self.assertEqual(link.count(), 1)
+            for method in ("click", "Enter"):
+                with self.subTest(link=link_type, method=method):
+                    self.reset_events()
+                    if method == "click":
+                        link.dispatch_event("click", {"button": 0})
+                    else:
+                        link.focus()
+                        link.press(method)
+                    self.assert_event(f"GHW tables. {link_type}", f"{title}. {link_type}", href, section)
         self.assertEqual(self.errors, [])
 
     def test_site_navigation_links_have_one_event_and_the_current_page_is_not_a_link(self):

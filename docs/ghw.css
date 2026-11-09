@@ -20,6 +20,10 @@
 #ghw-codes:has(#ghw-loading) { min-height: 100vh; }
 #about .ghw-cite-text { margin: 0 0 1em 0; }
 #about > header.major > h2 { margin-bottom: 0.15em; line-height: 1.2; }
+/* The same space under "How to cite" and "References" as under "Where the bounds come from"
+   (the references have taller lines, so their heading needs less margin). */
+#about > #cite { margin-bottom: 0.45em; }
+#about > #references { margin-bottom: 0.25em; }
 
 /* ---------- The BibTeX entry, with a copy button in its top right corner (as on GitHub) ---------- */
 .ghw-bibtex-box { position: relative; margin-bottom: 1.5em; }
