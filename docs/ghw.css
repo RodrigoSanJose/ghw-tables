@@ -19,7 +19,10 @@
 /* While the tables load, keep the text below them out of sight, so that it does not jump. */
 #ghw-codes:has(#ghw-loading) { min-height: 100vh; }
 #about .ghw-cite-text { margin: 0 0 1em 0; }
-#about > header.major > h2 { margin-bottom: 0.15em; line-height: 1.2; }
+/* As every section title of the site, "Where the bounds come from" has the same space above and below it
+   (see header.major h2 in /assets/css/main.css). The list below it has taller lines than a paragraph,
+   so the title needs no margin. */
+#about > header.major > h2 { margin-bottom: 0; }
 /* The same space under "How to cite" and "References" as under "Where the bounds come from"
    (the references have taller lines, so their heading needs less margin). */
 #about > #cite { margin-bottom: 0.45em; }
