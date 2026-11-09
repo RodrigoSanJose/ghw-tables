@@ -25,11 +25,11 @@ def exact_values(table, q, d, m):
     code = (q, d, m)
     changes = 0
 
-    H, name = known_hierarchy(q, d, m)  # name: "SJ26 Thm. 1.1", "SJ26 Cor. 4.2", "whole space" or "dual is all-ones"
+    H, name = known_hierarchy(q, d, m)  # name: "SJ26 Thm. 1.2", "SJ26 Cor. 4.2", "whole space" or "dual is all-ones"
     if H is not None:
         for r in range(1, len(H)):
             reason = {"rule": name}
-            if name == "SJ26 Thm. 1.1":
+            if name == "SJ26 Thm. 1.2":
                 reason["mu"] = macaulay(binom(m + d, d) - r, d)
             if name == "SJ26 Cor. 4.2":
                 reason["dual_degree"] = m * (q - 1) - d

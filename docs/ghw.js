@@ -156,7 +156,7 @@ function explain(reason, q, d, m, r, value, k) {
 	const n = p(q, m);
 	switch (reason.rule) {
 
-	case "SJ26 Thm. 1.1": {
+	case "SJ26 Thm. 1.2": {
 		const mu = reason.mu;              // mu[0] is mu_1, ..., mu[d-1] is mu_d
 		const tuple = d === 1 ? "\\mu_1 = " + mu[0]
 			: "(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu.join(",") + ")";

@@ -283,14 +283,14 @@ def large_degree_hierarchy(q, d, m):
 
 def known_hierarchy(q, d, m):
     """For d >= 1: the complete hierarchy (0, d_1, ..., d_k) of PRM_q(d, m) when one of the results
-    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result: "SJ26 Thm. 1.1",
+    above gives it (d < q, or d > (m-1)(q-1)), together with the name of the result: "SJ26 Thm. 1.2",
     "SJ26 Cor. 4.2", "whole space" or "dual is all-ones".  Otherwise, and also for d <= 0, it
     returns (None, None).
     """
     if d <= 0:
         return None, None
     if d < q:
-        return bdg_hierarchy(q, d, m), "SJ26 Thm. 1.1"
+        return bdg_hierarchy(q, d, m), "SJ26 Thm. 1.2"
     if (m - 1) * (q - 1) < d < m * (q - 1):
         return high_degree_hierarchy(q, d, m), "SJ26 Cor. 4.2"
     if d > m * (q - 1):
