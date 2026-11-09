@@ -4,7 +4,7 @@ Formulas and bounds for the generalized Hamming weights of projective Reed-Mulle
 Each function implements one formula, with the notation of the papers:
 
   [SJ26]  R. San-Jose, Common zeros of homogeneous polynomials and the weight hierarchy of
-          projective Reed-Muller codes, arXiv:2611.08203 (2026).  Its numbering is that of v1.
+          projective Reed-Muller codes, arXiv:2611.08203 (2026).  Its numbering is that of v2.
   [SJ24]  R. San-Jose, A recursive construction for projective Reed-Muller codes,
           IEEE Trans. Inform. Theory 70(12) (2024), 8511-8523.
 
@@ -70,7 +70,7 @@ def leading_term(q, n):
 
 
 def macaulay(h, d):
-    """The Macaulay tuple (mu_1, ..., mu_d) of an integer h >= 0 in degree d  ([SJ26], (1.2)).
+    """The degree-d Macaulay tuple (mu_1, ..., mu_d) of an integer h >= 0  ([SJ26], Def. 1.1).
 
     It is the unique tuple with -1 <= mu_1 <= ... <= mu_d such that
         h = binom(mu_1 + 1, 1) + binom(mu_2 + 2, 2) + ... + binom(mu_d + d, d).
@@ -216,10 +216,10 @@ def B(q, d, m, r):
 # ---------------------------------------------------------------------------------------------
 
 def bdg_weight(q, d, m, r):
-    """d_r(PRM_q(d, m)) for 1 <= d < q and 1 <= r <= binom(m + d, d)  ([SJ26], Thm. 1.1).
+    """d_r(PRM_q(d, m)) for 1 <= d < q and 1 <= r <= binom(m + d, d)  ([SJ26], Thm. 1.2).
     (bdg stands for Beelen, Datta and Ghorpade, who conjectured this formula [BDG22].)
 
-    With (mu_1, ..., mu_d) the Macaulay tuple of binom(m + d, d) - r,
+    With (mu_1, ..., mu_d) the degree-d Macaulay tuple of binom(m + d, d) - r,
         e_r(d, m) = p_{mu_d} + floor(q^mu_1) + ... + floor(q^mu_{d-1})     ([SJ26], (1.3)),
         d_r = p_m - e_r(d, m)                                                ([SJ26], (1.4)).
     """
@@ -229,7 +229,7 @@ def bdg_weight(q, d, m, r):
 
 
 def bdg_hierarchy(q, d, m):
-    """(0, d_1, ..., d_k) for PRM_q(d, m) with 1 <= d < q  ([SJ26], Thm. 1.1)."""
+    """(0, d_1, ..., d_k) for PRM_q(d, m) with 1 <= d < q  ([SJ26], Thm. 1.2)."""
     return (0,) + tuple(bdg_weight(q, d, m, r) for r in range(1, binom(m + d, d) + 1))
 
 
@@ -260,7 +260,7 @@ def high_degree_hierarchy(q, d, m):
     """(0, d_1, ..., d_k) for PRM_q(d, m) with (m-1)(q-1) < d < m(q-1)  ([SJ26], Cor. 4.2).
 
     The dual is PRM_q(e, m) with e = m(q-1) - d < q-1 (Sorensen; [SJ24, Thm. 2]), whose
-    weights are given by Thm. 1.1, and we apply Wei duality.  In this range d lies strictly between
+    weights are given by Thm. 1.2, and we apply Wei duality.  In this range d lies strictly between
     the multiples (m-1)(q-1) and m(q-1) of q-1, so d is not a multiple of q-1, and by [SJ24, Thm. 2]
     the dual is exactly PRM_q(e, m), with no all-ones vector added.
     """

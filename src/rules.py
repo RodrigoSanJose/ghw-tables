@@ -19,7 +19,7 @@ from formulas import (affine_hierarchy, attaining_set, binom, bounds_after_addin
 
 
 def exact_values(table, q, d, m):
-    """Exact values: the complete hierarchy when it is known ([SJ26, Thm. 1.1] for d < q, [SJ26, Cor. 4.2]
+    """Exact values: the complete hierarchy when it is known ([SJ26, Thm. 1.2] for d < q, [SJ26, Cor. 4.2]
     for (m-1)(q-1) < d < m(q-1), and the degrees d >= m(q-1)); the minimum distance (Sorensen);
     and the first weights given by [SJ26, Prop. 6.12]."""
     code = (q, d, m)

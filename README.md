@@ -45,21 +45,21 @@ $\mathrm{RM}_2(d,m+1)$ shortened at the origin.
 
 ## Where the bounds come from
 
-Theorem numbers refer to [SJ26] ([arXiv:2611.08203v1](https://arxiv.org/abs/2611.08203v1)) and to the
+Theorem numbers refer to [SJ26] ([arXiv:2611.08203v2](https://arxiv.org/abs/2611.08203v2)) and to the
 published version of [SJ24].
 
 ### Exact values
 
 | Range | Value | Source |
 |---|---|---|
-| $d < q$ | complete hierarchy | [SJ26, Thm. 1.1], conjectured by Beelen, Datta and Ghorpade [BDG22] |
+| $d < q$ | complete hierarchy | [SJ26, Thm. 1.2], conjectured by Beelen, Datta and Ghorpade [BDG22] |
 | $(m-1)(q-1) < d < m(q-1)$ | complete hierarchy | [SJ26, Cor. 4.2]: Wei duality [Wei91] and Sørensen's description of the dual [Sør91] |
 | $d = m(q-1)$ | $d_r = r + 1$ | the dual code is spanned by the all-ones vector [Sør91] |
 | $d > m(q-1)$ | $d_r = r$ | the code is the whole space |
 | $r = 1$ | minimum distance | [Sør91] |
 | $d = 1 + t(q-1)$, or $d = 2 + t(q-1)$ with $q \ge 3$ | the first $m - t + 1$ weights | [SJ26, Prop. 6.12] |
 
-For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the Macaulay tuple of $\binom{m+d}{d} - r$ in degree $d$,
+For $d < q$, writing $(\mu_1, \dots, \mu_d)$ for the degree-$d$ Macaulay tuple of $\binom{m+d}{d} - r$,
 
 ```math
 d_r(\mathrm{PRM}_q(d,m)) = p_m - p_{\mu_d} - \sum_{i=1}^{d-1} \lfloor q^{\mu_i} \rfloor .
@@ -191,7 +191,7 @@ FULL_CHECK=1 python3 -m unittest discover -s tests -v
 
 The tests reproduce the examples and the computational checks of [SJ26]:
 
-* the formula of Thm. 1.1 for $d < q$, Sørensen's minimum distance, Cor. 4.2, Prop. 6.12, Lemma 6.10 and Cor. 5.2;
+* the formula of Thm. 1.2 for $d < q$, Sørensen's minimum distance, Cor. 4.2, Prop. 6.12, Lemma 6.10 and Cor. 5.2;
 * the examples of Section 6, and the remark verifying Conj. 6.9 for $q = 3$, $m = 3$.
 
 They also reproduce Examples 2–5 of [SJ24], and the value of [SJ24, Thm. 7] at every entry of

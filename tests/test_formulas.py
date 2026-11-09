@@ -54,7 +54,7 @@ class TestBasicFunctions(unittest.TestCase):
             self.assertEqual(p(q, j) * (q - 1), q**(j + 1) - 1)
 
     def test_macaulay(self):
-        """The Macaulay tuple satisfies the defining properties of [SJ26], eq. (1.2)."""
+        """The degree-d Macaulay tuple satisfies the defining properties of [SJ26], Def. 1.1."""
         for d in range(1, 7):
             self.assertEqual(macaulay(0, d), (-1,) * d)
             for value in range(400):
@@ -158,7 +158,7 @@ class TestUpperBound(unittest.TestCase):
             self.assertEqual(H[-1], p(q, m), (q, d, m))
 
     def test_theorem_1_1(self):
-        """Thm. 6.7: B_r(q, d, m) is the formula of Thm. 1.1 when d < q."""
+        """Thm. 6.7: B_r(q, d, m) is the formula of Thm. 1.2 when d < q."""
         for q, d, m in CHECKED_CODES:
             if d < q:
                 self.assertEqual(upper_bound_hierarchy(q, d, m), bdg_hierarchy(q, d, m), (q, d, m))

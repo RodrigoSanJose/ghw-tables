@@ -162,9 +162,9 @@ function explain(reason, q, d, m, r, value, k) {
 			: "(\\mu_1,\\dots,\\mu_" + d + ") = (" + mu.join(",") + ")";
 		const terms = [p(q, mu[d - 1])];   // p_{mu_d}, then floor(q^mu_i) for i < d
 		for (let i = 0; i < d - 1; i++) terms.push(mu[i] >= 0 ? q ** mu[i] : 0);
-		return "Since " + math("d < q") + ", the weight is given by [SJ26, Thm. 1.1], conjectured by Beelen, Datta"
-			+ " and Ghorpade [BDG22]: if " + math("(\\mu_1,\\dots,\\mu_d)") + " is the Macaulay tuple of "
-			+ math("\\binom{m+d}{d} - r = " + (binomial(m + d, d) - r)) + " in degree " + math("d")
+		return "Since " + math("d < q") + ", the weight is given by [SJ26, Thm. 1.2], conjectured by Beelen, Datta"
+			+ " and Ghorpade [BDG22]: if " + math("(\\mu_1,\\dots,\\mu_d)") + " is the degree-" + math("d") + " Macaulay tuple of "
+			+ math("\\binom{m+d}{d} - r = " + (binomial(m + d, d) - r))
 			+ ", then " + math("d_r = p_m - p_{\\mu_d} - \\sum_{i=1}^{d-1} \\lfloor q^{\\mu_i} \\rfloor")
 			+ ". Here " + math(tuple) + ", so " + math("d_r = " + n + " - " + terms.join(" - ") + " = " + value) + ".";
 	}
@@ -173,7 +173,7 @@ function explain(reason, q, d, m, r, value, k) {
 		const e = reason.dual_degree;
 		return "Since " + math("(m-1)(q-1) < d < m(q-1)") + ", the dual code is "
 			+ '<a href="' + address(q, m, e) + '"' + analyticsAttributes("Referenced code", q, m, e) + '>' + math(PRM(q, e, m)) + "</a>"
-			+ " [Sør91], whose weights are given by [SJ26, Thm. 1.1] because " + math(e + " < q")
+			+ " [Sør91], whose weights are given by [SJ26, Thm. 1.2] because " + math(e + " < q")
 			+ ". By Wei duality [Wei91], " + math("d_r") + " is the " + math("r") + "-th integer of "
 			+ math("\\{1,\\dots,p_m\\}") + " that is not of the form " + math("p_m + 1 - d_s(" + PRM(q, e, m) + ")")
 			+ " [SJ26, Cor. 4.2].";
