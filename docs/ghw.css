@@ -103,6 +103,12 @@
 	border-radius: 4px;
 	overflow: hidden;
 }
+/* The last block is as far above the bar below it as the bar is above "Where the bounds come from"
+   (on phones, the section below the tables adds its own padding). */
+#ghw-codes > .ghw-code:last-child { margin-bottom: 1.2em; }
+@media screen and (max-width: 736px) {
+	#ghw-codes > .ghw-code:last-child { margin-bottom: 0.3em; }
+}
 .ghw-code-label {
 	width: 7.5em;
 	flex-shrink: 0;
