@@ -4,7 +4,7 @@ Formulas and bounds for the generalized Hamming weights of projective Reed-Mulle
 Each function implements one formula, with the notation of the papers:
 
   [SJ26]  R. San-Jose, Common zeros of homogeneous polynomials and the weight hierarchy of
-          projective Reed-Muller codes, arXiv:2611.08203 (2026).  Its numbering is that of v2.
+          projective Reed-Muller codes, arXiv:2611.08203 (2026).
   [SJ24]  R. San-Jose, A recursive construction for projective Reed-Muller codes,
           IEEE Trans. Inform. Theory 70(12) (2024), 8511-8523.
 

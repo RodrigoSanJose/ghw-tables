@@ -45,7 +45,7 @@ $\mathrm{RM}_2(d,m+1)$ shortened at the origin.
 
 ## Where the bounds come from
 
-Theorem numbers refer to [SJ26] ([arXiv:2611.08203v2](https://arxiv.org/abs/2611.08203v2)) and to the
+Theorem numbers refer to [SJ26] ([arXiv:2611.08203](https://arxiv.org/abs/2611.08203)) and to the
 published version of [SJ24].
 
 ### Exact values
